@@ -49,7 +49,8 @@ class PreviewPanel {
         $('<div class="panel-title">Settings</div>').appendTo(container);
         $('<div>Name: <span id="fileName" data-inline-edit="file-name"/></div><br/>').appendTo(container);
         $('<div><span id="selectedSpritesCount">0</span> sprite(s) selected!</div>').appendTo(container);
-        $('<div><input id="exportButton" type="button" value="Export" title="Export the selected sprite"></div>').appendTo(container);
+        $('<div><input id="addButton" type="button" value="Add" title="Add to map"></div>').appendTo(container);
+        $('<div><input id="exportButton" type="button" value="Export" title="Export as JSON"></div>').appendTo(container);
         
         return container;
     }
@@ -73,6 +74,9 @@ class PreviewPanel {
             0, 0, previewCanvas.width, previewCanvas.height
         );
     };
+
+    handleAdd(){
+    }
 
     handleExport() {
         if(this.selectedSprites.length > 1) {
