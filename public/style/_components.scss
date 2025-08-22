@@ -211,13 +211,32 @@
 // Preview Panel
 	.preview-panel {
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		width: 50%;
+		grid-template-columns: 0.5fr 0.5fr 0.5fr 0.5fr 0.5fr;
+		grid-template-rows: 1fr 1fr;
+		width: 75%;
 		color: #000;
-		padding-left: 50px;
+		padding-left: 10px;
+		justify-items: center;
 
 		& .panel-title {
 			font-size: large;
+		}
+
+		& .panel-sprite-selected {
+			border: 1px solid black;
+			background: #fff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX///8AAABVwtN+AAAAAnRSTlMzMz0oyR4AAAARSURBVAgdY/jPwIAVYRf9DwB+vw/xbMOy9QAAAABJRU5ErkJggg==');
+		}
+		
+		& .panel-mods {
+			& #animFps {
+				width: 50px;
+			}
+		}
+
+		& .panel-props {
+			& input {
+				width: 50px;
+			}
 		}
 
 		.intro & {
@@ -318,7 +337,7 @@
 			&.open-img::before {
 				background-position: -26px -2px;
 			}
-			&.invert-bg::before {
+			&.remove-bg::before {
 				background-position: -99px -2px;
 			}
 			&.reload-img::before {
