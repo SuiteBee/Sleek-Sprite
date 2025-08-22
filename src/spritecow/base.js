@@ -36,7 +36,7 @@ import PreviewPanel from '../cutter/PreviewPanel';
 					addItem('select-sprite', 'Select Sprite', {active: true}).
 					addItem('select-bg', 'Pick Background')
 			).
-			addItem('invert-bg', 'Toggle Dark Background', {noLabel: true});
+			addItem('remove-bg', 'Strip Background', {noLabel: true});
 
 		toolbarTop.$container.addClass('top');
 
@@ -100,13 +100,8 @@ import PreviewPanel from '../cutter/PreviewPanel';
 		
 		imgInput.fileClickjackFor( toolbarTop.$container.find('div.open-img') );
 		
-		toolbarTop.bind('invert-bg', function(event) {
-			if ( event.isActive ) {
-				spriteCanvasView.setBg('#fff');
-			}
-			else {
-				spriteCanvasView.setBg('#000');
-			}
+		toolbarTop.bind('remove-bg', function(img) {
+			spriteCanvas.clearBg(img);
 		});
 
 		toolbarBottom.bind('percent', function(event) {

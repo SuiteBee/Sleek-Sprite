@@ -47,6 +47,28 @@ export default (function() {
 		
 		this._img = img;
 	};
+
+	SpriteCanvasProto.clearBg = function(img){
+		var canvas = this.canvas,
+		context = this._context;
+
+		const imgDat = context.getImageData(0,0, canvas.width, canvas.height);
+		const pixels = imgDat.data;
+		const targetBg = this._bgData;
+
+		for(let i=0; i < pixels.length; i += 4){
+			const r = pixels[i];
+			const g = pixels[i+1];
+			const b = pixels[i+2];
+
+			if(r == targetBg[0] && g == targetBg[1] && b == targetBg[2]){
+				pixels[i+3] = 0;
+			}
+		}
+
+		context.putImageData(imgDat, 0, 0);
+		this._bgData = [0,0,0,0];
+	}
 	
 	SpriteCanvasProto.setBg = function(pixelArr) {
 		this._bgData = pixelArr;
