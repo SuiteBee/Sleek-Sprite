@@ -2,11 +2,12 @@ import $ from 'jquery';
 import JSZip from 'jszip';
 
 import InlineEdit from '../spritecow/InlineEdit';
-import PreviewAnimation from './PreviewAnimation';
+import PreviewAnimation from '../mapper/PreviewAnimation';
+import Rect from '../spritecow/Rect';
 
 class PreviewPanel {
 
-    constructor(spriteCanvas, $appendTo) {
+    constructor(spriteCanvas, spriteCanvasView, $appendTo) {
         var $container = $('<div class="preview-panel"></div>').appendTo($appendTo);
         this._$container = $container;
         this.$preview = this.createPreviewComponent().appendTo($container);
@@ -20,6 +21,7 @@ class PreviewPanel {
         this.$exportButton = this.$settings.find('#exportButton');
 
         this.$spriteCanvas = spriteCanvas.canvas;
+        this.$spriteCanvasView = spriteCanvasView;
         this.fileName = 'map';
         this.spriteName = 'tile';
         this.fps = 5;
@@ -30,7 +32,7 @@ class PreviewPanel {
     }
 
     createPreviewComponent() {
-        const container = $('<div></div>');
+        const container = $('<div class="preview-container"></div>');
         $('<div class="panel-title">Sprite Preview</div>').appendTo(container);
         $('<div id="preview"><canvas class="panel-sprite-selected" width="100" height="100"></canvas></div>').appendTo(container);
 
@@ -54,9 +56,9 @@ class PreviewPanel {
 
         $('<div class="panel-title">Properties</div>').appendTo(container);
         $('<div>Top Left</div>').appendTo(container);
-        $('<div><span><input id="topX" disabled/> , <input id="topY" disabled/></span></div>').appendTo(container);
+        $('<div><span><input id="topX"/> , <input id="topY"/></span></div>').appendTo(container);
         $('<div>Dimensions</div>').appendTo(container);
-        $('<div><span><input id="width" disabled/> x <input id="height" disabled/></span></div>').appendTo(container);
+        $('<div><span><input id="width"/> x <input id="height"/></span></div>').appendTo(container);
         
         return container;
     }
@@ -64,7 +66,7 @@ class PreviewPanel {
     createSettingsComponent() {
         const container = $('<div></div>');
 
-        $('<div class="panel-title">Settings</div>').appendTo(container);
+        $('<div class="panel-title">Export</div>').appendTo(container);
         $('<div>File Name: <span id="fileName" data-inline-edit="file-name"/></div>').appendTo(container);
         $('<div><span id="selectedSpritesCount">0</span> sprite(s) selected!</div>').appendTo(container);
         $('<div><input id="exportButton" type="button" value="Export" title="Export as JSON"></div>').appendTo(container);
@@ -88,6 +90,7 @@ class PreviewPanel {
         this.$array.find('#spriteName').text(this.spriteName);
         this.fps = this.$mods.find('#animFps').val();
         this.$settings.find('#selectedSpritesCount').text(this.selectedSprites.length);
+
         this.$properties.find('#topX').val(rect.x);
         this.$properties.find('#topY').val(rect.y);
         this.$properties.find('#width').val(rect.width);
@@ -178,6 +181,19 @@ class PreviewPanel {
         this.$mods.find('#animFps').val(this.fps);
         const fpsInput = document.getElementById("animFps");
         fpsInput.addEventListener('change', this.fpsHandler);
+
+        const topXInput = document.getElementById("topX");
+        topXInput.addEventListener('change', this.resizeHandler);
+
+        const topYInput = document.getElementById("topY");
+        topYInput.addEventListener('change', this.resizeHandler);
+
+        const widthInput = document.getElementById("width");
+        widthInput.addEventListener('change', this.resizeHandler);
+
+        const heightInput = document.getElementById("height");
+        heightInput.addEventListener('change', this.resizeHandler);
+
     };
 
     fpsHandler = () => {
@@ -186,6 +202,24 @@ class PreviewPanel {
         if(this.selectedSprites.length > 1){
             this.animation.Update(this.fps);
         }
+    }
+
+    resizeHandler = () => {
+        let oldRect = this.selectedSprites[this.selectedSprites.length - 1].rect
+
+        let strX = this.$properties.find('#topX').val();
+        let strY = this.$properties.find('#topY').val();
+        let strWidth = this.$properties.find('#width').val();
+        let strHeight = this.$properties.find('#height').val();
+
+        let newX = parseInt(strX);
+        let newY = parseInt(strY);
+        let newWidth = parseInt(strWidth);
+        let newHeight = parseInt(strHeight);
+
+        let newRect = new Rect(newX, newY, newWidth, newHeight);
+
+        this.$spriteCanvasView.resizeSelectedSprite(oldRect, newRect);
     }
 }
 

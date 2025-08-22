@@ -24,7 +24,7 @@ import PreviewPanel from '../cutter/PreviewPanel';
 		var spriteCanvas      = new SpriteCanvas();
 		var spriteCanvasView  = new SpriteCanvasView( spriteCanvas, $canvasContainer );
 		var imgInput          = new ImgInput( $canvasContainer, $canvasContainer, $tutorialLink.attr('href') );
-		var previewPanel      = new PreviewPanel( spriteCanvas, $codeContainer );
+		var previewPanel      = new PreviewPanel( spriteCanvas, spriteCanvasView, $codeContainer );
 		var toolbarTop        = new Toolbar('.toolbar-container');
 		var toolbarBottom     = new Toolbar('.toolbar-bottom-container');
 		
@@ -36,7 +36,7 @@ import PreviewPanel from '../cutter/PreviewPanel';
 					addItem('select-sprite', 'Select Sprite', {active: true}).
 					addItem('select-bg', 'Pick Background')
 			).
-			addItem('remove-bg', 'Strip Background', {noLabel: true});
+			addItem('remove-bg', 'Strip Background');
 
 		toolbarTop.$container.addClass('top');
 
@@ -102,6 +102,7 @@ import PreviewPanel from '../cutter/PreviewPanel';
 		
 		toolbarTop.bind('remove-bg', function(img) {
 			spriteCanvas.clearBg(img);
+			img.preventDefault();
 		});
 
 		toolbarBottom.bind('percent', function(event) {

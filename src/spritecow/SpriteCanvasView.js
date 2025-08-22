@@ -285,6 +285,15 @@ SpriteCanvasViewProto._handleSelectedSprite = function(clickedRect, spriteRect) 
 	this.trigger('selectedSpritesChange', this._selectedSprites);
 }
 
+SpriteCanvasViewProto.resizeSelectedSprite = function(oldRect, newRect){
+	const alreadySelectedSpriteIndex = this._selectedSprites.findIndex(sprite => JSON.stringify(sprite.rect) == JSON.stringify(oldRect));
+	if(alreadySelectedSpriteIndex > -1) {
+		this._selectedSprites[alreadySelectedSpriteIndex].reselect(newRect);
+	}
+
+	this.trigger('selectedSpritesChange', this._selectedSprites);
+}
+
 SpriteCanvasViewProto._selectSprite = function(clickedRect, spriteRect) {
 	const highlight = new Highlight(this._$container);
 	highlight.moveTo(clickedRect); // move to clicked area so the animation starts from click position

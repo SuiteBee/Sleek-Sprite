@@ -9,6 +9,11 @@ class SelectedSprite {
     unselect() {
         this.highlight.remove();
     }
+
+    reselect(newRect) {
+        this.rect = newRect;
+        this.highlight.moveTo(newRect, true);
+    }
 }
 
 export default SelectedSprite;

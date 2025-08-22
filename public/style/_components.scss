@@ -211,19 +211,33 @@
 // Preview Panel
 	.preview-panel {
 		display: grid;
-		grid-template-columns: 0.5fr 0.5fr 0.5fr 0.5fr 0.5fr;
-		grid-template-rows: 1fr 1fr;
-		width: 75%;
-		color: #000;
-		padding-left: 10px;
+		grid-template-columns: 1fr;
+		grid-template-rows: auto;
 		justify-items: center;
+		width: 20%;
+		border-radius: 5px 5px 5px 5px;
+		font: normal 12px/1 oswald, sans-serif;
+		border-color: #e2e2e2 #000 #888;
+		color: #333;
+		background-color: #B9B9B9;
+		@include linear-gradient((top, #d0d0d0, #a7a7a7));
+
+		position: fixed;
+		top: 105px;
+		right: 36px;
+		opacity: 1;
+		transition:opacity 0.3s ease-in-out;
+
+		& .preview-container {
+			//
+		}
 
 		& .panel-title {
 			font-size: large;
 		}
 
 		& .panel-sprite-selected {
-			border: 1px solid black;
+			border: 2px solid black;
 			background: #fff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX///8AAABVwtN+AAAAAnRSTlMzMz0oyR4AAAARSURBVAgdY/jPwIAVYRf9DwB+vw/xbMOy9QAAAABJRU5ErkJggg==');
 		}
 		
@@ -272,6 +286,10 @@
 			padding: 3px;
 			outline: none;
 		}
+	}
+
+	.preview-panel:hover {
+		//opacity: 0;
 	}
 
 // Toolbar
