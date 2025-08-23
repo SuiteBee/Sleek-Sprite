@@ -122,7 +122,7 @@
 	}
 	.start-buttons {
 		position: absolute;
-		top: 39px;
+		top: 50px;
 		left: 0;
 		width: 100%;
 		text-align: center;
@@ -228,10 +228,6 @@
 		opacity: 1;
 		transition:opacity 0.3s ease-in-out;
 
-		& .preview-container {
-			//
-		}
-
 		& .panel-title {
 			font-size: large;
 		}
@@ -286,10 +282,6 @@
 			padding: 3px;
 			outline: none;
 		}
-	}
-
-	.preview-panel:hover {
-		//opacity: 0;
 	}
 
 // Toolbar
@@ -394,6 +386,15 @@
 	.main-footer {
 		overflow: hidden;
 		background: rgba(0, 0, 0, .23);
+
+		&.intro {
+			margin: 0 auto;
+			position: relative;
+			display: table;
+			table-layout: fixed;
+			width: 635px;
+			height: auto;
+		}
 
 		& p {
 			float: right;

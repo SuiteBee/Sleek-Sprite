@@ -1,10 +1,12 @@
 import $ from 'jquery';
 
 export default (function() {
-	var $container = $('.container'),
+	var $container = $('.selection-tab'),
+		$workflow = $('.workflow'),
 		$header = $('.container > header'),
 		$canvasCell = $('.canvas-cell'),
 		$canvasInner = $('.canvas-inner'),
+		$footerMain = $('.main-footer'),
 		$footerUl = $('.main-footer ul'),
 		$footerP = $('.main-footer p'),
 		$cssOutput,
@@ -28,6 +30,8 @@ export default (function() {
 			containerWidth = getContainerWidthPercent();
 		
 		$container.removeClass('intro');
+		$footerMain.removeClass('intro');
+		$workflow.removeClass('intro');
 		
 		transitions = [
 			{
@@ -91,6 +95,8 @@ export default (function() {
 		];
 		
 		$container.addClass('intro');
+		$footerMain.addClass('intro');
+		$workflow.addClass('intro');
 		
 		return transitions;
 	}
@@ -144,6 +150,8 @@ export default (function() {
 					var targets = [];
 					
 					$container.removeClass('intro');
+					$footerMain.removeClass('intro');
+					$workflow.removeClass('intro');
 					
 					steps.forEach(function(step) {
 						targets = targets.concat( step.targets );
@@ -158,6 +166,8 @@ export default (function() {
 			}
 			else {
 				$container.removeClass('intro');
+				$footerMain.removeClass('intro');
+				$workflow.removeClass('intro');
 			}
 
 		}
