@@ -1,5 +1,6 @@
 import $ from 'jquery';
 
+//Hide all tab content
 function hideTabs(){
     var $tabcontent = $('.tabcontent');
     for (var i = 0; i < $tabcontent.length; i++) {
@@ -7,10 +8,13 @@ function hideTabs(){
     }
 };
 
-function showTab(tabName){
+//Make visible and set as active (no event)
+function initTab(btn, tabName){
+    btn.addClass('active');
     $(tabName).css('display', 'table');
 };
 
+//Make visible and set as active
 function setTab(evt, tabName) {
   var i, $tablinks;
 
@@ -25,9 +29,10 @@ function setTab(evt, tabName) {
   evt.className += ' active';
 };
 
+//Initialize tabs
 (function() {
-	// init
 	(function() {
+        //Create tab button with event
         function addButton(text, target){
             var $button = $('<div role="button"/>').addClass('tablinks').text(text).data('target', target);
             $button.on('click', function() {
@@ -36,15 +41,17 @@ function setTab(evt, tabName) {
             });
             return $button;
         }
-
+        
+        //Add buttons to container
         var $workflow = $('.workflow');
-
-        addButton('Selection', '.selection-tab').appendTo($workflow);
+        var $selectionBtn = addButton('Selection', '.selection-tab');
+        $selectionBtn.appendTo($workflow);
         addButton('Adjustment', '.adjustment-tab').appendTo($workflow);
         addButton('Export', '.export-tab').appendTo($workflow);
 
+        //Set initial state
         hideTabs();
-        showTab('.selection-tab');
+        initTab($selectionBtn, '.selection-tab');
         
 	})();
 })();

@@ -2,7 +2,6 @@ import $ from 'jquery';
 
 import MicroEvent from './MicroEvent';
 import Rect from './Rect';
-import { SHIFT_KEY, isKeyDown } from '../cutter/KeyboardEvents';
 import SelectedSprite from './extension/SelectedSprite';
 
 var Highlight = (function() {
@@ -269,17 +268,12 @@ class SpriteCanvasView extends MicroEvent {
 var SpriteCanvasViewProto = SpriteCanvasView.prototype;
 
 SpriteCanvasViewProto._handleSelectedSprite = function(clickedRect, spriteRect) {
-	if(isKeyDown(SHIFT_KEY)) {
-		const alreadySelectedSpriteIndex = this._selectedSprites.findIndex(sprite => JSON.stringify(sprite.rect) == JSON.stringify(spriteRect));
-		if(alreadySelectedSpriteIndex > -1) {
-			this._selectedSprites[alreadySelectedSpriteIndex].unselect();
-			this._selectedSprites.splice(alreadySelectedSpriteIndex, 1);
-		} else {
-			this._selectedSprites.push(this._selectSprite(clickedRect, spriteRect));
-		}
+	const alreadySelectedSpriteIndex = this._selectedSprites.findIndex(sprite => JSON.stringify(sprite.rect) == JSON.stringify(spriteRect));
+	if(alreadySelectedSpriteIndex > -1) {
+		this._selectedSprites[alreadySelectedSpriteIndex].unselect();
+		this._selectedSprites.splice(alreadySelectedSpriteIndex, 1);
 	} else {
-		this._unselectAllSprites();
-		this._selectedSprites = [this._selectSprite(clickedRect, spriteRect)];
+		this._selectedSprites.push(this._selectSprite(clickedRect, spriteRect));
 	}
 
 	this.trigger('selectedSpritesChange', this._selectedSprites);

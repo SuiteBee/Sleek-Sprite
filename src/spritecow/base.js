@@ -7,6 +7,7 @@ import {Toolbar, ToolbarGroup} from './Toolbar';
 import pageLayout from './pageLayout';
 
 import PreviewPanel from '../cutter/PreviewPanel';
+import Editor from '../editor/Editor';
 
 (function() {
 	// init
@@ -18,13 +19,16 @@ import PreviewPanel from '../cutter/PreviewPanel';
 			return 'rgba(' + color[0] + ', ' + color[1] + ', ' + color[2] + ', ' + String( color[3] / 255 ).slice(0, 5) + ')';
 		}
 		
-		var $canvasContainer  = $('.canvas-inner');
+		var $canvasContainer  = $('.selection-inner');
 		var $codeContainer    = $('.code-container');
 		var $tutorialLink     = $('.tutorial');
 		var spriteCanvas      = new SpriteCanvas();
 		var spriteCanvasView  = new SpriteCanvasView( spriteCanvas, $canvasContainer );
 		var imgInput          = new ImgInput( $canvasContainer, $canvasContainer, $tutorialLink.attr('href') );
+		
 		var previewPanel      = new PreviewPanel( spriteCanvas, spriteCanvasView, $codeContainer );
+		var editorView		  = new Editor(spriteCanvas);
+		
 		var toolbarTop        = new Toolbar('.toolbar-container');
 		var toolbarBottom     = new Toolbar('.toolbar-bottom-container');
 		
@@ -36,7 +40,8 @@ import PreviewPanel from '../cutter/PreviewPanel';
 					addItem('select-sprite', 'Select Sprite', {active: true}).
 					addItem('select-bg', 'Pick Background')
 			).
-			addItem('remove-bg', 'Strip Background');
+			addStatus('selected-bg', 'Selected Background').
+			addItem('remove-bg', 'Clear');
 
 		toolbarTop.$container.addClass('top');
 
@@ -59,6 +64,9 @@ import PreviewPanel from '../cutter/PreviewPanel';
 
 			previewPanel.selectedSprites = selectedSprites;
 			previewPanel.update();
+			
+			editorView.selectedSprites = selectedSprites;
+			editorView.reset();
 
 			selectedSprites.forEach(({rect}) => {
 				if (rect.width === spriteCanvas.canvas.width && rect.height === spriteCanvas.canvas.height) {
@@ -75,10 +83,16 @@ import PreviewPanel from '../cutter/PreviewPanel';
 		});
 		
 		spriteCanvasView.bind('bgColorSelect', function(color) {
-			var toolName = 'select-sprite';
-			spriteCanvasView.setTool(toolName);
-			toolbarTop.activate(toolName);
-			toolbarTop.feedback( 'Background set to ' + colourBytesToCss(color) );
+			var $selectedBg = $('.selected-bg');
+			var colorStr = colourBytesToCss(color);
+			if (colorStr == 'transparent'){
+				$selectedBg.css('background-color', '');
+				$selectedBg.addClass('none');
+			} else {
+				$selectedBg.removeClass('none');
+				$selectedBg.css('background-color', colorStr);
+			}
+			toolbarTop.feedback( 'Background set to ' + colorStr );
 		});
 		
 		toolbarTop.bind('open-img', function(event) {

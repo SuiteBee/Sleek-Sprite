@@ -308,6 +308,24 @@
 			border-bottom-width: 0;
 		}
 
+		& [role=img]{
+			float: left;
+			margin: 0 5px 5px 0;
+			border: 3px solid #888;
+			border-radius: 50%;
+			cursor: pointer;
+			padding: 8px;
+			position: relative;
+			width: 5px;
+			height: 5px;
+			text-indent: -5000px;
+			
+			&.none{
+				background: url('imgs/trans.png');
+				background-repeat: repeat;
+			}
+		}
+
 		& [role=button] {
 			float: left;
 			margin: 0 5px 5px 0;

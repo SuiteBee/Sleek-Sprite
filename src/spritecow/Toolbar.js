@@ -16,6 +16,11 @@ class Toolbar extends MicroEvent {
 			toolbar.feedback($button.hasClass('no-label') ? $button.text() : '');
 		});
 
+		$container.on('mouseenter', 'div[role=img]', function () {
+			var $item = $(this);
+			toolbar.feedback($item.text());
+		});
+
 		$container.on('click', 'div[role=button]', function () {
 			var $button = $(this),
 				toolName = $button.data('toolName'),
@@ -52,6 +57,11 @@ class Toolbar extends MicroEvent {
 
 		return $button;
 	}
+
+	static createStatus(statusName, text){
+		var $status = $('<div role="img"/>').addClass(statusName).text(text).data('status', statusName);
+		return $status;
+	}
 }
 
 var ToolbarProto = Toolbar.prototype;
@@ -63,6 +73,12 @@ ToolbarProto.addItem = function(toolName, text, opts) {
 	else {
 		Toolbar.createButton(toolName, text, opts).insertBefore( this._$feedback );
 	}
+
+	return this;
+};
+
+ToolbarProto.addStatus = function(statusName, text) {
+	Toolbar.createStatus(statusName, text).insertBefore(this._$feedback);
 
 	return this;
 };

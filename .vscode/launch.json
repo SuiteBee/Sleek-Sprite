@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "firefox",
+           "type": "firefox",
            "request": "launch",
            "name": "Launch Firefox",
            "url": "http://localhost:1234",
