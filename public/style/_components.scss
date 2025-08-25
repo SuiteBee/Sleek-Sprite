@@ -326,6 +326,18 @@
 			}
 		}
 
+		& [role=input]{
+			color: black;
+			margin: 0 5px 5px 5px;
+			border: 1px solid #888;
+			border-radius: 4px;
+			cursor: pointer;
+			padding: 8px;
+			position: relative;
+			width: 25px;
+			height: 5px;
+		}
+
 		& [role=button] {
 			float: left;
 			margin: 0 5px 5px 0;

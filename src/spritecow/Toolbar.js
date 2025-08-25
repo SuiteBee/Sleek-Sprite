@@ -2,14 +2,14 @@ import $ from 'jquery';
 import MicroEvent from './MicroEvent';
 
 class Toolbar extends MicroEvent {
-	constructor($appendToElm) {
+	constructor(parent, appendToElm) {
 		super();
 		var toolbar = this,
 			$container = $('' +
 				'<div class="toolbar">' +
 				'<span class="feedback"></span>' +
 				'</div>' +
-				'').appendTo($appendToElm);
+				'').appendTo($(parent).find(appendToElm));
 
 		$container.on('mouseenter', 'div[role=button]', function () {
 			var $button = $(this);
@@ -40,6 +40,13 @@ class Toolbar extends MicroEvent {
 			event.preventDefault();
 		});
 
+		$container.on('change', 'input[role=input]', function() {
+			var $input = $(this), 
+			inputName = $input.data('inputName'),
+			inputChange = new $.Event(inputName);
+			toolbar.trigger(inputChange, $input.text());
+		});
+
 		toolbar.$container = $container;
 		toolbar._$feedback = $container.find('span.feedback');
 	}
@@ -62,6 +69,13 @@ class Toolbar extends MicroEvent {
 		var $status = $('<div role="img"/>').addClass(statusName).text(text).data('status', statusName);
 		return $status;
 	}
+
+	static createInput(inputName, text){
+		var $label = $(`<label for="${inputName}">${text}</label>`);
+		var $txtInput = $(`<input role="input" name=${inputName} id=${inputName}/>`).addClass(inputName).data('inputName', inputName);
+		$txtInput.appendTo($label);
+		return $label;
+	}
 }
 
 var ToolbarProto = Toolbar.prototype;
@@ -82,6 +96,12 @@ ToolbarProto.addStatus = function(statusName, text) {
 
 	return this;
 };
+
+ToolbarProto.addInput = function(inputName, text) {
+	Toolbar.createInput(inputName, text).insertBefore(this._$feedback);
+
+	return this;
+}
 
 ToolbarProto.feedback = function(msg, severe) {
 	var $feedback = this._$feedback,

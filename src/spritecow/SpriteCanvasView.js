@@ -1,7 +1,7 @@
 import $ from 'jquery';
 
 import MicroEvent from './MicroEvent';
-import Rect from './Rect';
+import Rect from '../sprite/Rect';
 import SelectedSprite from './extension/SelectedSprite';
 
 var Highlight = (function() {

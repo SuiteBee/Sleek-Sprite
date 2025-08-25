@@ -27,10 +27,10 @@ import Editor from '../editor/Editor';
 		var imgInput          = new ImgInput( $canvasContainer, $canvasContainer, $tutorialLink.attr('href') );
 		
 		var previewPanel      = new PreviewPanel( spriteCanvas, spriteCanvasView, $codeContainer );
-		var editorView		  = new Editor(spriteCanvas);
+		var editorView		  = new Editor();
 		
-		var toolbarTop        = new Toolbar('.toolbar-container');
-		var toolbarBottom     = new Toolbar('.toolbar-bottom-container');
+		var toolbarTop        = new Toolbar('.selection-tab', '.toolbar-container');
+		var toolbarBottom     = new Toolbar('.selection-tab', '.toolbar-bottom-container');
 		
 		toolbarTop.
 			addItem('open-img', 'Open').
@@ -65,8 +65,8 @@ import Editor from '../editor/Editor';
 			previewPanel.selectedSprites = selectedSprites;
 			previewPanel.update();
 			
-			editorView.selectedSprites = selectedSprites;
-			editorView.reset();
+			editorView.gather(spriteCanvas.canvas, selectedSprites);
+			editorView.place(1, selectedSprites.length);
 
 			selectedSprites.forEach(({rect}) => {
 				if (rect.width === spriteCanvas.canvas.width && rect.height === spriteCanvas.canvas.height) {

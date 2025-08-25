@@ -10,28 +10,40 @@ export default (function() {
 	}
 	
 	var EditorCanvasProto = EditorCanvas.prototype;
-	
-	EditorCanvasProto.setSprites = function(srcCanvas, spriteArr, cellSize) {
-        var curX, curY;
-        curX = curY = 0;
+
+    EditorCanvasProto.init = function(gridInfo) {
+        this._context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.canvas.width = gridInfo.gridWidth;
+        this.canvas.height = gridInfo.gridHeight;
+    }
+
+    EditorCanvasProto.placeSprites = function(spriteArr, cellSize, rows, columns) {
+        var curX, curY, nRows, nCols;
+        curX = curY = nRows = nCols = 0;
         var halfWidth, halfCell, midpoint;
         halfCell = cellSize/2;
 
         let dstCtx = this.canvas.getContext('2d');
 
-		spriteArr.forEach(function(sprite, i) {
+		spriteArr.forEach(function(sprite) {
             let r = sprite.rect;
             halfWidth = r.width/2;
             midpoint = halfCell - halfWidth;
 
-            dstCtx.drawImage(
-                srcCanvas, 
-                r.x, r.y, r.width, r.height, //src
-                curX + midpoint, curY, r.width, r.height //dst
-            ); 
-            curX += cellSize;
+            sprite.rect.x = curX + midpoint;
+            sprite.rect.y = curY;
+
+            dstCtx.putImageData(sprite.imgData, sprite.rect.x, sprite.rect.y);
+
+            if(nCols >= columns){
+                curX = 0;
+                curY += cellSize;
+            } else{
+                curX += cellSize;
+            }
         }); 
-	};
+    }
 
 	return EditorCanvas;
 })();

@@ -1,18 +1,19 @@
 
 //ctx: grid context
+
+import MockSprite from "../sprite/MockSprite";
+
 //size: of each cell in pixels
-export function drawGrid(editorCanvas, size) {
+export function drawGrid(editorCanvas, cellSize) {
     let ctx = editorCanvas._context;
     let canvasWidth = editorCanvas.canvas.width;
     let canvasHeight = editorCanvas.canvas.height;
-
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight); // Clear previous drawings
 
     ctx.strokeStyle = 'black'; // Grid line color
     ctx.lineWidth = 1; // Grid line thickness
 
     // Draw vertical lines
-    for (let x = 0; x <= canvasWidth; x += size) {
+    for (let x = 0; x <= canvasWidth; x += cellSize) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, canvasHeight);
@@ -20,7 +21,7 @@ export function drawGrid(editorCanvas, size) {
     }
 
     // Draw horizontal lines
-    for (let y = 0; y <= canvasHeight; y += size) {
+    for (let y = 0; y <= canvasHeight; y += cellSize) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(canvasWidth, y);
@@ -28,23 +29,17 @@ export function drawGrid(editorCanvas, size) {
     }
 }
 
-export function getGridInfo(spriteArr) {
-    var  sWidth, sHeight, maxWidth, maxHeight;
-         sWidth = sHeight =
-         maxWidth = maxHeight = 0;
+export function initGrid(spriteArr, rows, columns) {
+    //Get the max size of the selected sprites width and height
+    var maxWidth = Math.max(...spriteArr.map(sprite => sprite.rect.width));
+    var maxHeight = Math.max(...spriteArr.map(sprite => sprite.rect.height));
 
-    spriteArr.forEach(function(sprite, i) {
-        sWidth = Number(sprite.rect.width);
-        sHeight = Number(sprite.rect.height);
-
-        maxWidth = sWidth > maxWidth ? sWidth : maxWidth;
-        maxHeight = sHeight > maxHeight ? sHeight : maxHeight;
-    });
-
+    //Set cell size (square) to the largest dimension
     var cSize = Math.max(maxWidth, maxHeight);
+    
     let gridInfo = {
-        gridWidth: cSize*spriteArr.length,
-        gridHeight: cSize*spriteArr.length,
+        gridWidth: cSize * columns,
+        gridHeight: cSize * rows,
         cellSize: cSize
     };
 

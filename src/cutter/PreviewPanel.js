@@ -3,7 +3,7 @@ import JSZip from 'jszip';
 
 import InlineEdit from '../spritecow/InlineEdit';
 import PreviewAnimation from '../mapper/PreviewAnimation';
-import Rect from '../spritecow/Rect';
+import Rect from '../sprite/Rect';
 
 class PreviewPanel {
 
