@@ -9,23 +9,23 @@ function hideTabs(){
 };
 
 //Make visible and set as active (no event)
-function initTab(btn, tabName){
+function initTab(btn, tabClass){
     btn.addClass('active');
-    $(tabName).css('display', 'table');
+    $(tabClass).css('display', 'table');
 };
 
 //Make visible and set as active
-function setTab(evt, tabName) {
+function setTab(evt, tabClass) {
   var i, $tablinks;
 
   hideTabs();
 
   $tablinks = $('.tablinks');
   for (i = 0; i < $tablinks.length; i++) {
-    $tablinks[i].className = $tablinks[i].className.replace(' active', "");
+    $tablinks[i].className = $tablinks[i].className.replace(' active', '');
   }
 
-  $(tabName).css('display', 'table');
+$(tabClass).css('display', 'table');
   evt.className += ' active';
 };
 
@@ -33,21 +33,20 @@ function setTab(evt, tabName) {
 (function() {
 	(function() {
         //Create tab button with event
-        function addButton(text, target){
-            var $button = $('<div role="button"/>').addClass('tablinks').text(text).data('target', target);
+        function addButton(text, id, tabClass){
+            var $button = $('<div role="button"/>').attr("id", id).addClass('tablinks').text(text);
             $button.on('click', function() {
-                var tgt = $(this).data('target');
-                setTab(this, tgt);
+                setTab(this, tabClass);
             });
             return $button;
         }
         
         //Add buttons to container
         var $workflow = $('.workflow');
-        var $selectionBtn = addButton('Selection', '.selection-tab');
+        var $selectionBtn = addButton('Selection', 'tabSelection', '.selection-tab');
         $selectionBtn.appendTo($workflow);
-        addButton('Adjustment', '.adjustment-tab').appendTo($workflow);
-        addButton('Export', '.export-tab').appendTo($workflow);
+        addButton('Adjustment', 'tabAdjustment', '.adjustment-tab').appendTo($workflow);
+        addButton('Export', 'tabExport', '.export-tab').appendTo($workflow);
 
         //Set initial state
         hideTabs();

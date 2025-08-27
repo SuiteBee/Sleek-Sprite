@@ -44,7 +44,7 @@ class Toolbar extends MicroEvent {
 			var $input = $(this), 
 			inputName = $input.data('inputName'),
 			inputChange = new $.Event(inputName);
-			toolbar.trigger(inputChange, $input.text());
+			toolbar.trigger(inputChange, $input.val());
 		});
 
 		toolbar.$container = $container;
@@ -72,7 +72,7 @@ class Toolbar extends MicroEvent {
 
 	static createInput(inputName, text){
 		var $label = $(`<label for="${inputName}">${text}</label>`);
-		var $txtInput = $(`<input role="input" name=${inputName} id=${inputName}/>`).addClass(inputName).data('inputName', inputName);
+		var $txtInput = $(`<input role="input" name="${inputName}" id="${inputName}"/>`).addClass(inputName).data('inputName', inputName);
 		$txtInput.appendTo($label);
 		return $label;
 	}

@@ -66,7 +66,6 @@ import Editor from '../editor/Editor';
 			previewPanel.update();
 			
 			editorView.gather(spriteCanvas.canvas, selectedSprites);
-			editorView.place(1, selectedSprites.length);
 
 			selectedSprites.forEach(({rect}) => {
 				if (rect.width === spriteCanvas.canvas.width && rect.height === spriteCanvas.canvas.height) {

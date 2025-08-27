@@ -18,7 +18,7 @@ export default (function() {
         this.canvas.height = gridInfo.gridHeight;
     }
 
-    EditorCanvasProto.placeSprites = function(spriteArr, cellSize, rows, columns) {
+    EditorCanvasProto.drawSprites = function(spriteArr, cellSize, rows, columns) {
         var curX, curY, nRows, nCols;
         curX = curY = nRows = nCols = 0;
         var halfWidth, halfCell, midpoint;
@@ -34,9 +34,17 @@ export default (function() {
             sprite.rect.x = curX + midpoint;
             sprite.rect.y = curY;
 
+            sprite.cell.x = curX;
+            sprite.cell.y = curY;
+            sprite.cell.width = cellSize;
+            sprite.cell.height = cellSize;
+
             dstCtx.putImageData(sprite.imgData, sprite.rect.x, sprite.rect.y);
 
+            nCols++;
+
             if(nCols >= columns){
+                nCols = 0;
                 curX = 0;
                 curY += cellSize;
             } else{
