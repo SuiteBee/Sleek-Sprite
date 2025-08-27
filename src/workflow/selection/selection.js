@@ -1,12 +1,13 @@
 import $ from 'jquery';
 
+import ImgInput from '../../utilities/ImgInput';
+import {Toolbar, ToolbarGroup} from '../../components/Toolbar';
+import pageLayout from '../../utilities/pageLayout';
+
 import SpriteCanvas from './SpriteCanvas';
 import SpriteCanvasView from './SpriteCanvasView';
-import ImgInput from './ImgInput';
-import {Toolbar, ToolbarGroup} from './Toolbar';
-import pageLayout from './pageLayout';
 
-import PreviewPanel from '../cutter/PreviewPanel';
+import PreviewPanel from '../../cutter/PreviewPanel';
 import Editor from '../editor/Editor';
 
 (function() {

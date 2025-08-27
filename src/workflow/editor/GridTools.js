@@ -1,11 +1,11 @@
 
 //ctx: grid context
 
-import MockSprite from "../sprite/MockSprite";
+import MockSprite from "./MockSprite";
 
 //size: of each cell in pixels
 export function drawGrid(editorCanvas, cellSize) {
-    let ctx = editorCanvas._context;
+    let ctx = editorCanvas.context;
     let canvasWidth = editorCanvas.canvas.width;
     let canvasHeight = editorCanvas.canvas.height;
 

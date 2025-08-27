@@ -1,9 +1,9 @@
 import $ from 'jquery';
 import { drawGrid, initGrid } from './GridTools';
-import { Toolbar } from '../spritecow/Toolbar';
+import { Toolbar } from '../../components/Toolbar';
 
 import EditorCanvas from './EditorCanvas';
-import MockSprite from '../sprite/MockSprite';
+import MockSprite from './MockSprite';
 
 class Editor {
 
@@ -73,6 +73,9 @@ class Editor {
             }
             
         }.bind(this));
+        
+
+        
     }
 }
 

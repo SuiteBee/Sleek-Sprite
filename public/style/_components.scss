@@ -1,3 +1,5 @@
+@use "utils";
+
 // Logo
 	.cow-logo {
 		background: url("imgs/sprites1.png") no-repeat -2px -66px;
@@ -9,15 +11,15 @@
 		overflow: hidden;
 		text-indent: -5000px;
 		display: inline-block;
-		@include transform( scale(0.1) );
-		@include transform-origin(50% 0);
+		@include utils.transform( scale(0.1) );
+		@include utils.transform-origin(50% 0);
 
 		.intro & {
 			width: 448px;
 			height: 388px;
 			margin: 66px 0 29px;
 			opacity: 1;
-			@include transform( scale(1) );
+			@include utils.transform( scale(1) );
 		}
 	}
 // Headings
@@ -30,7 +32,7 @@
 // Canvas
 	.canvas-view {
 		text-align: center;
-		@include user-select(none);
+		@include utils.user-select(none);
 
 		& .upload-input {
 			position: absolute;
@@ -104,8 +106,8 @@
 			box-sizing: border-box;
 			display: none;
 
-			@include transition(0.5s ease-in-out);
-			@include transition-property((border, background));
+			@include utils.transition(0.5s ease-in-out);
+			@include utils.transition-property((border, background));
 
 			&.high-vis {
 				background-color: rgba(0, 255, 48, 0.25);
@@ -154,7 +156,7 @@
 		cursor: pointer;
 		text-shadow: rgba(0,0,0,0.5) 0 2px 0;
 
-		@include linear-gradient((top, rgba(255,185,90,1) 0%, rgba(255,108,0,1) 50%, rgba(199,58,0,1) 100%));
+		@include utils.linear-gradient((top, rgba(255,185,90,1) 0%, rgba(255,108,0,1) 50%, rgba(199,58,0,1) 100%));
 	}
 // CSS output
 	.css-output {
@@ -220,7 +222,7 @@
 		border-color: #e2e2e2 #000 #888;
 		color: #333;
 		background-color: #B9B9B9;
-		@include linear-gradient((top, #d0d0d0, #a7a7a7));
+		@include utils.linear-gradient((top, #d0d0d0, #a7a7a7));
 
 		position: fixed;
 		top: 105px;
@@ -294,7 +296,7 @@
 		border-width: 1px 0;
 		border-color: #e2e2e2 #000 #888;
 		color: #333;
-		@include linear-gradient((top, #d0d0d0, #a7a7a7));
+		@include utils.linear-gradient((top, #d0d0d0, #a7a7a7));
 
 		&.top {
 			border-radius: 5px 5px 0 0;
@@ -347,7 +349,7 @@
 			padding: 4px 10px 4px 26px;
 			position: relative;
 			
-			@include linear-gradient((top, #fefefe, #b8b8b8));
+			@include utils.linear-gradient((top, #fefefe, #b8b8b8));
 
 			&::before {
 				content: '';

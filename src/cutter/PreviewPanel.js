@@ -1,9 +1,8 @@
 import $ from 'jquery';
 import JSZip from 'jszip';
 
-import InlineEdit from '../spritecow/InlineEdit';
 import PreviewAnimation from '../mapper/PreviewAnimation';
-import Rect from '../sprite/Rect';
+import Rect from '../utilities/Rect';
 
 class PreviewPanel {
 
@@ -169,15 +168,6 @@ class PreviewPanel {
     _addEditEvents() {
         var previewPanel = this;
     
-        new InlineEdit( previewPanel._$container ).bind('file-name', function(event) {
-            var newVal = event.val;
-
-            if(newVal.trim() !== "") {
-                previewPanel.fileName = newVal;
-                previewPanel.update();
-            }
-        });
-
         this.$mods.find('#animFps').val(this.fps);
         const fpsInput = document.getElementById("animFps");
         fpsInput.addEventListener('change', this.fpsHandler);

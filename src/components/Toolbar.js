@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import MicroEvent from './MicroEvent';
+import MicroEvent from '../utilities/MicroEvent';
 
 class Toolbar extends MicroEvent {
 	constructor(parent, appendToElm) {

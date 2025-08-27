@@ -1,9 +1,11 @@
+@use "utils";
+
 // Background
 	html {
 		height: 100%;
 		background: #004a86;
 
-		@include radial-gradient((
+		@include utils.radial-gradient((
 			center center,
 			circle cover,
 			grey 0%,
@@ -40,7 +42,7 @@
 			padding: 4px 10px 4px 10px;
 			position: relative;
 			
-			@include linear-gradient((top, #fefefe, #b8b8b8));
+			@include utils.linear-gradient((top, #fefefe, #b8b8b8));
 
 			&.active {
 				background: #707070;
@@ -97,5 +99,5 @@
 	.toolbar-bottom-container {
 		display: table-row;
 		position: relative;
-		@include user-select(none);
+		@include utils.user-select(none);
 	}

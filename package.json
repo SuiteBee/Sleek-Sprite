@@ -1,15 +1,15 @@
 {
-  "name": "spritesheet-cutter",
+  "name": "sleek-sprite",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "yeoji",
+  "author": "SuiteBee",
   "scripts": {
     "dev": "parcel public/index.html",
     "build": "parcel build --public-url '.' public/index.html"
   },
   "devDependencies": {
     "parcel-bundler": "^1.12.5",
-    "sass": "^1.34.0"
+    "sass": "^1.63.6"
   },
   "dependencies": {
     "jquery": "^3.6.0",

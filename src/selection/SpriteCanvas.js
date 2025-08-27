@@ -1,4 +1,4 @@
-import MicroEvent from './MicroEvent';
+import MicroEvent from '../utilities/MicroEvent';
 
 export default (function() {
 	function pixelsEquivalent(pixels1, offset1, pixels2, offset2) {
