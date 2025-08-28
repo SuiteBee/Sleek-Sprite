@@ -1,4 +1,4 @@
-class SelectedSprite {
+class Selected {
     constructor(rect, highlight) {
         this.rect = rect;
         this.highlight = highlight;
@@ -16,4 +16,4 @@ class SelectedSprite {
     }
 }
 
-export default SelectedSprite;
+export default Selected;

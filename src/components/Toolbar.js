@@ -40,11 +40,18 @@ class Toolbar extends MicroEvent {
 			event.preventDefault();
 		});
 
-		$container.on('change', 'input[role=input]', function() {
+		$container.on('input', 'input[role=input]', function() {
 			var $input = $(this), 
 			inputName = $input.data('inputName'),
 			inputChange = new $.Event(inputName);
 			toolbar.trigger(inputChange, $input.val());
+		});
+
+		$container.on('change', 'select[role=select]', function() {
+			var $ddl = $(this), 
+			ddlName = $ddl.data('ddlName'),
+			ddlChange = new $.Event(ddlName);
+			toolbar.trigger(ddlChange, $ddl.val());
 		});
 
 		toolbar.$container = $container;
@@ -72,8 +79,19 @@ class Toolbar extends MicroEvent {
 
 	static createInput(inputName, text){
 		var $label = $(`<label for="${inputName}">${text}</label>`);
-		var $txtInput = $(`<input role="input" name="${inputName}" id="${inputName}"/>`).addClass(inputName).data('inputName', inputName);
+		var $txtInput = $(`<input role="input" name="${inputName}" id="${inputName}" maxlength="3"/>`).addClass(inputName).data('inputName', inputName);
 		$txtInput.appendTo($label);
+		return $label;
+	}
+
+	static createDropDown(ddlName, text, ...options){
+		var $label = $(`<label for="${ddlName}">${text}</label>`);
+		var $ddl = $(`<select role="select" name="${ddlName}" id="${ddlName}">`).addClass(ddlName).data('ddlName', ddlName);;
+		for(let i=0; i<options.length; i++){
+			let $option = $(`<option value="${options[i]}">${options[i]}</option>`);
+			$option.appendTo($ddl);
+		}
+		$ddl.appendTo($label);
 		return $label;
 	}
 }
@@ -99,6 +117,12 @@ ToolbarProto.addStatus = function(statusName, text) {
 
 ToolbarProto.addInput = function(inputName, text) {
 	Toolbar.createInput(inputName, text).insertBefore(this._$feedback);
+
+	return this;
+}
+
+ToolbarProto.addDropDown = function(ddlName, text, ...options){
+	Toolbar.createDropDown(ddlName, text, ...options).insertBefore(this._$feedback);
 
 	return this;
 }

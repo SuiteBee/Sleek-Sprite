@@ -28,7 +28,7 @@ import Editor from '../editor/Editor';
 		var imgInput          = new ImgInput( $canvasContainer, $canvasContainer, $tutorialLink.attr('href') );
 		
 		var previewPanel      = new PreviewPanel( spriteCanvas, spriteCanvasView, $codeContainer );
-		var editorView		  = new Editor();
+		var editor		  	  = new Editor(spriteCanvas);
 		
 		var toolbarTop        = new Toolbar('.selection-tab', '.toolbar-container');
 		var toolbarBottom     = new Toolbar('.selection-tab', '.toolbar-bottom-container');
@@ -54,7 +54,15 @@ import Editor from '../editor/Editor';
 		imgInput.bind('load', function(img) {
 			spriteCanvas.setImg(img);
 			
-			spriteCanvasView.setTool('select-sprite');
+			spriteCanvasView.unselectAllSprites();
+			toolbarTop.activate('select-bg');
+			spriteCanvasView.setTool('select-bg');
+			var $selectedBg = $('.selected-bg');
+			$selectedBg.css('background-color', '');
+			$selectedBg.addClass('none');
+
+			spriteCanvas.setBg([0, 0, 0, 0]);
+
 			pageLayout.toAppView();
 		});
 		
@@ -66,7 +74,7 @@ import Editor from '../editor/Editor';
 			previewPanel.selectedSprites = selectedSprites;
 			previewPanel.update();
 			
-			editorView.gather(spriteCanvas.canvas, selectedSprites);
+			editor.gather(selectedSprites);
 
 			selectedSprites.forEach(({rect}) => {
 				if (rect.width === spriteCanvas.canvas.width && rect.height === spriteCanvas.canvas.height) {

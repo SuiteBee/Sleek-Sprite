@@ -1,19 +1,21 @@
 import $ from 'jquery';
-import { drawGrid, initGrid } from './GridTools';
 import { Toolbar } from '../../components/Toolbar';
+import Selected from '../../components/Selected';
 
 import EditorCanvas from './EditorCanvas';
+import EditorCanvasView from './EditorCanvasView';
 import MockSprite from './MockSprite';
 
 class Editor {
 
-    constructor() {
+    constructor(srcCanvas) {
 		this.$editorContainer   = $('.adjustment-inner');
 		this.editorCanvas       = new EditorCanvas(this.$editorContainer);
-        
-        var $editorViewContainer = $('<div class="sprite-canvas-container"/>');
-        $( this.editorCanvas.canvas ).appendTo( $editorViewContainer );
-        $editorViewContainer.appendTo(this.$editorContainer);
+        this.selectorCanvas     = srcCanvas;
+        this.selectedSprites    = [];
+        this.editorCanvas.canvas.width=1000;
+        this.editorCanvas.canvas.height=1000;
+        this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, this.$editorContainer );
 
         this.nRows = -1;
         this.nCols = -1;
@@ -26,8 +28,10 @@ class Editor {
 		
         //Editor tools
 		toolbarTop.
+            addDropDown('set-all-align', 'Anchor All:', 'Center', 'Bottom').
 			addInput('set-columns', 'Cols:').
 			addInput('set-rows', 'Rows:');
+            
 
 		toolbarTop.$container.addClass('top');
 		toolbarBottom.$container.addClass('bottom');
@@ -55,11 +59,27 @@ class Editor {
             }
 		}.bind(this));
 
+        toolbarTop.bind('set-all-align', function(evt, option) {
+            if(this.mockup.length > 0){
+                this.align(option);
+                this.place();
+            }
+        }.bind(this));
+
         //Editor tab activated
         var $editorTabBtn = $('#tabAdjustment');
         $editorTabBtn.on("click", function() {
-            var defRows = 1, defCols = this.mockup.length;
 
+            //Unselect all highlighted cells in editor
+            this.editorCanvasView.unselectAllCells();
+
+            //Pack any selected sprites into mockup[]
+            if(this.selectedSprites.length > 0){
+                this.pack();
+            }
+
+            //Default rows/cols setting on editor
+            var defRows = 1, defCols = this.mockup.length;
             if(this.nRows <= 0 || this.nCols <= 0){
                  $('#set-rows').val(defRows.toString());
                  $('#set-columns').val(defCols.toString());
@@ -68,54 +88,46 @@ class Editor {
                  this.nCols = defCols;
             }
 
+            //Draw sliced sprites in editor
             if(this.mockup.length > 0){
                 this.place();
             }
             
         }.bind(this));
-        
 
-        
     }
 }
 
 var EditorProto = Editor.prototype;
 
-//Pack selected sprites into an array
-EditorProto.gather = function(srcCanvas, selectedSprites) {
-    var srcContext = srcCanvas.getContext('2d');
+//Update sprites from selector
+EditorProto.gather = function(selectedSprites) {
+    this.selectedSprites = selectedSprites;
+}
+
+//Pack selected sprites into an object array
+EditorProto.pack = function() {
+    var srcContext = this.selectorCanvas.canvas.getContext('2d');
     this.mockup = [];
     
-    selectedSprites.forEach(function(sprite, i) {
+    this.selectedSprites.forEach(function(sprite, i) {
         let rect = sprite.rect;
         let data = srcContext.getImageData(rect.x, rect.y, rect.width, rect.height);
         this.mockup.push(new MockSprite(sprite.rect, data, i));
     }.bind(this)); 
 }
 
-//Place sprites from mockup array onto editor canvas and draw a grid
-EditorProto.place = function() {
-    var gInfo = initGrid(this.mockup, this.nRows, this.nCols);
-    this.editorCanvas.init(gInfo);
-
-    this.editorCanvas.drawSprites(this.mockup, gInfo.cellSize, this.nRows, this.nCols); 
-    drawGrid(this.editorCanvas, gInfo.cellSize);
+EditorProto.align = function(alignOption) {
+    this.mockup.forEach(function(sprite, i) {
+        sprite.align = alignOption;
+    }.bind(this)); 
 }
 
-EditorProto.find = function(mousePos) {
-    if(mousePos.x <= this.editorCanvas.width && mousePos.y <= this.editorCanvas.height){
-        var found = this.mockup.find(sprite => 
-            (mousePos.x > sprite.cell.x) && 
-            (mousePos.x < sprite.cell.x + sprite.cell.width) &&
-            (mousePos.y > sprite.cell.y) &&
-            (mousePos.y < sprite.cell.y + sprite.cell.height)
-        )
-
-        if(found){
-            //Display properties
-        }
-    }
-    
+//Place sprites from mockup array onto editor canvas and draw a grid
+EditorProto.place = function() {
+    this.editorCanvas.reset(this.mockup, this.nRows, this.nCols);
+    this.editorCanvas.drawSprites(); 
+    this.editorCanvas.drawGrid();
 }
 
 export default Editor;

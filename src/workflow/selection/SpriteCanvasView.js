@@ -1,11 +1,11 @@
 import $ from 'jquery';
 
 import MicroEvent from '../../utilities/MicroEvent';
-import SelectedSprite from '../../canvas/SelectedSprite';
+import Selected from '../../components/Selected';
 
-import Highlight from '../../canvas/highlight';
-import SelectArea from '../../canvas/selectArea';
-import SelectColor from '../../canvas/selectColor';
+import Highlight from '../../components/highlight';
+import SelectArea from '../../components/selectArea';
+import SelectColor from '../../components/selectColor';
 
 class SpriteCanvasView extends MicroEvent {
 	constructor(spriteCanvas, $appendToElm) {
@@ -38,7 +38,7 @@ class SpriteCanvasView extends MicroEvent {
 				
 				spriteCanvasView._handleSelectedSprite(clickedRect, spriteRect);
 			} else {
-				spriteCanvasView._unselectAllSprites();
+				spriteCanvasView.unselectAllSprites();
 			}
 		});
 
@@ -80,10 +80,10 @@ SpriteCanvasViewProto._selectSprite = function(clickedRect, spriteRect) {
 	const highlight = new Highlight(this._$container);
 	highlight.moveTo(clickedRect); // move to clicked area so the animation starts from click position
 
-	return new SelectedSprite(spriteRect, highlight);
+	return new Selected(spriteRect, highlight);
 }
 
-SpriteCanvasViewProto._unselectAllSprites = function() {
+SpriteCanvasViewProto.unselectAllSprites = function() {
 	this._selectedSprites.forEach(sprite => sprite.unselect());
 	this._selectedSprites = [];
 }

@@ -1,4 +1,4 @@
-import MicroEvent from '../../utilities/MicroEvent';
+import Grid from './Grid';
 
 export default (function() {
 
@@ -6,75 +6,52 @@ export default (function() {
 		var canvas = document.createElement('canvas');
 		this.canvas = canvas;
 		this.context = canvas.getContext('2d');
+
+        this.grid = new Grid(this.context);
+        this.sprites = [];
 	}
 	
 	var EditorCanvasProto = EditorCanvas.prototype;
 
-    EditorCanvasProto.init = function(gridInfo) {
+    EditorCanvasProto.reset = function(spriteArr, rows, cols) {
+        this.sprites = spriteArr;
+        this.grid.set(spriteArr, rows, cols);
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.canvas.width = gridInfo.gridWidth;
-        this.canvas.height = gridInfo.gridHeight;
+        this.canvas.width = this.grid.width;
+        this.canvas.height = this.grid.height;
     }
 
-    EditorCanvasProto.drawSprites = function(spriteArr, cellSize, rows, columns) {
-        var curX, curY, nRows, nCols;
-        curX = curY = nRows = nCols = 0;
-        var halfWidth, halfHeight, halfCell, midX, midY;
-        halfCell = cellSize/2;
+    EditorCanvasProto.drawSprites = function() {
+        var curX, curY, nCols;
+        curX = curY = nCols = 0;
+        
+        for(let i=0; i<this.sprites.length; i++){
+            let sprite = this.sprites[i];
 
-        let dstCtx = this.canvas.getContext('2d');
+            //Set rect alignemtn to draw sprite from anchor
+            let previous = i > 0 ? this.sprites[i-1] : sprite;
+            sprite.setAlignment(curX, curY, previous, this.grid.cellSize);
 
-        for(let i=0; i<spriteArr.length; i++){
-            let sprite = spriteArr[i];
-            let r = sprite.rect;
+            //Set full cell rect position/dimensions
+            sprite.setCell(curX, curY, this.grid.cellSize);
 
-            halfWidth = r.width/2;
-            halfHeight = r.height/2;
-
-            let align_previous = false;
-            let align_bottom = false;
-            let align_center = true;
-
-            //Align Previous
-            let previous = i > 0 ? spriteArr[i-1] : sprite;
-            let prevDiff = Math.abs(previous.old.y - sprite.old.y);
-
-            //Align Bottom
-            let cellDiff = cellSize - r.height;
-            let verticalPadding = cellDiff/2;
-
-            //Align Center
-            midX = halfCell - halfWidth;
-            midY = halfCell - halfHeight;
-
-            sprite.rect.x = curX + midX;
-
-            if(align_previous){
-                sprite.rect.y = curY + midY + verticalPadding - prevDiff;
-            } else if(align_bottom){
-                sprite.rect.y = curY + midY + verticalPadding;
-            } else if(align_center){
-                sprite.rect.y = curY + midY;
-            }
-
-            sprite.cell.x = curX;
-            sprite.cell.y = curY;
-            sprite.cell.width = cellSize;
-            sprite.cell.height = cellSize;
-
-            dstCtx.putImageData(sprite.imgData, sprite.rect.x, sprite.rect.y);
+            this.context.putImageData(sprite.imgData, sprite.rect.x, sprite.rect.y);
 
             nCols++;
 
-            if(nCols >= columns){
+            if(nCols >= this.grid.cols){
                 nCols = 0;
                 curX = 0;
-                curY += cellSize;
+                curY += this.grid.cellSize;
             } else{
-                curX += cellSize;
+                curX += this.grid.cellSize;
             }
         }
+    }
+
+    EditorCanvasProto.drawGrid = function() {
+        this.grid.draw()
     }
 
 	return EditorCanvas;

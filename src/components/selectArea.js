@@ -26,6 +26,7 @@ export default (function() {
 			selectArea._$eventArea, 'mousedown', function(event) {
 				if (event.button !== 0) { return; }
 				var offset = selectArea._$area.offset();
+
 				startX = event.pageX;
 				startY = event.pageY;
 				// firefox like coming up with fraction values from offset()
