@@ -77,9 +77,9 @@ class Toolbar extends MicroEvent {
 		return $status;
 	}
 
-	static createInput(inputName, text){
-		var $label = $(`<label for="${inputName}">${text}</label>`);
-		var $txtInput = $(`<input role="input" name="${inputName}" id="${inputName}" maxlength="3"/>`).addClass(inputName).data('inputName', inputName);
+	static createInput(inputName, text, limit, defVal){
+		var $label = $(`<label for="${inputName}">${text}</label>`).addClass(`lbl-${inputName}`);
+		var $txtInput = $(`<input role="input" name="${inputName}" id="${inputName}" maxlength="${limit}"/>`).addClass(inputName).data('inputName', inputName).val(defVal);
 		$txtInput.appendTo($label);
 		return $label;
 	}
@@ -115,8 +115,8 @@ ToolbarProto.addStatus = function(statusName, text) {
 	return this;
 };
 
-ToolbarProto.addInput = function(inputName, text) {
-	Toolbar.createInput(inputName, text).insertBefore(this._$feedback);
+ToolbarProto.addInput = function(inputName, text, limit, defVal = '') {
+	Toolbar.createInput(inputName, text, limit, defVal).insertBefore(this._$feedback);
 
 	return this;
 }

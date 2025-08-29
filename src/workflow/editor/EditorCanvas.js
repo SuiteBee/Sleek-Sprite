@@ -2,7 +2,7 @@ import Grid from './Grid';
 
 export default (function() {
 
-	function EditorCanvas(container) {
+	function EditorCanvas() {
 		var canvas = document.createElement('canvas');
 		this.canvas = canvas;
 		this.context = canvas.getContext('2d');

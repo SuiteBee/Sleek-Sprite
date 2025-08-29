@@ -29,11 +29,11 @@ class EditorCanvasView extends MicroEvent {
 
 		selectArea.bind('select', function (clickedRect) {
 			const rect = Object.assign({}, clickedRect);
-			var index = this._grid.find(rect);
+			let index = this._grid.find(rect);
 
             if(index >= 0 && index < this._editorCanvas.sprites.length){
-                var cellRect = this._editorCanvas.sprites[index].cell;
-                EditorCanvasView._handleSelectedSprite(clickedRect, cellRect);
+				let sprite = this._editorCanvas.sprites[index];
+                EditorCanvasView._handleSelectedCell(clickedRect, sprite);
             }else{
                 EditorCanvasView.unselectAllCells()
             }
@@ -45,16 +45,17 @@ class EditorCanvasView extends MicroEvent {
 
 var EditorCanvasViewProto = EditorCanvasView.prototype;
 
-EditorCanvasViewProto._handleSelectedSprite = function(clickedRect, spriteRect) {
-	const alreadySelectedSpriteIndex = this._selectedCells.findIndex(sprite => JSON.stringify(sprite.rect) == JSON.stringify(spriteRect));
-	if(alreadySelectedSpriteIndex > -1) {
-		this._selectedCells[alreadySelectedSpriteIndex].unselect();
-		this._selectedCells.splice(alreadySelectedSpriteIndex, 1);
+EditorCanvasViewProto._handleSelectedCell = function(clickedRect, sprite) {
+	let cellRect = sprite.cell;
+	const cellSelected = this._selectedCells.findIndex(cell => JSON.stringify(cell.rect) == JSON.stringify(cellRect));
+	if(cellSelected > -1) {
+		this._selectedCells[cellSelected].unselect();
+		this._selectedCells.splice(cellSelected, 1);
+		this.trigger('editNone');
 	} else {
-		this._selectedCells.push(this._selectCell(clickedRect, spriteRect));
+		this._selectedCells.push(this._selectCell(clickedRect, cellRect));
+		this.trigger('editCellChange', sprite);
 	}
-
-	//this.trigger('selectedSpritesChange', this._selectedCells);
 }
 
 EditorCanvasViewProto.resizeSelectedSprite = function(oldRect, newRect){
@@ -66,16 +67,18 @@ EditorCanvasViewProto.resizeSelectedSprite = function(oldRect, newRect){
 	//this.trigger('selectedSpritesChange', this._selectedCells);
 }
 
-EditorCanvasViewProto._selectCell = function(clickedRect, spriteRect) {
+EditorCanvasViewProto._selectCell = function(clickedRect, cellRect) {
 	const highlight = new Highlight(this._$container);
 	highlight.moveTo(clickedRect); // move to clicked area so the animation starts from click position
 
-	return new Selected(spriteRect, highlight);
+	return new Selected(cellRect, highlight);
 }
 
 EditorCanvasViewProto.unselectAllCells = function() {
 	this._selectedCells.forEach(cell => cell.unselect());
 	this._selectedCells = [];
+
+	this.trigger('editNone');
 }
 
 export default EditorCanvasView;

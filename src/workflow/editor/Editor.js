@@ -4,6 +4,7 @@ import Selected from '../../components/Selected';
 
 import EditorCanvas from './EditorCanvas';
 import EditorCanvasView from './EditorCanvasView';
+import EditPreview from './EditPreview';
 import MockSprite from './MockSprite';
 
 class Editor {
@@ -11,59 +12,69 @@ class Editor {
     constructor(srcCanvas) {
 		this.$editorContainer   = $('.adjustment-inner');
 		this.editorCanvas       = new EditorCanvas(this.$editorContainer);
+        this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, this.$editorContainer );
+        this.editPreview        = new EditPreview(this.$editorContainer);
+
         this.selectorCanvas     = srcCanvas;
         this.selectedSprites    = [];
-        this.editorCanvas.canvas.width=1000;
-        this.editorCanvas.canvas.height=1000;
-        this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, this.$editorContainer );
-
+        
         this.nRows = -1;
         this.nCols = -1;
 
         this.mockup = [];
         this.saved = [];
 
-        var toolbarTop        = new Toolbar('.adjustment-tab', '.toolbar-container');
-		var toolbarBottom     = new Toolbar('.adjustment-tab', '.toolbar-bottom-container');
+        this.toolbarTop         = new Toolbar('.adjustment-tab', '.toolbar-container');
+		this.toolbarBottom      = new Toolbar('.adjustment-tab', '.toolbar-bottom-container');
 		
         //Editor tools
-		toolbarTop.
+		this.toolbarTop.
             addDropDown('set-all-align', 'Anchor All:', 'Center', 'Bottom').
-			addInput('set-columns', 'Cols:').
-			addInput('set-rows', 'Rows:');
+			addInput('set-columns', 'Cols:', '3').
+			addInput('set-rows', 'Rows:', '3');
             
 
-		toolbarTop.$container.addClass('top');
-		toolbarBottom.$container.addClass('bottom');
+		this.toolbarTop.$container.addClass('top');
+		this.toolbarBottom.$container.addClass('bottom');
 
         //Toolbar events
-        toolbarTop.bind('set-columns', function(evt, txt) {
+        this.toolbarTop.bind('set-columns', function(evt, txt) {
             var cols = Number(txt);
            
             if (isNaN(cols) || cols < 0 || cols > 100) {
-                toolbarTop.feedback("Columns must be a number between 1-100");
+                this.toolbarTop.feedback("Columns must be a number between 1-100");
             } else{
                 this.nCols = cols;
                 this.place();
             }
 		}.bind(this));
 
-        toolbarTop.bind('set-rows', function(evt, txt) {
+        this.toolbarTop.bind('set-rows', function(evt, txt) {
             var rows = Number(txt);
 
             if (isNaN(rows) || rows < 0 || rows > 100) {
-                toolbarTop.feedback("Rows must be a number between 1-100");
+                this.toolbarTop.feedback("Rows must be a number between 1-100");
             } else{
                 this.nRows = rows;
                 this.place();
             }
 		}.bind(this));
 
-        toolbarTop.bind('set-all-align', function(evt, option) {
+        this.toolbarTop.bind('set-all-align', function(evt, option) {
             if(this.mockup.length > 0){
                 this.align(option);
                 this.place();
             }
+        }.bind(this));
+
+        //Cell selected
+        this.editorCanvasView.bind('editCellChange', function(sprite) {
+            this.editing(sprite);
+        }.bind(this));
+
+        //Cells unselected
+        this.editorCanvasView.bind('editNone', function(){
+            this.notEditing();
         }.bind(this));
 
         //Editor tab activated
@@ -99,6 +110,29 @@ class Editor {
 }
 
 var EditorProto = Editor.prototype;
+
+EditorProto.editing = function(sprite){
+    var $editName =$('#edit-name');
+    var $editX = $('#edit-x');
+    var $editY = $('#edit-y');
+
+    if($editName.length){
+        $editName.val(sprite.n.toString());
+        $editX.val(sprite.rect.x.toString());
+        $editY.val(sprite.rect.y.toString());
+    } else{
+        this.toolbarTop.
+        addInput('edit-name', '| Editing     Name:', '20', sprite.n.toString()).
+        addInput('edit-x', 'X:', '20', sprite.rect.x.toString()).
+        addInput('edit-y', 'Y:', '20', sprite.rect.y.toString());
+    }
+}
+
+EditorProto.notEditing = function() {
+    $('.lbl-edit-name').remove();
+    $('.lbl-edit-x').remove();
+    $('.lbl-edit-y').remove();
+}
 
 //Update sprites from selector
 EditorProto.gather = function(selectedSprites) {
