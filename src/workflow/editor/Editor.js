@@ -21,6 +21,7 @@ class Editor {
         this.nRows = -1;
         this.nCols = -1;
 
+        this.editSelected;
         this.mockup = [];
         this.saved = [];
 
@@ -64,6 +65,28 @@ class Editor {
             if(this.mockup.length > 0){
                 this.align(option);
                 this.place();
+                this.editorCanvasView.unselectAllCells();
+            }
+        }.bind(this));
+
+        this.toolbarTop.bind('edit-anchor', function(evt, option) {
+            if(this.editSelected){
+                this.editSelected.align = option;
+                this.place();
+            }
+        }.bind(this));
+
+        this.toolbarTop.bind('edit-x', function(evt, txt) {
+            if(this.editSelected){
+                this.editSelected.rect.x = txt;
+                this.place();
+            }
+        }.bind(this));
+
+        this.toolbarTop.bind('edit-y', function(evt, txt) {
+            if(this.editSelected){
+                this.editSelected.rect.y = txt;
+                this.place();
             }
         }.bind(this));
 
@@ -85,9 +108,7 @@ class Editor {
             this.editorCanvasView.unselectAllCells();
 
             //Pack any selected sprites into mockup[]
-            if(this.selectedSprites.length > 0){
-                this.pack();
-            }
+            this.pack();
 
             //Default rows/cols setting on editor
             var defRows = 1, defCols = this.mockup.length;
@@ -100,9 +121,7 @@ class Editor {
             }
 
             //Draw sliced sprites in editor
-            if(this.mockup.length > 0){
-                this.place();
-            }
+            this.place();
             
         }.bind(this));
 
@@ -112,26 +131,39 @@ class Editor {
 var EditorProto = Editor.prototype;
 
 EditorProto.editing = function(sprite){
-    var $editName =$('#edit-name');
+    this.editSelected = sprite;
+
     var $editX = $('#edit-x');
     var $editY = $('#edit-y');
+    var $editAnchorCenter = $('#anchor-center');
+    var $editAnchorBottom = $('#anchor-bottom');
+    var $editAnchorPrevious = $('#anchor-previous');
 
-    if($editName.length){
-        $editName.val(sprite.n.toString());
+    if($editX.length){
         $editX.val(sprite.rect.x.toString());
         $editY.val(sprite.rect.y.toString());
+
+        $editAnchorCenter.prop('checked', sprite.align == "Center");
+        $editAnchorBottom.prop('checked', sprite.align == "Bottom");
+        $editAnchorPrevious.prop('checked', sprite.align == "Previous");
+
     } else{
         this.toolbarTop.
-        addInput('edit-name', '| Editing     Name:', '20', sprite.n.toString()).
-        addInput('edit-x', 'X:', '20', sprite.rect.x.toString()).
-        addInput('edit-y', 'Y:', '20', sprite.rect.y.toString());
+        addInput('edit-x', '| Editing   X:', '5', sprite.rect.x.toString()).
+        addInput('edit-y', 'Y:', '5', sprite.rect.y.toString()).
+        addRadio('edit-anchor', 'anchor-center', 'Center', '| Anchor   Center:', sprite.align == "Center").
+        addRadio('edit-anchor', 'anchor-bottom', 'Bottom', 'Bottom:', sprite.align == "Bottom").
+        addRadio('edit-anchor', 'anchor-previous', 'Previous', 'Previous:', sprite.align == "Previous");
     }
 }
 
 EditorProto.notEditing = function() {
-    $('.lbl-edit-name').remove();
+    this.editSelected = null;
+
     $('.lbl-edit-x').remove();
     $('.lbl-edit-y').remove();
+
+    $('.lbl-edit-anchor').remove();
 }
 
 //Update sprites from selector

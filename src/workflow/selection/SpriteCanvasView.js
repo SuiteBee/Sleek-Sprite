@@ -33,12 +33,14 @@ class SpriteCanvasView extends MicroEvent {
 			const rect = Object.assign({}, clickedRect);
 
 			var spriteRect = spriteCanvas.trimBg(rect);
-			if (spriteRect.width && spriteRect.height) { // false if clicked on bg pixel
+			if (spriteRect.width && spriteRect.height) {
 				spriteRect = spriteCanvas.expandToSpriteBoundry(rect);
 				
 				spriteCanvasView._handleSelectedSprite(clickedRect, spriteRect);
-			} else {
-				spriteCanvasView.unselectAllSprites();
+			} 
+			//Clicked background
+			else {
+				//spriteCanvasView.unselectAllSprites();
 			}
 		});
 
@@ -86,6 +88,8 @@ SpriteCanvasViewProto._selectSprite = function(clickedRect, spriteRect) {
 SpriteCanvasViewProto.unselectAllSprites = function() {
 	this._selectedSprites.forEach(sprite => sprite.unselect());
 	this._selectedSprites = [];
+
+	this.trigger('selectedSpritesChange', this._selectedSprites);
 }
 
 SpriteCanvasViewProto.setTool = function(mode) {

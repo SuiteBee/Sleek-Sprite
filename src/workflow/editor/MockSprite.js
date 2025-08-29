@@ -19,19 +19,20 @@ MockProto.setAlignment = function(x, y, previous, cellSize) {
 	let halfHeight = this.rect.height/2;
 	let halfCell = cellSize/2;
 
-	//Align Center: Default
+	//Cell center pos to draw from
 	let midX = halfCell - halfWidth;
 	let midY = halfCell - halfHeight;
 
 	//Horizontal alignment: Always center
 	this.rect.x = x + midX;
 
-	//Align based on previous sprite position (uses original y AND current y)
+	//Vertical alignment 
+	//Base on previous sprite (uses original y AND current y)
 	if(this.align == "Previous"){
 		let prevOldDiff = previous.old.y - this.old.y;
-		let prevCurDiff = previous.rect.y - this.rect.y;
+		let prevCurDiff = previous.rect.y;
 
-		this.rect.y = y + prevOldDiff + prevCurDiff;
+		this.rect.y = y + prevCurDiff - prevOldDiff;
 	//Align to bottom of cell
 	} else if(this.align == "Bottom"){
 		let cellDiff = cellSize - this.rect.height;

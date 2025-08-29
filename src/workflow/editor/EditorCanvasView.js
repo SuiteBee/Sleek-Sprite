@@ -53,6 +53,8 @@ EditorCanvasViewProto._handleSelectedCell = function(clickedRect, sprite) {
 		this._selectedCells.splice(cellSelected, 1);
 		this.trigger('editNone');
 	} else {
+		this.unselectAllCells();
+
 		this._selectedCells.push(this._selectCell(clickedRect, cellRect));
 		this.trigger('editCellChange', sprite);
 	}

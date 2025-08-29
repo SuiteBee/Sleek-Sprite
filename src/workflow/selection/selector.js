@@ -36,13 +36,14 @@ import Editor from '../editor/Editor';
 		toolbarTop.
 			addItem('open-img', 'Open').
 			addItem('reload-img', 'Reload Current Image', {noLabel: true}).
+			addItem('select-none', 'Unselect All', {noLabel: true}).
 			addItem(
 				new ToolbarGroup().
 					addItem('select-sprite', 'Select Sprite', {active: true}).
 					addItem('select-bg', 'Pick Background')
 			).
 			addStatus('selected-bg', 'Selected Background').
-			addItem('remove-bg', 'Clear');
+			addItem('remove-bg', 'Cut');
 
 		toolbarTop.$container.addClass('top');
 
@@ -53,28 +54,27 @@ import Editor from '../editor/Editor';
 		// listeners
 		imgInput.bind('load', function(img) {
 			spriteCanvas.setImg(img);
-			
+			spriteCanvas.setBg([0, 0, 0, 0]);
+
 			spriteCanvasView.unselectAllSprites();
-			toolbarTop.activate('select-bg');
-			spriteCanvasView.setTool('select-bg');
+			spriteCanvasView.setTool('select-sprite');
+
 			var $selectedBg = $('.selected-bg');
 			$selectedBg.css('background-color', '');
 			$selectedBg.addClass('none');
-
-			spriteCanvas.setBg([0, 0, 0, 0]);
 
 			pageLayout.toAppView();
 		});
 		
 		spriteCanvasView.bind('selectedSpritesChange', function(selectedSprites) {
+			editor.gather(selectedSprites);
+			
 			if(selectedSprites.length === 0) {
 				return;
 			}
 
 			previewPanel.selectedSprites = selectedSprites;
 			previewPanel.update();
-			
-			editor.gather(selectedSprites);
 
 			selectedSprites.forEach(({rect}) => {
 				if (rect.width === spriteCanvas.canvas.width && rect.height === spriteCanvas.canvas.height) {
@@ -117,6 +117,11 @@ import Editor from '../editor/Editor';
 		
 		toolbarTop.bind('reload-img', function(event) {
 			imgInput.reloadLastFile();
+			event.preventDefault();
+		});
+
+		toolbarTop.bind('select-none', function(event) {
+			spriteCanvasView.unselectAllSprites();
 			event.preventDefault();
 		});
 		

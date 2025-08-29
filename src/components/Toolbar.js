@@ -54,6 +54,14 @@ class Toolbar extends MicroEvent {
 			toolbar.trigger(ddlChange, $ddl.val());
 		});
 
+		$container.on('change', 'input[role=radio]', function() {
+			var $radio = $(this),
+			rdName = $radio.data('rdName'),
+			rdOption = $radio.data('rdOption'),
+			rdChange = new $.Event(rdName);
+			toolbar.trigger(rdChange, rdOption);
+		});
+
 		toolbar.$container = $container;
 		toolbar._$feedback = $container.find('span.feedback');
 	}
@@ -94,6 +102,22 @@ class Toolbar extends MicroEvent {
 		$ddl.appendTo($label);
 		return $label;
 	}
+
+	static createCheckbox(chkName, text, defVal) {
+		var $label = $(`<label for="${chkName}">${text}</label>`).addClass(`lbl-${chkName}`);
+		var $chkBox = $(`<input type="checkbox" role="checkbox" name="${chkName}" id="${chkName}"/>`).addClass(chkName).data('chkName', chkName);
+		$chkBox.prop('checked', defVal);
+		$chkBox.appendTo($label);
+		return $label;
+	}
+
+	static createRadio(rdName, option, optionVal, text, defVal) {
+		var $label = $(`<label for="${option}">${text}</label>`).addClass(`lbl-${rdName}`);
+		var $radio = $(`<input type="radio" role="radio" name="${rdName}" id="${option}"/>`).addClass(option);
+		$radio.data('rdName', rdName).data('rdOption', optionVal).prop('checked', defVal);
+		$radio.appendTo($label);
+		return $label;
+	}
 }
 
 var ToolbarProto = Toolbar.prototype;
@@ -123,6 +147,18 @@ ToolbarProto.addInput = function(inputName, text, limit, defVal = '') {
 
 ToolbarProto.addDropDown = function(ddlName, text, ...options){
 	Toolbar.createDropDown(ddlName, text, ...options).insertBefore(this._$feedback);
+
+	return this;
+}
+
+ToolbarProto.addCheckbox = function(chkName, text, defVal = false) {
+	Toolbar.createCheckbox(chkName, text, defVal).insertBefore(this._$feedback);
+
+	return this;
+}
+
+ToolbarProto.addRadio = function(rdName, option, optionVal, text, defVal = false) {
+	Toolbar.createRadio(rdName, option, optionVal, text, defVal).insertBefore(this._$feedback);
 
 	return this;
 }
