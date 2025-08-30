@@ -78,34 +78,34 @@ class Editor {
         this.toolbarTop.bind('edit-x', function(evt, txt) {
             if(this.editSelected){
                 var newX = Number(txt);
-                var minX = this.editSelected.cell.x;
-                var maxX = this.editSelected.cell.x + this.editSelected.cell.width;
+                var minX = (this.editSelected.rect.width/2) - (this.editSelected.cell.width/2);
+                var maxX = (this.editSelected.cell.width/2) -(this.editSelected.rect.width/2);
                 
                 if(isNaN(newX)){
                     this.toolbarTop.feedback(`X must be a number`);
                 }else if(newX < minX || newX > maxX){
                     this.toolbarTop.feedback(`Must be within cell bounds: ${minX}-${maxX}`);
+                } else{  
+                    this.editSelected.nudgeX = newX;
+                    this.place();
                 }
-
-                this.editSelected.nudgeX = this.editSelected.rect.x - newX;
-                this.place();
             }
         }.bind(this));
 
         this.toolbarTop.bind('edit-y', function(evt, txt) {
             if(this.editSelected){
                 var newY = Number(txt);
-                var minY = this.editSelected.cell.y;
-                var maxY = this.editSelected.cell.y + this.editSelected.cell.height;
+                var minY = (this.editSelected.rect.height/2) - (this.editSelected.cell.height/2);
+                var maxY = (this.editSelected.cell.height/2) - (this.editSelected.rect.height/2);
                 
                 if(isNaN(newY)){
                     this.toolbarTop.feedback(`Y must be a number`);
                 }else if(newY < minY || newY > maxY){
                     this.toolbarTop.feedback(`Must be within cell bounds: ${minY}-${maxY}`);
+                } else{
+                    this.editSelected.nudgeY = newY;
+                    this.place();
                 }
-                
-                this.editSelected.nudgeY = this.editSelected.rect.y - newY;
-                this.place();
             }
         }.bind(this));
 
@@ -175,8 +175,8 @@ EditorProto.editing = function(sprite){
     var $editFlipY = $('#edit-flip-y');
 
     if($editX.length){
-        $editX.val(sprite.rect.x.toString());
-        $editY.val(sprite.rect.y.toString());
+        $editX.val(sprite.nudgeX.toString());
+        $editY.val(sprite.nudgeY.toString());
 
         $editAnchorCenter.prop('checked', sprite.anchor == "Center");
         $editAnchorBottom.prop('checked', sprite.anchor == "Bottom");
@@ -187,8 +187,8 @@ EditorProto.editing = function(sprite){
 
     } else{
         this.toolbarTop.
-        addInput('edit-x', '| Editing   X:', '5', sprite.rect.x.toString()).
-        addInput('edit-y', 'Y:', '5', sprite.rect.y.toString()).
+        addInput('edit-x', '| Nudge   X:', '5', sprite.nudgeX.toString()).
+        addInput('edit-y', 'Y:', '5', sprite.nudgeY.toString()).
         addRadio('edit-anchor', 'anchor-center', 'Center', '| Anchor   Center:', sprite.anchor == "Center").
         addRadio('edit-anchor', 'anchor-bottom', 'Bottom', 'Bottom:', sprite.anchor == "Bottom").
         addRadio('edit-anchor', 'anchor-previous', 'Previous', 'Previous:', sprite.anchor == "Previous").

@@ -16,6 +16,15 @@ class MockSprite {
 		this.nudgeY = 0;
 	}
 
+	get pos() {
+		return new Rect(
+			this.rect.x + this.nudgeX, 
+			this.rect.y + this.nudgeY, 
+			this.rect.width, 
+			this.rect.height
+		);
+	}
+
 	get flipped(){
 		return this.flipX || this.flipY;
 	}
@@ -56,10 +65,6 @@ MockProto._setAlignment = function(x, y, cellSize, previous) {
 	} else if(this.anchor == "Center"){
 		this.rect.y = y + midY;
 	}
-
-	//Adjustments in editor
-	this.rect.x += this.nudgeX;
-	this.rect.y += this.nudgeY;
 }
 
 //Cell size/pos sprite is contained in

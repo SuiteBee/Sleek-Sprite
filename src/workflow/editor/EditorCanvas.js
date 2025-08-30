@@ -59,7 +59,7 @@ export default (function() {
 
     EditorCanvasProto.draw = function(sprite){
         let s = sprite.src;
-        let d = sprite.rect;
+        let d = sprite.pos;
 
         this.context.drawImage(this.srcCanvas, s.x, s.y, s.width, s.height, d.x, d.y, d.width, d.height);
     }
@@ -67,26 +67,28 @@ export default (function() {
     EditorCanvasProto.drawFlipped = function(sprite){
         this.context.save();
 
+        let s = sprite.src;
+        let d = sprite.pos;
+
         var translateX = 0, translateY = 0, 
-        posX = sprite.rect.x, posY = sprite.rect.y, 
+        posX = d.x, posY = d.y, 
         scaleX = 1, scaleY = 1;
 
         if(sprite.flipX){
-            translateX = sprite.rect.x + sprite.rect.width / 2;
-            posX = -sprite.rect.width / 2;
+            translateX = d.x + d.width / 2;
+            posX = -d.width / 2;
             scaleX = -1;
         }
         if(sprite.flipY){
-            translateY = sprite.rect.y + sprite.rect.height / 2;
-            posY = -sprite.rect.height / 2;
+            translateY = d.y + d.height / 2;
+            posY = -d.height / 2;
             scaleY = -1;
         }
 
         this.context.translate(translateX, translateY);
         this.context.scale(scaleX, scaleY);
 
-        let s = sprite.src;
-        let d = sprite.rect;
+        
         this.context.drawImage(this.srcCanvas, s.x, s.y, s.width, s.height, posX, posY, d.width, d.height);
         this.context.restore();
     }
