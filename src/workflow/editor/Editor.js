@@ -78,8 +78,9 @@ class Editor {
         this.toolbarTop.bind('edit-x', function(evt, txt) {
             if(this.editSelected){
                 var newX = Number(txt);
-                var minX = (this.editSelected.rect.width/2) - (this.editSelected.cell.width/2);
-                var maxX = (this.editSelected.cell.width/2) -(this.editSelected.rect.width/2);
+                
+                var minX = this.editSelected.cell.x - this.editSelected.rect.x;
+                var maxX = this.editSelected.rect.x - this.editSelected.cell.x;
                 
                 if(isNaN(newX)){
                     this.toolbarTop.feedback(`X must be a number`);
@@ -95,8 +96,13 @@ class Editor {
         this.toolbarTop.bind('edit-y', function(evt, txt) {
             if(this.editSelected){
                 var newY = Number(txt);
-                var minY = (this.editSelected.rect.height/2) - (this.editSelected.cell.height/2);
-                var maxY = (this.editSelected.cell.height/2) - (this.editSelected.rect.height/2);
+
+                var minY = this.editSelected.cell.y - this.editSelected.rect.y;
+                var maxY = this.editSelected.rect.y - this.editSelected.cell.y;
+
+                if(this.editSelected.anchor == "Bottom"){
+                    maxY = 0;
+                }
                 
                 if(isNaN(newY)){
                     this.toolbarTop.feedback(`Y must be a number`);
