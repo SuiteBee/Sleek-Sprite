@@ -54,6 +54,13 @@ class Toolbar extends MicroEvent {
 			toolbar.trigger(ddlChange, $ddl.val());
 		});
 
+		$container.on('change', 'input[role=checkbox]', function() {
+			var $chkbox = $(this),
+			chkName = $chkbox.data('chkName'),
+			chkChange = new $.Event(chkName);
+			toolbar.trigger(chkChange, $chkbox.prop("checked"));
+		});
+
 		$container.on('change', 'input[role=radio]', function() {
 			var $radio = $(this),
 			rdName = $radio.data('rdName'),

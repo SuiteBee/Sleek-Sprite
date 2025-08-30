@@ -11,11 +11,10 @@ class Editor {
 
     constructor(srcCanvas) {
 		this.$editorContainer   = $('.adjustment-inner');
-		this.editorCanvas       = new EditorCanvas(this.$editorContainer);
+		this.editorCanvas       = new EditorCanvas(srcCanvas);
         this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, this.$editorContainer );
         this.editPreview        = new EditPreview(this.$editorContainer);
 
-        this.selectorCanvas     = srcCanvas;
         this.selectedSprites    = [];
         
         this.nRows = -1;
@@ -63,7 +62,7 @@ class Editor {
 
         this.toolbarTop.bind('set-all-align', function(evt, option) {
             if(this.mockup.length > 0){
-                this.align(option);
+                this.anchorAll(option);
                 this.place();
                 this.editorCanvasView.unselectAllCells();
             }
@@ -71,21 +70,55 @@ class Editor {
 
         this.toolbarTop.bind('edit-anchor', function(evt, option) {
             if(this.editSelected){
-                this.editSelected.align = option;
+                this.editSelected.anchor = option;
                 this.place();
             }
         }.bind(this));
 
         this.toolbarTop.bind('edit-x', function(evt, txt) {
             if(this.editSelected){
-                this.editSelected.rect.x = txt;
+                var newX = Number(txt);
+                var minX = this.editSelected.cell.x;
+                var maxX = this.editSelected.cell.x + this.editSelected.cell.width;
+                
+                if(isNaN(newX)){
+                    this.toolbarTop.feedback(`X must be a number`);
+                }else if(newX < minX || newX > maxX){
+                    this.toolbarTop.feedback(`Must be within cell bounds: ${minX}-${maxX}`);
+                }
+
+                this.editSelected.nudgeX = this.editSelected.rect.x - newX;
                 this.place();
             }
         }.bind(this));
 
         this.toolbarTop.bind('edit-y', function(evt, txt) {
             if(this.editSelected){
-                this.editSelected.rect.y = txt;
+                var newY = Number(txt);
+                var minY = this.editSelected.cell.y;
+                var maxY = this.editSelected.cell.y + this.editSelected.cell.height;
+                
+                if(isNaN(newY)){
+                    this.toolbarTop.feedback(`Y must be a number`);
+                }else if(newY < minY || newY > maxY){
+                    this.toolbarTop.feedback(`Must be within cell bounds: ${minY}-${maxY}`);
+                }
+                
+                this.editSelected.nudgeY = this.editSelected.rect.y - newY;
+                this.place();
+            }
+        }.bind(this));
+
+        this.toolbarTop.bind('edit-flip-x', function(evt, chk) {
+            if(this.editSelected){
+                this.editSelected.flipX = chk;
+                this.place();
+            }
+        }.bind(this));
+
+        this.toolbarTop.bind('edit-flip-y', function(evt, chk) {
+            if(this.editSelected){
+                this.editSelected.flipY = chk;
                 this.place();
             }
         }.bind(this));
@@ -138,22 +171,29 @@ EditorProto.editing = function(sprite){
     var $editAnchorCenter = $('#anchor-center');
     var $editAnchorBottom = $('#anchor-bottom');
     var $editAnchorPrevious = $('#anchor-previous');
+    var $editFlipX = $('#edit-flip-x');
+    var $editFlipY = $('#edit-flip-y');
 
     if($editX.length){
         $editX.val(sprite.rect.x.toString());
         $editY.val(sprite.rect.y.toString());
 
-        $editAnchorCenter.prop('checked', sprite.align == "Center");
-        $editAnchorBottom.prop('checked', sprite.align == "Bottom");
-        $editAnchorPrevious.prop('checked', sprite.align == "Previous");
+        $editAnchorCenter.prop('checked', sprite.anchor == "Center");
+        $editAnchorBottom.prop('checked', sprite.anchor == "Bottom");
+        $editAnchorPrevious.prop('checked', sprite.anchor == "Previous");
+
+        $editFlipX.prop('checked', sprite.flipX);
+        $editFlipY.prop('checked', sprite.flipY);
 
     } else{
         this.toolbarTop.
         addInput('edit-x', '| Editing   X:', '5', sprite.rect.x.toString()).
         addInput('edit-y', 'Y:', '5', sprite.rect.y.toString()).
-        addRadio('edit-anchor', 'anchor-center', 'Center', '| Anchor   Center:', sprite.align == "Center").
-        addRadio('edit-anchor', 'anchor-bottom', 'Bottom', 'Bottom:', sprite.align == "Bottom").
-        addRadio('edit-anchor', 'anchor-previous', 'Previous', 'Previous:', sprite.align == "Previous");
+        addRadio('edit-anchor', 'anchor-center', 'Center', '| Anchor   Center:', sprite.anchor == "Center").
+        addRadio('edit-anchor', 'anchor-bottom', 'Bottom', 'Bottom:', sprite.anchor == "Bottom").
+        addRadio('edit-anchor', 'anchor-previous', 'Previous', 'Previous:', sprite.anchor == "Previous").
+        addCheckbox('edit-flip-x', '| Flip X:', sprite.flipX).
+        addCheckbox('edit-flip-y', 'Y:', sprite.flipY);
     }
 }
 
@@ -162,8 +202,9 @@ EditorProto.notEditing = function() {
 
     $('.lbl-edit-x').remove();
     $('.lbl-edit-y').remove();
-
     $('.lbl-edit-anchor').remove();
+    $('.lbl-edit-flip-x').remove();
+    $('.lbl-edit-flip-y').remove();
 }
 
 //Update sprites from selector
@@ -173,19 +214,16 @@ EditorProto.gather = function(selectedSprites) {
 
 //Pack selected sprites into an object array
 EditorProto.pack = function() {
-    var srcContext = this.selectorCanvas.canvas.getContext('2d');
     this.mockup = [];
     
     this.selectedSprites.forEach(function(sprite, i) {
-        let rect = sprite.rect;
-        let data = srcContext.getImageData(rect.x, rect.y, rect.width, rect.height);
-        this.mockup.push(new MockSprite(sprite.rect, data, i));
+        this.mockup.push(new MockSprite(sprite.rect, i));
     }.bind(this)); 
 }
 
-EditorProto.align = function(alignOption) {
-    this.mockup.forEach(function(sprite, i) {
-        sprite.align = alignOption;
+EditorProto.anchorAll = function(anchorPos) {
+    this.mockup.forEach(function(sprite) {
+        sprite.anchor = anchorPos;
     }.bind(this)); 
 }
 

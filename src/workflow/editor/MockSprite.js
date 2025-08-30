@@ -1,25 +1,39 @@
 import Rect from '../../utilities/Rect';
 
 class MockSprite {
-	constructor(rect, data, index) {
-		this.old = rect;
+	constructor(rect, index) {
 		this.n = index;
-		this.rect = new Rect(rect.x, rect.y, rect.width, rect.height);
-		this.cell = new Rect(rect.x, rect.y, rect.width, rect.height)
-        this.imgData = data;
 
-		this.align = "Center";
+		this.src = rect;
+		this.rect = new Rect(rect.x, rect.y, rect.width, rect.height);
+		this.cell = new Rect(rect.x, rect.y, rect.width, rect.height);
+
+		//Defaults
+		this.anchor = "Center";
+		this.flipX = false;
+		this.flipY = false;
+		this.nudgeX = 0;
+		this.nudgeY = 0;
+	}
+
+	get flipped(){
+		return this.flipX || this.flipY;
 	}
 }
 
 var MockProto = MockSprite.prototype;
 
-MockProto.setAlignment = function(x, y, previous, cellSize) {
+MockProto.update = function(x, y, cellSize, previous){
+	this._setAlignment(x, y, cellSize, previous);
+	this._setCell(x, y, cellSize);
+}
+
+MockProto._setAlignment = function(x, y, cellSize, previous) {
 	let halfWidth = this.rect.width/2;
 	let halfHeight = this.rect.height/2;
 	let halfCell = cellSize/2;
 
-	//Cell center pos to draw from
+	//Sprite center pos to draw from
 	let midX = halfCell - halfWidth;
 	let midY = halfCell - halfHeight;
 
@@ -28,23 +42,28 @@ MockProto.setAlignment = function(x, y, previous, cellSize) {
 
 	//Vertical alignment 
 	//Base on previous sprite (uses original y AND current y)
-	if(this.align == "Previous"){
-		let prevOldDiff = previous.old.y - this.old.y;
+	if(this.anchor == "Previous"){
+		let prevOldDiff = previous.src.y - this.src.y;
 		let prevCurDiff = previous.rect.y;
 
 		this.rect.y = y + prevCurDiff - prevOldDiff;
 	//Align to bottom of cell
-	} else if(this.align == "Bottom"){
+	} else if(this.anchor == "Bottom"){
 		let cellDiff = cellSize - this.rect.height;
 		let verticalPadding = cellDiff/2;
 
 		this.rect.y = y + midY + verticalPadding;
-	} else if(this.align == "Center"){
+	} else if(this.anchor == "Center"){
 		this.rect.y = y + midY;
 	}
+
+	//Adjustments in editor
+	this.rect.x += this.nudgeX;
+	this.rect.y += this.nudgeY;
 }
 
-MockProto.setCell = function(x, y, size) {
+//Cell size/pos sprite is contained in
+MockProto._setCell = function(x, y, size) {
 	this.cell.x = x;
 	this.cell.y = y;
 	this.cell.width = size;
