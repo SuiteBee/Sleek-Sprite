@@ -1,6 +1,5 @@
 import $ from 'jquery';
-import { Toolbar } from '../../components/Toolbar';
-import Selected from '../../components/Selected';
+import { Toolbar, ToolbarGroup } from '../../components/Toolbar';
 
 import EditorCanvas from './EditorCanvas';
 import EditorCanvasView from './EditorCanvasView';
@@ -29,10 +28,15 @@ class Editor {
 		
         //Editor tools
 		this.toolbarTop.
-            addDropDown('set-all-align', 'Anchor All:', 'Center', 'Bottom').
-			addInput('set-columns', 'Cols:', '3').
-			addInput('set-rows', 'Rows:', '3');
-            
+            addItem(
+                new ToolbarGroup('edit-all').
+                addDropDown('set-all-align', 'Anchor All:', 'Center', 'Bottom')
+            ).
+            addItem(
+                new ToolbarGroup('edit-grid').
+                    addInput('set-columns', 'Cols:', '3').
+			        addInput('set-rows', 'Rows:', '3')
+            );
 
 		this.toolbarTop.$container.addClass('top');
 		this.toolbarBottom.$container.addClass('bottom');
@@ -193,13 +197,22 @@ EditorProto.editing = function(sprite){
 
     } else{
         this.toolbarTop.
-        addInput('edit-x', '| Nudge   X:', '5', sprite.nudgeX.toString()).
-        addInput('edit-y', 'Y:', '5', sprite.nudgeY.toString()).
-        addRadio('edit-anchor', 'anchor-center', 'Center', '| Anchor   Center:', sprite.anchor == "Center").
-        addRadio('edit-anchor', 'anchor-bottom', 'Bottom', 'Bottom:', sprite.anchor == "Bottom").
-        addRadio('edit-anchor', 'anchor-previous', 'Previous', 'Previous:', sprite.anchor == "Previous").
-        addCheckbox('edit-flip-x', '| Flip X:', sprite.flipX).
-        addCheckbox('edit-flip-y', 'Y:', sprite.flipY);
+        addItem(
+            new ToolbarGroup('edit-selected').
+            addInput('edit-x', '| Nudge   X:', '5', sprite.nudgeX.toString()).
+            addInput('edit-y', 'Y:', '5', sprite.nudgeY.toString())
+        ).
+        addItem(
+            new ToolbarGroup('edit-selected').
+            addRadio('edit-anchor', 'anchor-center', 'Center', '| Anchor   Center:', sprite.anchor == "Center").
+            addRadio('edit-anchor', 'anchor-bottom', 'Bottom', 'Bottom:', sprite.anchor == "Bottom").
+            addRadio('edit-anchor', 'anchor-previous', 'Previous', 'Previous:', sprite.anchor == "Previous")
+        ).
+        addItem(
+            new ToolbarGroup('edit-selected').
+                addCheckbox('edit-flip-x', 'X:', sprite.flipX).
+                addCheckbox('edit-flip-y', 'Y:', sprite.flipY)
+        );
     }
 }
 
@@ -208,9 +221,7 @@ EditorProto.notEditing = function() {
 
     $('.lbl-edit-x').remove();
     $('.lbl-edit-y').remove();
-    $('.lbl-edit-anchor').remove();
-    $('.lbl-edit-flip-x').remove();
-    $('.lbl-edit-flip-y').remove();
+    $('.edit-selected').remove();
 }
 
 //Update sprites from selector

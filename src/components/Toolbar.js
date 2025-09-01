@@ -225,17 +225,47 @@ ToolbarProto.isActive = function(toolName) {
 };
 
 class ToolbarGroup {
-	constructor() {
-		this.$container = $('<div class="toolbar-group"/>');
+	constructor(groupClass) {
+		this.$container = $('<div class="toolbar-group"/>').addClass(groupClass);
 	}
 }
 
 var ToolbarGroupProto = ToolbarGroup.prototype;
 
 ToolbarGroupProto.addItem = function(toolName, text, opts) {
-	Toolbar.createButton(toolName, text, opts).appendTo( this.$container );
+	Toolbar.createButton(toolName, text, opts).appendTo(this.$container);
 	return this;
 };
+
+ToolbarGroupProto.addStatus = function(statusName, text) {
+	Toolbar.createStatus(statusName, text).appendTo(this.$container);
+
+	return this;
+};
+
+ToolbarGroupProto.addInput = function(inputName, text, limit, defVal = '') {
+	Toolbar.createInput(inputName, text, limit, defVal).appendTo(this.$container);
+
+	return this;
+}
+
+ToolbarGroupProto.addDropDown = function(ddlName, text, ...options){
+	Toolbar.createDropDown(ddlName, text, ...options).appendTo(this.$container);
+
+	return this;
+}
+
+ToolbarGroupProto.addCheckbox = function(chkName, text, defVal = false) {
+	Toolbar.createCheckbox(chkName, text, defVal).appendTo(this.$container);
+
+	return this;
+}
+
+ToolbarGroupProto.addRadio = function(rdName, option, optionVal, text, defVal = false) {
+	Toolbar.createRadio(rdName, option, optionVal, text, defVal).appendTo(this.$container);
+
+	return this;
+}
 
 export {
 	Toolbar,

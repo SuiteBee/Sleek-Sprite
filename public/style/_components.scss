@@ -1,27 +1,5 @@
 @use "utils";
 
-// Logo
-	.cow-logo {
-		background: url("imgs/sprites1.png") no-repeat -2px -66px;
-		position: relative;
-		left: 25px;
-		height: 20px;
-		margin: 0;
-		opacity: 0;
-		overflow: hidden;
-		text-indent: -5000px;
-		display: inline-block;
-		@include utils.transform( scale(0.1) );
-		@include utils.transform-origin(50% 0);
-
-		.intro & {
-			width: 448px;
-			height: 388px;
-			margin: 66px 0 29px;
-			opacity: 1;
-			@include utils.transform( scale(1) );
-		}
-	}
 // Headings
 	.h-main {
 		font: normal 59px/1 oswald, sans-serif;
@@ -289,7 +267,7 @@
 // Toolbar
 	.toolbar {
 		overflow: hidden;
-		padding: 5px 6px 0;
+		padding: 5px 6px 3px;
 		position: relative;
 		z-index: 1;
 		border-style: solid;
@@ -311,7 +289,6 @@
 		}
 
 		& [role=checkbox]{
-			margin: 0 5px 8px 5px;
 			border: 3px solid #888;
 			border-radius: 50%;
 			cursor: pointer;
@@ -344,31 +321,30 @@
 			
 			&.none{
 				background: url('imgs/trans.png');
-				background-repeat: repeat;
+				background-repeat: round;
 			}
 		}
 
 		& [role=input]{
-			color: black;
-			margin: 0 5px 5px 5px;
+			margin: 0px 5px 0px 5px;
 			border: 1px solid #888;
 			border-radius: 4px;
 			cursor: pointer;
 			position: relative;
 			padding-left: 5px;
 			width: 30px;
-			height: 20px;
+			height: 12px;
 		}
 
 		& [role=select]{
 			color: black;
-			margin: 0 5px 5px 5px;
+			margin: 0 5px 0px 5px;
 			border: 1px solid #888;
 			border-radius: 4px;
 			cursor: pointer;
 			position: relative;
 			width: 75px;
-			height: 22px;
+			height: 20px;
 		}
 
 		& [role=button] {
@@ -377,23 +353,16 @@
 			border: 1px solid #888;
 			border-radius: 4px;
 			cursor: pointer;
-			padding: 4px 10px 4px 26px;
+			padding: 6px 10px 6px 30px;
 			position: relative;
 			
 			@include utils.linear-gradient((top, #fefefe, #b8b8b8));
 
-			&.remove-bg {
-				padding: 4px 10px 4px 10px;
-			}
-
 			&::before {
 				content: '';
-				width: 16px;
-				height: 17px;
 				position: absolute;
-				top: 4px;
+				top: 5px;
 				left: 5px;
-				background: url('imgs/sprites1.png') no-repeat;
 			}
 			&.active {
 				background: #707070;
@@ -401,39 +370,36 @@
 				color: #fff;	
 			}
 			&.no-label {
-				width: 26px;
-				padding: 4px 0;
+				width: 28px;
+				padding: 6px 0;
 				text-indent: -5000px;
 			}
+			&.select-none::before {
+				@include utils.icon("cancel", 1px);
+			}
 			&.select-sprite::before {
-				background-position: -4px -2px;
+				@include utils.icon("arrow", 1px, 90);
 			}
 			&.select-bg::before {
-				background-position: -50px -3px;
+				@include utils.icon("dropper", 1px);
 			}
 			&.open-img::before {
-				background-position: -26px -2px;
+				@include utils.icon("folderFile", 1px);
 			}
 			&.remove-bg::before {
-				background: none;
-				//background-position: -99px -2px;
+				@include utils.icon("erase");
 			}
 			&.reload-img::before {
-				background-position: -75px -2px;
-			}
-			&.percent::before {
-				background-position: -121px -2px;
-			}
-			&.bg-size::before {
-				background-position: -141px -1px;
+				@include utils.icon("reload", 1px);
 			}
 		}
 		& .feedback {
 			position: fixed;
 			float: left;
-			padding: 5px;
+			padding: 10px;
 			color: #555;
 			opacity: 0;
+			font-size: larger;
 		}
 	}
 
@@ -451,6 +417,22 @@
 			border-radius: 0 4px 4px 0;
 		}
 	}
+
+	.edit-selected, .edit-all, .edit-grid {
+		margin: 0 5px 5px 0;
+		border: 1px solid #888;
+		border-radius: 4px;
+		float: left;
+		width: fit-content;
+
+		padding: 5px;
+		@include utils.linear-gradient((top, #fefefe, #b8b8b8));
+	}
+
+	.edit-all {
+		padding: 3px 5px;
+	}
+	
 // Footer
 	.main-footer {
 		overflow: hidden;
@@ -473,15 +455,6 @@
 			.intro & {
 				padding: 12px 16px 0;
 			}
-		}
-		& .the-team-logo {
-			background: url('imgs/sprites1.png') no-repeat -4px -29px;
-			width: 88px;
-			height: 17px;
-			display: inline-block;
-			text-indent: -5000px;
-			vertical-align: top;
-			margin: -1px 0 0 4px;
 		}
 		& ul {
 			float: left;

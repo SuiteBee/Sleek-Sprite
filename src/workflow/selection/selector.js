@@ -34,7 +34,7 @@ import Editor from '../editor/Editor';
 		var toolbarBottom     = new Toolbar('.selection-tab', '.toolbar-bottom-container');
 		
 		toolbarTop.
-			addItem('open-img', 'Open').
+			addItem('open-img', 'Open Image', {noLabel: true}).
 			addItem('reload-img', 'Reload Current Image', {noLabel: true}).
 			addItem('select-none', 'Unselect All', {noLabel: true}).
 			addItem(
@@ -43,7 +43,7 @@ import Editor from '../editor/Editor';
 					addItem('select-bg', 'Pick Background')
 			).
 			addStatus('selected-bg', 'Selected Background').
-			addItem('remove-bg', 'Cut');
+			addItem('remove-bg', 'Erase Color', {noLabel: true});
 
 		toolbarTop.$container.addClass('top');
 

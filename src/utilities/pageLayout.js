@@ -89,7 +89,8 @@ export default (function() {
 				duration: 500,
 				easing: 'swing',
 				targets: [
-					[$spriteCanvasContainer, {opacity: 1}]
+					[$spriteCanvasContainer, {opacity: 1}],
+					[$workflow, {opacity: 1}]
 				]
 			}
 		];
