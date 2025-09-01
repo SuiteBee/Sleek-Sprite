@@ -43,7 +43,8 @@ import Editor from '../editor/Editor';
 					addItem('select-bg', 'Pick Background')
 			).
 			addStatus('selected-bg', 'Selected Background').
-			addItem('remove-bg', 'Erase Color', {noLabel: true});
+			addItem('remove-bg', 'Erase Color', {noLabel: true}).
+			addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
 
 		toolbarTop.$container.addClass('top');
 
@@ -130,6 +131,15 @@ import Editor from '../editor/Editor';
 		toolbarTop.bind('remove-bg', function(img) {
 			spriteCanvas.clearBg(img);
 			img.preventDefault();
+		});
+
+		toolbarTop.bind('invert-bg', function(event) {
+			if ( event.isActive ) {
+				spriteCanvasView.setBg('#fff');
+			}
+			else {
+				spriteCanvasView.setBg('#000');
+			}
 		});
 
 		toolbarBottom.bind('percent', function(event) {

@@ -387,6 +387,12 @@
 			&.open-img::before {
 				@include utils.icon("folderFile", 1px);
 			}
+			&.invert-bg {
+				float:right;
+			}
+			&.invert-bg::before {
+				@include utils.icon("visible");
+			}
 			&.remove-bg::before {
 				@include utils.icon("erase");
 			}
