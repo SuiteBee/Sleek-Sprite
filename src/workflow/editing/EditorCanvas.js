@@ -6,6 +6,7 @@ export default (function() {
 		var canvas = document.createElement('canvas');
 		this.canvas = canvas;
 		this.context = canvas.getContext('2d');
+        this._bgData = [0, 0, 0, 0];
 
         this.srcCanvas = srcCanvas.canvas;
         this.srcContext = srcCanvas.canvas.getContext('2d');

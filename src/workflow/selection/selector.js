@@ -8,7 +8,7 @@ import SpriteCanvas from './SpriteCanvas';
 import SpriteCanvasView from './SpriteCanvasView';
 
 import PreviewPanel from '../../cutter/PreviewPanel';
-import Editor from '../editor/Editor';
+import Editor from '../editing/Editor';
 
 (function() {
 	// init
