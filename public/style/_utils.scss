@@ -39,13 +39,20 @@
 
 // Icons
 	$icon-path: "./icons/";
-    @mixin icon($icon-name, $dropShadow: 0px, $rotate: 0, $width: 18px, $height: 18px) {
+    @mixin icon($icon-name, $dropShadow: 0px, $width: 18px, $height: 18px) {
         width: $width;
         height: $height;
-		transform: rotate($rotate);
         background-image: url("#{$icon-path}#{$icon-name}.svg");
         background-size: contain;
         background-repeat: no-repeat;
 		
 		filter: drop-shadow( $dropShadow $dropShadow 0px rgba(0, 0, 0, 0.7));
     }
+
+	@mixin rotate($degrees) {
+	  -webkit-transform: rotate($degrees);
+      -moz-transform: rotate($degrees);
+      -ms-transform: rotate($degrees);
+      -o-transform: rotate($degrees);
+      transform: rotate($degrees);
+	}

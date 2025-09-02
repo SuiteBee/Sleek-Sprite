@@ -288,26 +288,6 @@
 			border-bottom-width: 0;
 		}
 
-		& [role=checkbox]{
-			margin: 0px 5px 0px 5px;
-			border: 3px solid #888;
-			border-radius: 50%;
-			cursor: pointer;
-			position: relative;
-			width: 15px;
-			height: 15px;
-		}
-
-		& [role=radio]{
-			margin: 0 5px 0px 5px;
-			border: 3px solid #888;
-			border-radius: 50%;
-			cursor: pointer;
-			position: relative;
-			width: 15px;
-			height: 15px;
-		}
-
 		& [role=img]{
 			float: left;
 			margin: 0 5px 5px 0;
@@ -379,7 +359,7 @@
 				@include utils.icon("cancel", 1px);
 			}
 			&.select-sprite::before {
-				@include utils.icon("arrow", 1px, 90);
+				@include utils.icon("arrow", 1px);
 			}
 			&.select-bg::before {
 				@include utils.icon("dropper", 1px);
@@ -400,31 +380,104 @@
 				@include utils.icon("reload", 1px);
 			}
 		}
-		& .feedback {
-			position: fixed;
-			float: left;
-			padding: 10px;
-			color: #555;
-			opacity: 0;
-			font-size: larger;
+	}
+
+	 .feedback {
+		position:absolute;
+		width: fit-content;
+		height: 16px;
+
+		top: -35px;
+		right: 0px;
+		padding: 4px 10px 4px 10px;
+
+		border: 1px solid #888;
+		border-radius: 4px;
+
+		color: black;
+		opacity: 0;
+		font-size: larger;
+	}
+
+	.toolbar-group {
+		& [role=button] {
+			margin-right: 0;
+			border-radius: 0;
+			border-left-width: 0;
+
+			&:first-child {
+				border-left-width: 1px;
+				border-radius: 4px 0 0 4px;
+			}
+			&:last-child {
+				margin-right: 5px;
+				border-radius: 0 4px 4px 0;
+			}
+		}
+		& [role=checkbox]{
+			float:left;
+			margin: 0px 0px 0px 5px;
+			position: relative;
+
+			& input {
+				margin-left: 28px;
+				position: relative;
+				top: 1px;
+				cursor: pointer;
+				border: 3px solid #888;
+				border-radius: 50%;
+				width: 15px;
+				height: 15px;
+			}
+
+			&::before {
+				content: '';
+				position: absolute;
+				right: 20px;
+			}
+			&.edit-flip-x::before {
+				right: 20px;
+				@include utils.icon("flip");
+				@include utils.rotate(270deg);
+			}
+			&.edit-flip-y::before {
+				right: 20px;
+				@include utils.icon("flip");			
+			}
+		}
+
+		& [role=radio] {
+			float:left;
+			margin: 0px 0px 0px 5px;
+			position: relative;
+
+			& input {
+				margin-left: 28px;
+				position: relative;
+				top: 1px;
+				cursor: pointer;
+				border: 3px solid #888;
+				width: 15px;
+				height: 15px;
+			}
+			&::before {
+				content: '';
+				position: absolute;
+				right: 20px;
+			}
+			&.anchor-center::before {
+				@include utils.icon("center");
+			}
+			&.anchor-bottom::before {
+				@include utils.icon("bottom");
+			}
+			&.anchor-previous::before {
+				@include utils.icon("previous");
+			}
 		}
 	}
 
-	.toolbar-group [role=button] {
-		margin-right: 0;
-		border-radius: 0;
-		border-left-width: 0;
-
-		&:first-child {
-			border-left-width: 1px;
-			border-radius: 4px 0 0 4px;
-		}
-		&:last-child {
-			margin-right: 5px;
-			border-radius: 0 4px 4px 0;
-		}
-	}
-
+	//Specific Toolbargroup containers
 	.edit-selected, .edit-all, .edit-grid {
 		margin: 0 5px 5px 0;
 		border: 1px solid #888;
@@ -436,10 +489,14 @@
 		@include utils.linear-gradient((top, #fefefe, #b8b8b8));
 	}
 
+	.edit-selected {
+		@include utils.linear-gradient((top, #fefefe, #ffffff));
+	}
+
 	.edit-all {
 		padding: 3px 5px;
 	}
-	
+
 // Footer
 	.main-footer {
 		overflow: hidden;

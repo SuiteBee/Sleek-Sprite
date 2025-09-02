@@ -76,14 +76,14 @@ export default (function() {
         scaleX = 1, scaleY = 1;
 
         if(sprite.flipX){
-            translateX = d.x + d.width / 2;
-            posX = -d.width / 2;
-            scaleX = -1;
-        }
-        if(sprite.flipY){
             translateY = d.y + d.height / 2;
             posY = -d.height / 2;
             scaleY = -1;
+        }
+        if(sprite.flipY){
+            translateX = d.x + d.width / 2;
+            posX = -d.width / 2;
+            scaleX = -1;
         }
 
         this.context.translate(translateX, translateY);

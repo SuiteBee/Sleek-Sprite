@@ -8,8 +8,8 @@ import MockSprite from './MockSprite';
 
 class Editor {
 
-    constructor(srcCanvas) {
-		this.$editorContainer   = $('.adjustment-inner');
+    constructor(srcCanvas, srcTools) {
+		this.$editorContainer   = $('.editor-inner');
 		this.editorCanvas       = new EditorCanvas(srcCanvas);
         this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, this.$editorContainer );
         this.editPreview        = new EditPreview(this.$editorContainer);
@@ -23,8 +23,8 @@ class Editor {
         this.mockup = [];
         this.saved = [];
 
-        this.toolbarTop         = new Toolbar('.adjustment-tab', '.toolbar-container');
-		this.toolbarBottom      = new Toolbar('.adjustment-tab', '.toolbar-bottom-container');
+        this.toolbarTop         = new Toolbar('.editor-tab', '.toolbar-container');
+		this.toolbarBottom      = new Toolbar('.editor-tab', '.toolbar-bottom-container');
 		
         //Editor tools
 		this.toolbarTop.
@@ -34,9 +34,10 @@ class Editor {
             ).
             addItem(
                 new ToolbarGroup('edit-grid').
-                    addInput('set-columns', 'Cols:', '3').
-			        addInput('set-rows', 'Rows:', '3')
-            );
+                    addInput('set-rows', 'Rows:', '3').
+                    addInput('set-columns', 'Cols:', '3')
+            ).
+            addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
 
 		this.toolbarTop.$container.addClass('top');
 		this.toolbarBottom.$container.addClass('bottom');
@@ -71,6 +72,15 @@ class Editor {
                 this.editorCanvasView.unselectAllCells();
             }
         }.bind(this));
+
+        this.toolbarTop.bind('invert-bg', function(event) {
+			if ( event.isActive ) {
+				this.editorCanvasView.setBg('#fff');
+			}
+			else {
+				this.editorCanvasView.setBg('#000');
+			}
+		}.bind(this));
 
         this.toolbarTop.bind('edit-anchor', function(evt, option) {
             if(this.editSelected){
@@ -144,8 +154,18 @@ class Editor {
         }.bind(this));
 
         //Editor tab activated
-        var $editorTabBtn = $('#tabAdjustment');
+        var $editorTabBtn = $('#tabEditor');
         $editorTabBtn.on("click", function() {
+
+			let selectDark = srcTools.isActive('invert-bg');
+
+			if(selectDark){
+				this.toolbarTop.activate('invert-bg');
+				this.editorCanvasView.setBg('#000', false);
+			} else{
+				this.toolbarTop.deactivate('invert-bg');
+				this.editorCanvasView.setBg('#fff', false);
+			}
 
             //Unselect all highlighted cells in editor
             this.editorCanvasView.unselectAllCells();
@@ -176,26 +196,7 @@ var EditorProto = Editor.prototype;
 EditorProto.editing = function(sprite){
     this.editSelected = sprite;
 
-    var $editX = $('#edit-x');
-    var $editY = $('#edit-y');
-    var $editAnchorCenter = $('#anchor-center');
-    var $editAnchorBottom = $('#anchor-bottom');
-    var $editAnchorPrevious = $('#anchor-previous');
-    var $editFlipX = $('#edit-flip-x');
-    var $editFlipY = $('#edit-flip-y');
-
-    if($editX.length){
-        $editX.val(sprite.nudgeX.toString());
-        $editY.val(sprite.nudgeY.toString());
-
-        $editAnchorCenter.prop('checked', sprite.anchor == "Center");
-        $editAnchorBottom.prop('checked', sprite.anchor == "Bottom");
-        $editAnchorPrevious.prop('checked', sprite.anchor == "Previous");
-
-        $editFlipX.prop('checked', sprite.flipX);
-        $editFlipY.prop('checked', sprite.flipY);
-
-    } else{
+    if(sprite){
         this.toolbarTop.
         addItem(
             new ToolbarGroup('edit-selected').
@@ -204,14 +205,14 @@ EditorProto.editing = function(sprite){
         ).
         addItem(
             new ToolbarGroup('edit-selected').
-            addRadio('edit-anchor', 'anchor-center', 'Center', '| Anchor   Center:', sprite.anchor == "Center").
-            addRadio('edit-anchor', 'anchor-bottom', 'Bottom', 'Bottom:', sprite.anchor == "Bottom").
-            addRadio('edit-anchor', 'anchor-previous', 'Previous', 'Previous:', sprite.anchor == "Previous")
+            addRadio('edit-anchor', 'anchor-center', 'Center', 'Anchor |', 'Anchor Selected Cell: Center', sprite.anchor == "Center").
+            addRadio('edit-anchor', 'anchor-bottom', 'Bottom', '', 'Anchor Selected Cell: Bottom', sprite.anchor == "Bottom").
+            addRadio('edit-anchor', 'anchor-previous', 'Previous', '', 'Anchor Selected Cell: Previous', sprite.anchor == "Previous")
         ).
         addItem(
             new ToolbarGroup('edit-selected').
-                addCheckbox('edit-flip-x', 'X:', sprite.flipX).
-                addCheckbox('edit-flip-y', 'Y:', sprite.flipY)
+                addCheckbox('edit-flip-x', 'Flip |', 'Flip Sprite on X-Axis', sprite.flipX).
+                addCheckbox('edit-flip-y', '', 'Flip Sprite on Y-Axis', sprite.flipY)
         );
     }
 }

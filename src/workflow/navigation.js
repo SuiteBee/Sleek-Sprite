@@ -45,7 +45,7 @@ $(tabClass).css('display', 'table');
         var $workflow = $('.workflow');
         var $selectionBtn = addButton('Selector', 'tabSelection', '.selection-tab');
         $selectionBtn.appendTo($workflow);
-        addButton('Editor', 'tabAdjustment', '.adjustment-tab').appendTo($workflow);
+        addButton('Editor', 'tabEditor', '.editor-tab').appendTo($workflow);
         addButton('Export', 'tabExport', '.export-tab').appendTo($workflow);
 
         //Set initial state

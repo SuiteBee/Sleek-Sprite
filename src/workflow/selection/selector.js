@@ -26,12 +26,12 @@ import Editor from '../editing/Editor';
 		var spriteCanvas      = new SpriteCanvas();
 		var spriteCanvasView  = new SpriteCanvasView( spriteCanvas, $canvasContainer );
 		var imgInput          = new ImgInput( $canvasContainer, $canvasContainer, $tutorialLink.attr('href') );
-		
-		var previewPanel      = new PreviewPanel( spriteCanvas, spriteCanvasView, $codeContainer );
-		var editor		  	  = new Editor(spriteCanvas);
-		
+
 		var toolbarTop        = new Toolbar('.selection-tab', '.toolbar-container');
 		var toolbarBottom     = new Toolbar('.selection-tab', '.toolbar-bottom-container');
+
+		var previewPanel      = new PreviewPanel( spriteCanvas, spriteCanvasView, $codeContainer );
+		var editor		  	  = new Editor(spriteCanvas, toolbarTop);
 		
 		toolbarTop.
 			addItem('open-img', 'Open Image', {noLabel: true}).
@@ -88,7 +88,7 @@ import Editor from '../editing/Editor';
 		});
 		
 		spriteCanvasView.bind('bgColorHover', function(color) {
-			toolbarTop.feedback( colourBytesToCss(color) );
+			toolbarTop.feedbackColor(color, colourBytesToCss(color) );
 		});
 		
 		spriteCanvasView.bind('bgColorSelect', function(color) {
@@ -156,5 +156,19 @@ import Editor from '../editing/Editor';
 			imgInput.loadImgUrl( this.href );
 			event.preventDefault();
 		});
+
+		//Selector tab activated
+        var $selectorTabBtn = $('#tabSelection');
+        $selectorTabBtn.on("click", function() {
+			let editorDark = editor.toolbarTop.isActive('invert-bg');
+
+			if(editorDark){
+				toolbarTop.activate('invert-bg');
+				spriteCanvasView.setBg('#000', false);
+			} else{
+				toolbarTop.deactivate('invert-bg');
+				spriteCanvasView.setBg('#fff', false);
+			}
+        });
 	})();
 })();

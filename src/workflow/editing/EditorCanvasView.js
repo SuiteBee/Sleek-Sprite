@@ -20,6 +20,7 @@ class EditorCanvasView extends MicroEvent {
         selectArea.activate();
 
 		this._$container = $container;
+		this._$bgElm = $appendToElm;
 		this._highlight = highlight;
 		this._selectedCells = selectedCells;
         this._grid = editorCanvas.grid;
@@ -82,5 +83,18 @@ EditorCanvasViewProto.unselectAllCells = function() {
 
 	this.trigger('editNone');
 }
+
+EditorCanvasViewProto.setBg = function(color, anim = true) {
+	if ( $.support.transition && anim ) {
+		this._$bgElm.transition({ 'background-color': color }, {
+			duration: 500
+		});								
+	}
+	else {
+		this._$bgElm.css({ 'background-color': color });
+	}
+	
+	this._highlight.setHighVisOnDark( color === '#000' );
+};
 
 export default EditorCanvasView;

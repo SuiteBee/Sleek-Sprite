@@ -5,20 +5,29 @@ class Toolbar extends MicroEvent {
 	constructor(parent, appendToElm) {
 		super();
 		var toolbar = this,
-			$container = $('' +
-				'<div class="toolbar">' +
-				'<span class="feedback"></span>' +
-				'</div>' +
-				'').appendTo($(parent).find(appendToElm));
+			$container = $('<div class="toolbar">').appendTo($(parent).find(appendToElm)),
+			$feed = $('<div class="feedback"></div>').appendTo($(parent).find(appendToElm));
 
 		$container.on('mouseenter', 'div[role=button]', function () {
 			var $button = $(this);
-			toolbar.feedback($button.hasClass('no-label') ? $button.text() : '');
+			if($button.hasClass('no-label')){
+				toolbar.feedback($button.text());
+			}
 		});
 
 		$container.on('mouseenter', 'div[role=img]', function () {
 			var $item = $(this);
 			toolbar.feedback($item.text());
+		});
+
+		$container.on('mouseenter', 'div[role=radio]', function () {
+			var $radio = $(this);
+			toolbar.feedback($radio.data('hint'));
+		});
+
+		$container.on('mouseenter', 'div[role=checkbox]', function () {
+			var $checkbox = $(this);
+			toolbar.feedback($checkbox.data('hint'));
 		});
 
 		$container.on('click', 'div[role=button]', function () {
@@ -54,14 +63,14 @@ class Toolbar extends MicroEvent {
 			toolbar.trigger(ddlChange, $ddl.val());
 		});
 
-		$container.on('change', 'input[role=checkbox]', function() {
+		$container.on('change', 'input[type=checkbox]', function() {
 			var $chkbox = $(this),
 			chkName = $chkbox.data('chkName'),
 			chkChange = new $.Event(chkName);
 			toolbar.trigger(chkChange, $chkbox.prop("checked"));
 		});
 
-		$container.on('change', 'input[role=radio]', function() {
+		$container.on('change', 'input[type=radio]', function() {
 			var $radio = $(this),
 			rdName = $radio.data('rdName'),
 			rdOption = $radio.data('rdOption'),
@@ -70,7 +79,7 @@ class Toolbar extends MicroEvent {
 		});
 
 		toolbar.$container = $container;
-		toolbar._$feedback = $container.find('span.feedback');
+		toolbar._$feedback = $feed;
 	}
 	static createButton(toolName, text, opts) {
 		opts = opts || {};
@@ -110,20 +119,22 @@ class Toolbar extends MicroEvent {
 		return $label;
 	}
 
-	static createCheckbox(chkName, text, defVal) {
-		var $label = $(`<label for="${chkName}">${text}</label>`).addClass(`lbl-${chkName}`);
-		var $chkBox = $(`<input type="checkbox" role="checkbox" name="${chkName}" id="${chkName}"/>`).addClass(chkName).data('chkName', chkName);
+	static createCheckbox(chkName, text, hint, defVal) {
+		var $container = $('<div role="checkbox"/>').addClass(`${chkName}`).text(text).data('hint', hint);
+		var $chkBox = $(`<input type="checkbox" name="${chkName}" id="${chkName}"/>`).addClass(chkName).data('chkName', chkName);
 		$chkBox.prop('checked', defVal);
-		$chkBox.appendTo($label);
-		return $label;
+		$chkBox.appendTo($container);
+		return $container;
 	}
 
-	static createRadio(rdName, option, optionVal, text, defVal) {
-		var $label = $(`<label for="${option}">${text}</label>`).addClass(`lbl-${rdName}`);
-		var $radio = $(`<input type="radio" role="radio" name="${rdName}" id="${option}"/>`).addClass(option);
+	static createRadio(rdName, option, optionVal, text, hint, defVal) {
+		var $container = $('<div role="radio"/>').addClass(`${rdName}`).addClass(option).text(text).data('hint', hint);
+		var $radio = $(`<input type="radio" name="${rdName}" id="${option}"/>`).addClass(option);
 		$radio.data('rdName', rdName).data('rdOption', optionVal).prop('checked', defVal);
-		$radio.appendTo($label);
-		return $label;
+
+		$radio.appendTo($container);
+
+		return $container;
 	}
 }
 
@@ -131,53 +142,82 @@ var ToolbarProto = Toolbar.prototype;
 
 ToolbarProto.addItem = function(toolName, text, opts) {
 	if (toolName instanceof ToolbarGroup) {
-		this._$feedback.before( toolName.$container );
+		toolName.$container.appendTo(this.$container);
 	}
 	else {
-		Toolbar.createButton(toolName, text, opts).insertBefore( this._$feedback );
+		Toolbar.createButton(toolName, text, opts).appendTo( this.$container );
 	}
 
 	return this;
 };
 
 ToolbarProto.addStatus = function(statusName, text) {
-	Toolbar.createStatus(statusName, text).insertBefore(this._$feedback);
+	Toolbar.createStatus(statusName, text).appendTo( this.$container );
 
 	return this;
 };
 
 ToolbarProto.addInput = function(inputName, text, limit, defVal = '') {
-	Toolbar.createInput(inputName, text, limit, defVal).insertBefore(this._$feedback);
+	Toolbar.createInput(inputName, text, limit, defVal).appendTo( this.$container );
 
 	return this;
 }
 
 ToolbarProto.addDropDown = function(ddlName, text, ...options){
-	Toolbar.createDropDown(ddlName, text, ...options).insertBefore(this._$feedback);
+	Toolbar.createDropDown(ddlName, text, ...options).appendTo( this.$container );
+	return this;
+}
+
+ToolbarProto.addCheckbox = function(chkName, text, hint, defVal = false) {
+	Toolbar.createCheckbox(chkName, text, hint, defVal).appendTo( this.$container );
 
 	return this;
 }
 
-ToolbarProto.addCheckbox = function(chkName, text, defVal = false) {
-	Toolbar.createCheckbox(chkName, text, defVal).insertBefore(this._$feedback);
+ToolbarProto.addRadio = function(rdName, option, optionVal, text, hint, defVal = false) {
+	Toolbar.createRadio(rdName, option, optionVal, text, hint, defVal).appendTo( this.$container );
 
 	return this;
 }
 
-ToolbarProto.addRadio = function(rdName, option, optionVal, text, defVal = false) {
-	Toolbar.createRadio(rdName, option, optionVal, text, defVal).insertBefore(this._$feedback);
+ToolbarProto.feedbackColor = function(color, msg){
+	var $feedback = this._$feedback, tmpColor, txtColor, brightness;
 
+	if(msg == 'transparent'){
+		tmpColor = 'white';
+		txtColor = 'black';
+	}else{
+		tmpColor = msg;
+		brightness = Math.round(((color[0] * 299) + (color[1] * 587) + (color[2]) * 114)/1000);
+		txtColor = brightness > 125 ? 'black' : 'white';
+	}
+
+	// opacity 0.999 to avoid antialiasing differences when 1
+	$feedback.transitionStop(true).text(msg).css({
+		opacity: 0.999,
+		color: txtColor,
+		background: '',
+		'background-color': tmpColor
+	});
+
+	$feedback.transition({ opacity: 0 }, {
+		duration: 2000
+	});
+	
 	return this;
 }
 
 ToolbarProto.feedback = function(msg, severe) {
 	var $feedback = this._$feedback,
-		initialColor = '#555';
+		initialColor = '#000000ff';
 	
+	var initialBack = 'linear-gradient(to bottom, #d0d0d0, #a7a7a7)';
+
 	// opacity 0.999 to avoid antialiasing differences when 1
 	$feedback.transitionStop(true).text(msg).css({
 		opacity: 0.999,
 		color: initialColor,
+		background: initialBack,
 		'font-weight': 'normal'
 	});
 	
@@ -255,14 +295,14 @@ ToolbarGroupProto.addDropDown = function(ddlName, text, ...options){
 	return this;
 }
 
-ToolbarGroupProto.addCheckbox = function(chkName, text, defVal = false) {
-	Toolbar.createCheckbox(chkName, text, defVal).appendTo(this.$container);
+ToolbarGroupProto.addCheckbox = function(chkName, text, hint, defVal = false) {
+	Toolbar.createCheckbox(chkName, text, hint, defVal).appendTo(this.$container);
 
 	return this;
 }
 
-ToolbarGroupProto.addRadio = function(rdName, option, optionVal, text, defVal = false) {
-	Toolbar.createRadio(rdName, option, optionVal, text, defVal).appendTo(this.$container);
+ToolbarGroupProto.addRadio = function(rdName, option, optionVal, text, hint, defVal = false) {
+	Toolbar.createRadio(rdName, option, optionVal, text, hint, defVal).appendTo(this.$container);
 
 	return this;
 }
