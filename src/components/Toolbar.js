@@ -181,15 +181,19 @@ ToolbarProto.addRadio = function(rdName, option, optionVal, text, hint, defVal =
 }
 
 ToolbarProto.feedbackColor = function(color, msg){
-	var $feedback = this._$feedback, tmpColor, txtColor, brightness;
+	var $feedback = this._$feedback, colBack, txtColor, readable, noColor = 'transparent';
 
-	if(msg == 'transparent'){
-		tmpColor = 'white';
+	if(msg == noColor){
+		$feedback.addClass(noColor);
+
+		colBack = 'white';
 		txtColor = 'black';
 	}else{
-		tmpColor = msg;
-		brightness = Math.round(((color[0] * 299) + (color[1] * 587) + (color[2]) * 114)/1000);
-		txtColor = brightness > 125 ? 'black' : 'white';
+		$feedback.removeClass(noColor);
+
+		colBack = msg;
+		readable = Math.round(((color[0] * 299) + (color[1] * 587) + (color[2]) * 114)/1000);
+		txtColor = readable > 125 ? 'black' : 'white';
 	}
 
 	// opacity 0.999 to avoid antialiasing differences when 1
@@ -197,7 +201,8 @@ ToolbarProto.feedbackColor = function(color, msg){
 		opacity: 0.999,
 		color: txtColor,
 		background: '',
-		'background-color': tmpColor
+		'background-color': colBack,
+		'font-weight': 'bold'
 	});
 
 	$feedback.transition({ opacity: 0 }, {
@@ -209,15 +214,14 @@ ToolbarProto.feedbackColor = function(color, msg){
 
 ToolbarProto.feedback = function(msg, severe) {
 	var $feedback = this._$feedback,
-		initialColor = '#000000ff';
-	
-	var initialBack = 'linear-gradient(to bottom, #d0d0d0, #a7a7a7)';
+		txtColor = 'black',
+		gradBack = 'linear-gradient(to bottom, #d0d0d0, #a7a7a7)';
 
 	// opacity 0.999 to avoid antialiasing differences when 1
 	$feedback.transitionStop(true).text(msg).css({
 		opacity: 0.999,
-		color: initialColor,
-		background: initialBack,
+		color: txtColor,
+		background: gradBack,
 		'font-weight': 'normal'
 	});
 	

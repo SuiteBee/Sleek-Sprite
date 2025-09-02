@@ -205,9 +205,9 @@ EditorProto.editing = function(sprite){
         ).
         addItem(
             new ToolbarGroup('edit-selected').
-            addRadio('edit-anchor', 'anchor-center', 'Center', 'Anchor |', 'Anchor Selected Cell: Center', sprite.anchor == "Center").
-            addRadio('edit-anchor', 'anchor-bottom', 'Bottom', '', 'Anchor Selected Cell: Bottom', sprite.anchor == "Bottom").
-            addRadio('edit-anchor', 'anchor-previous', 'Previous', '', 'Anchor Selected Cell: Previous', sprite.anchor == "Previous")
+            addRadio('edit-anchor', 'anchor-center', 'Center', 'Anchor |', 'Anchor Selected Sprite: Center', sprite.anchor == "Center").
+            addRadio('edit-anchor', 'anchor-bottom', 'Bottom', '', 'Anchor Selected Sprite: Bottom', sprite.anchor == "Bottom").
+            addRadio('edit-anchor', 'anchor-previous', 'Previous', '', 'Anchor Selected Sprite: Previous', sprite.anchor == "Previous")
         ).
         addItem(
             new ToolbarGroup('edit-selected').
