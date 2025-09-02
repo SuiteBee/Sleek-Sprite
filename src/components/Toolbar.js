@@ -20,14 +20,27 @@ class Toolbar extends MicroEvent {
 			toolbar.feedback($item.text());
 		});
 
-		$container.on('mouseenter', 'div[role=radio]', function () {
+		$container.on('mouseenter', 'input[type=radio]', function () {
 			var $radio = $(this);
 			toolbar.feedback($radio.data('hint'));
 		});
 
-		$container.on('mouseenter', 'div[role=checkbox]', function () {
+		$container.on('mouseenter', 'input[type=checkbox]', function () {
 			var $checkbox = $(this);
 			toolbar.feedback($checkbox.data('hint'));
+		});
+
+		$container.on('mouseenter', 'input[type=text]', function () {
+			var $txtInput = $(this);
+			var hint = $txtInput.data('hint');
+			if(hint.length > 0){
+				toolbar.feedback(hint);
+			}
+		});
+
+		$container.on('mouseenter', 'select', function () {
+			var $ddl = $(this);
+			toolbar.feedback($ddl.data('hint'));
 		});
 
 		$container.on('click', 'div[role=button]', function () {
@@ -49,14 +62,14 @@ class Toolbar extends MicroEvent {
 			event.preventDefault();
 		});
 
-		$container.on('input', 'input[role=input]', function() {
+		$container.on('input', 'input[type=text]', function() {
 			var $input = $(this), 
 			inputName = $input.data('inputName'),
 			inputChange = new $.Event(inputName);
 			toolbar.trigger(inputChange, $input.val());
 		});
 
-		$container.on('change', 'select[role=select]', function() {
+		$container.on('change', 'select', function() {
 			var $ddl = $(this), 
 			ddlName = $ddl.data('ddlName'),
 			ddlChange = new $.Event(ddlName);
@@ -101,35 +114,51 @@ class Toolbar extends MicroEvent {
 		return $status;
 	}
 
-	static createInput(inputName, text, limit, defVal){
-		var $label = $(`<label for="${inputName}">${text}</label>`).addClass(`lbl-${inputName}`);
-		var $txtInput = $(`<input role="input" name="${inputName}" id="${inputName}" maxlength="${limit}"/>`).addClass(inputName).data('inputName', inputName).val(defVal);
-		$txtInput.appendTo($label);
-		return $label;
+	static createInput(inputName, text, hint, limit, defVal){
+		var $container = $('<div role="input"/>').addClass(`${inputName}`).text(text);
+		var $txtInput = $(`<input type="text" name="${inputName}" id="${inputName}" maxlength="${limit}"/>`).
+			addClass(inputName).
+			data('inputName', inputName).
+			data('hint', hint).
+			val(defVal);
+
+		$txtInput.appendTo($container);
+		return $container;
 	}
 
-	static createDropDown(ddlName, text, ...options){
-		var $label = $(`<label for="${ddlName}">${text}</label>`);
-		var $ddl = $(`<select role="select" name="${ddlName}" id="${ddlName}">`).addClass(ddlName).data('ddlName', ddlName);;
-		for(let i=0; i<options.length; i++){
+	static createDropDown(ddlName, text, hint, ...options){
+		var $container = $('<div role="select"/>').addClass(`${ddlName}`).text(text);
+		var $ddl = $(`<select name="${ddlName}" id="${ddlName}"/>`).
+			addClass(ddlName).
+			data('ddlName', ddlName).
+			data('hint', hint);
+
+		for(let i=0; i<options.length;i++){
 			let $option = $(`<option value="${options[i]}">${options[i]}</option>`);
 			$option.appendTo($ddl);
 		}
-		$ddl.appendTo($label);
-		return $label;
+		$ddl.appendTo($container);
+		return $container;
 	}
 
 	static createCheckbox(chkName, text, hint, defVal) {
-		var $container = $('<div role="checkbox"/>').addClass(`${chkName}`).text(text).data('hint', hint);
-		var $chkBox = $(`<input type="checkbox" name="${chkName}" id="${chkName}"/>`).addClass(chkName).data('chkName', chkName);
+		var $container = $('<div role="checkbox"/>').addClass(`${chkName}`).text(text);
+		var $chkBox = $(`<input type="checkbox" name="${chkName}" id="${chkName}"/>`).
+			addClass(chkName).
+			data('chkName', chkName).
+			data('hint', hint);
+
 		$chkBox.prop('checked', defVal);
 		$chkBox.appendTo($container);
 		return $container;
 	}
 
 	static createRadio(rdName, option, optionVal, text, hint, defVal) {
-		var $container = $('<div role="radio"/>').addClass(`${rdName}`).addClass(option).text(text).data('hint', hint);
-		var $radio = $(`<input type="radio" name="${rdName}" id="${option}"/>`).addClass(option);
+		var $container = $('<div role="radio"/>').addClass(`${rdName}`).addClass(option).text(text);
+		var $radio = $(`<input type="radio" name="${rdName}" id="${option}"/>`).
+			addClass(option).
+			data('hint', hint);
+			
 		$radio.data('rdName', rdName).data('rdOption', optionVal).prop('checked', defVal);
 
 		$radio.appendTo($container);
@@ -157,14 +186,14 @@ ToolbarProto.addStatus = function(statusName, text) {
 	return this;
 };
 
-ToolbarProto.addInput = function(inputName, text, limit, defVal = '') {
-	Toolbar.createInput(inputName, text, limit, defVal).appendTo( this.$container );
+ToolbarProto.addInput = function(inputName, text, hint, limit, defVal = '') {
+	Toolbar.createInput(inputName, text, hint, limit, defVal).appendTo( this.$container );
 
 	return this;
 }
 
-ToolbarProto.addDropDown = function(ddlName, text, ...options){
-	Toolbar.createDropDown(ddlName, text, ...options).appendTo( this.$container );
+ToolbarProto.addDropDown = function(ddlName, text, hint, ...options){
+	Toolbar.createDropDown(ddlName, text, hint, ...options).appendTo( this.$container );
 	return this;
 }
 
@@ -287,14 +316,14 @@ ToolbarGroupProto.addStatus = function(statusName, text) {
 	return this;
 };
 
-ToolbarGroupProto.addInput = function(inputName, text, limit, defVal = '') {
-	Toolbar.createInput(inputName, text, limit, defVal).appendTo(this.$container);
+ToolbarGroupProto.addInput = function(inputName, text, hint, limit, defVal = '') {
+	Toolbar.createInput(inputName, text, hint, limit, defVal).appendTo(this.$container);
 
 	return this;
 }
 
-ToolbarGroupProto.addDropDown = function(ddlName, text, ...options){
-	Toolbar.createDropDown(ddlName, text, ...options).appendTo(this.$container);
+ToolbarGroupProto.addDropDown = function(ddlName, text, hint, ...options){
+	Toolbar.createDropDown(ddlName, text, hint, ...options).appendTo(this.$container);
 
 	return this;
 }

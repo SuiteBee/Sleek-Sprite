@@ -30,12 +30,16 @@ class Editor {
 		this.toolbarTop.
             addItem(
                 new ToolbarGroup('edit-all').
-                addDropDown('set-all-align', 'Anchor All:', 'Center', 'Bottom')
+                addDropDown(
+                    'set-all-align', 
+                    'Anchor All:', 
+                    'Will Overwrite Selected Anchor and Y-Nudge', 
+                    'Center', 'Bottom')
             ).
             addItem(
                 new ToolbarGroup('edit-grid').
-                    addInput('set-rows', 'Rows:', '3').
-                    addInput('set-columns', 'Cols:', '3')
+                    addInput('set-rows', 'Rows:', '', '3').
+                    addInput('set-columns', 'Cols:', '', '3')
             ).
             addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
 
@@ -93,13 +97,10 @@ class Editor {
             if(this.editSelected){
                 var newX = Number(txt);
                 
-                var minX = this.editSelected.cell.x - this.editSelected.rect.x;
-                var maxX = this.editSelected.rect.x - this.editSelected.cell.x;
-                
                 if(isNaN(newX)){
                     this.toolbarTop.feedback(`X must be a number`);
-                }else if(newX < minX || newX > maxX){
-                    this.toolbarTop.feedback(`Must be within cell bounds: ${minX}-${maxX}`);
+                }else if(!this.editSelected.validNudgeX(newX)){
+                    this.toolbarTop.feedback(`Must be within cell bounds: ${this.editSelected.xRangeStr}`);
                 } else{  
                     this.editSelected.nudgeX = newX;
                     this.place();
@@ -110,18 +111,11 @@ class Editor {
         this.toolbarTop.bind('edit-y', function(evt, txt) {
             if(this.editSelected){
                 var newY = Number(txt);
-
-                var minY = this.editSelected.cell.y - this.editSelected.rect.y;
-                var maxY = this.editSelected.rect.y - this.editSelected.cell.y;
-
-                if(this.editSelected.anchor == "Bottom"){
-                    maxY = 0;
-                }
                 
                 if(isNaN(newY)){
                     this.toolbarTop.feedback(`Y must be a number`);
-                }else if(newY < minY || newY > maxY){
-                    this.toolbarTop.feedback(`Must be within cell bounds: ${minY}-${maxY}`);
+                }else if(!this.editSelected.validNudgeY(newY)){
+                    this.toolbarTop.feedback(`Must be within cell bounds: ${this.editSelected.yRangeStr}`);
                 } else{
                     this.editSelected.nudgeY = newY;
                     this.place();
@@ -200,8 +194,8 @@ EditorProto.editing = function(sprite){
         this.toolbarTop.
         addItem(
             new ToolbarGroup('edit-selected').
-            addInput('edit-x', '| Nudge   X:', '5', sprite.nudgeX.toString()).
-            addInput('edit-y', 'Y:', '5', sprite.nudgeY.toString())
+            addInput('edit-x', 'Nudge |', `Valid X-Range: ${sprite.xRangeStr}`, '5', sprite.nudgeX.toString()).
+            addInput('edit-y', '', `Valid Y-Range: ${sprite.yRangeStr}`, '5', sprite.nudgeY.toString())
         ).
         addItem(
             new ToolbarGroup('edit-selected').
@@ -242,6 +236,7 @@ EditorProto.pack = function() {
 EditorProto.anchorAll = function(anchorPos) {
     this.mockup.forEach(function(sprite) {
         sprite.anchor = anchorPos;
+        sprite.nudgeY = 0;
     }.bind(this)); 
 }
 

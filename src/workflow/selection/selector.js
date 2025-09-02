@@ -36,6 +36,7 @@ import Editor from '../editing/Editor';
 		toolbarTop.
 			addItem('open-img', 'Open Image', {noLabel: true}).
 			addItem('reload-img', 'Reload Current Image', {noLabel: true}).
+			addItem('select-all', 'Find All', {noLabel: true}).
 			addItem('select-none', 'Unselect All', {noLabel: true}).
 			addItem(
 				new ToolbarGroup().
@@ -43,26 +44,42 @@ import Editor from '../editing/Editor';
 					addItem('select-bg', 'Pick Background')
 			).
 			addStatus('selected-bg', 'Selected Background').
-			addItem('remove-bg', 'Erase Color', {noLabel: true}).
+			addItem('remove-bg', 'Erase Selected Background', {noLabel: true}).
+			addItem('remove-rect', 'Delete Selected Pixels', {noLabel: true}).
+			addItem('undo', 'Undo Last Operation', {noLabel: true}).
 			addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
 
 		toolbarTop.$container.addClass('top');
-
 		toolbarBottom.$container.addClass('bottom');
 
 		pageLayout.init();
-		
-		// listeners
-		imgInput.bind('load', function(img) {
-			spriteCanvas.setImg(img);
-			spriteCanvas.setBg([0, 0, 0, 0]);
+		function init_selection_tools(){
+			//Set background as top left pixel
+			let colArr = spriteCanvas.getFirstPixelColor();
+			spriteCanvas.setBg(colArr);
 
 			spriteCanvasView.unselectAllSprites();
 			spriteCanvasView.setTool('select-sprite');
 
-			var $selectedBg = $('.selected-bg');
-			$selectedBg.css('background-color', '');
-			$selectedBg.addClass('none');
+			//Set background status
+			let $selectedBg = $('.selected-bg');
+			let colorStr = colourBytesToCss(colArr);
+			if (colorStr == 'transparent'){
+				$selectedBg.css('background-color', '');
+				$selectedBg.addClass('none');
+			} else {
+				$selectedBg.removeClass('none');
+				$selectedBg.css('background-color', colorStr);
+			}
+		}
+		
+		// listeners
+		imgInput.bind('load', function(img) {
+			//Send image to canvas
+			spriteCanvas.setImg(img);
+			
+			//Prepare toolbar
+			init_selection_tools();
 
 			pageLayout.toAppView();
 		});
@@ -122,15 +139,29 @@ import Editor from '../editing/Editor';
 		});
 
 		toolbarTop.bind('select-none', function(event) {
-			spriteCanvasView.unselectAllSprites();
+			spriteCanvasView.unselectAllSprites(true);
 			event.preventDefault();
 		});
 		
 		imgInput.fileClickjackFor( toolbarTop.$container.find('div.open-img') );
 		
-		toolbarTop.bind('remove-bg', function(img) {
-			spriteCanvas.clearBg(img);
-			img.preventDefault();
+		toolbarTop.bind('remove-bg', function(event) {
+			spriteCanvasView.clearBg();
+			event.preventDefault();
+		});
+
+		toolbarTop.bind('remove-rect', function(event) {
+			spriteCanvasView.clearRect();
+			event.preventDefault();
+		});
+
+		toolbarTop.bind('undo', function(event) {
+			let selectedSprites = spriteCanvasView.undo();
+			if(selectedSprites){
+				editor.gather(selectedSprites);
+			}
+			
+			event.preventDefault();
 		});
 
 		toolbarTop.bind('invert-bg', function(event) {
@@ -170,5 +201,6 @@ import Editor from '../editing/Editor';
 				spriteCanvasView.setBg('#fff', false);
 			}
         });
+		
 	})();
 })();

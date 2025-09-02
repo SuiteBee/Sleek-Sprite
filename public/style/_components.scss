@@ -306,28 +306,6 @@
 			}
 		}
 
-		& [role=input]{
-			margin: 0px 5px 0px 5px;
-			border: 1px solid #888;
-			border-radius: 4px;
-			cursor: pointer;
-			position: relative;
-			padding-left: 5px;
-			width: 30px;
-			height: 12px;
-		}
-
-		& [role=select]{
-			color: black;
-			margin: 0 5px 0px 5px;
-			border: 1px solid #888;
-			border-radius: 4px;
-			cursor: pointer;
-			position: relative;
-			width: 75px;
-			height: 20px;
-		}
-
 		& [role=button] {
 			float: left;
 			margin: 0 5px 5px 0;
@@ -355,6 +333,11 @@
 				padding: 6px 0;
 				text-indent: -5000px;
 			}
+			&.select-all::before {
+				top: 4px;
+				left: 4px;
+				@include utils.icon("search", 0px, 20px, 20px);
+			}
 			&.select-none::before {
 				@include utils.icon("cancel", 1px);
 			}
@@ -375,6 +358,12 @@
 			}
 			&.remove-bg::before {
 				@include utils.icon("erase", 1px);
+			}
+			&.remove-rect::before {
+				@include utils.icon("delete", 1px);
+			}
+			&.undo::before {
+				@include utils.icon("undo", 1px);
 			}
 			&.reload-img::before {
 				@include utils.icon("reload", 1px);
@@ -397,7 +386,6 @@
 		color: black;
 		opacity: 0;
 		font-size: larger;
-
 		background: '';
 
 		&.transparent{
@@ -420,10 +408,68 @@
 				border-radius: 0 4px 4px 0;
 			}
 		}
+		& [role=input]{
+			float:left;
+			color: black;
+			position: relative;
+			width: fit-content;
+			height: 20px;
+			top: 2px;
+
+			& input {
+				margin: 0px 5px;
+				position: relative;
+				
+				cursor: pointer;
+				border: 1px solid #888;
+				border-radius: 4px;
+				
+				padding-left: 5px;
+				width: 30px;
+				height: 12px;
+			}
+
+			&::before {
+				content: '';
+				position: absolute;
+				right: 20px;
+			}
+			#edit-x {
+				margin-left: 30px;
+			}
+			&.edit-x::before {
+				left: 50px;
+				@include utils.icon("nudgeHoriz");
+			}
+			#edit-y {
+				margin-left: 30px;
+			}
+			&.edit-y::before {
+				left: 5px;
+				@include utils.icon("nudgeHoriz");	
+				@include utils.rotate(270deg);		
+			}
+		}
+		& [role=select]{
+			float:left;
+			color: black;
+			position: relative;
+			width: fit-content;
+			height: 20px;
+
+			& select {
+				margin-left: 5px;
+				position: relative;
+				cursor: pointer;
+				border: 1px solid #888;
+				border-radius: 4px;
+			}
+		}
 		& [role=checkbox]{
 			float:left;
 			margin: 0px 0px 0px 5px;
 			position: relative;
+			padding: 2px 0px;
 
 			& input {
 				margin-left: 28px;
@@ -456,6 +502,7 @@
 			float:left;
 			margin: 0px 0px 0px 5px;
 			position: relative;
+			padding: 2px 0px;
 
 			& input {
 				margin-left: 28px;
@@ -485,22 +532,18 @@
 
 	//Specific Toolbargroup containers
 	.edit-selected, .edit-all, .edit-grid {
+		padding: 3px 5px;
 		margin: 0 5px 5px 0;
 		border: 1px solid #888;
 		border-radius: 4px;
 		float: left;
 		width: fit-content;
 
-		padding: 5px;
 		@include utils.linear-gradient((top, #fefefe, #b8b8b8));
 	}
 
 	.edit-selected {
 		@include utils.linear-gradient((top, #fefefe, #ffffff));
-	}
-
-	.edit-all {
-		padding: 3px 5px;
 	}
 
 // Footer

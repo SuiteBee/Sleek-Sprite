@@ -10,8 +10,10 @@ class MockSprite {
 
 		//Defaults
 		this.anchor = "Center";
+
 		this.flipX = false;
 		this.flipY = false;
+
 		this.nudgeX = 0;
 		this.nudgeY = 0;
 	}
@@ -28,9 +30,46 @@ class MockSprite {
 	get flipped(){
 		return this.flipX || this.flipY;
 	}
+
+	get xRange() {
+		var minX = this.cell.x - this.rect.x;
+		var maxX = this.rect.x - this.cell.x;
+
+		return [minX, maxX];
+	}
+
+	get xRangeStr() {
+		let range = this.xRange;
+		return `${range[0]}-${range[1]}`
+	}
+
+	get yRange() {
+		var minY = this.cell.y - this.rect.y;
+		var maxY = this.rect.y - this.cell.y;
+
+		if(this.anchor == "Bottom"){
+			maxY = 0;
+		}
+		return [minY, maxY];
+	}
+	
+	get yRangeStr() {
+		let range = this.yRange;
+		return `${range[0]}-${range[1]}`
+	}
 }
 
 var MockProto = MockSprite.prototype;
+
+MockProto.validNudgeX = function(val) {
+	let range = this.xRange;
+	return (val >= range[0] && val <= range[1]);
+}
+
+MockProto.validNudgeY = function(val) {
+	let range = this.yRange;
+	return (val >= range[0] && val <= range[1]);
+}
 
 MockProto.update = function(x, y, cellSize, previous){
 	this._setAlignment(x, y, cellSize, previous);

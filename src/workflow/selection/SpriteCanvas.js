@@ -48,11 +48,20 @@ export default (function() {
 		this._img = img;
 	};
 
-	SpriteCanvasProto.clearBg = function(img){
-		var canvas = this.canvas,
-		context = this._context;
+	SpriteCanvasProto.getFirstPixelColor = function() {
+		return this._context.getImageData(0,0, 1, 1).data;
+	}
 
-		const imgDat = context.getImageData(0,0, canvas.width, canvas.height);
+	SpriteCanvasProto.getCurrentState = function() {
+		return this._context.getImageData(0,0, this.canvas.width, this.canvas.height);
+	}
+
+	SpriteCanvasProto.undoPixels = function(lastState) {
+		this._context.putImageData(lastState, 0, 0);
+	}
+
+	SpriteCanvasProto.pixelsToAlpha = function(){
+		const imgDat = this._context.getImageData(0,0, this.canvas.width, this.canvas.height);
 		const pixels = imgDat.data;
 		const targetBg = this._bgData;
 
@@ -66,8 +75,28 @@ export default (function() {
 			}
 		}
 
-		context.putImageData(imgDat, 0, 0);
+		this._context.putImageData(imgDat, 0, 0);
 		this._bgData = [0,0,0,0];
+	}
+
+	SpriteCanvasProto.pixelsToBg = function(selected) {
+		const targetBg = this._bgData;
+
+		for(let i=0; i < selected.length; i++){
+
+			var toClear = selected[i].rect;
+			const imgDat = this._context.getImageData(toClear.x, toClear.y, toClear.width, toClear.height);
+			const pixels = imgDat.data;
+
+			for(let j=0; j < pixels.length; j += 4){
+				pixels[j] = targetBg[0];
+				pixels[j+1] = targetBg[1];
+				pixels[j+2] = targetBg[2];
+				pixels[j+3] = targetBg[3];
+			}
+
+			this._context.putImageData(imgDat, toClear.x, toClear.y);
+		}
 	}
 	
 	SpriteCanvasProto.setBg = function(pixelArr) {

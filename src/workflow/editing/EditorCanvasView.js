@@ -64,7 +64,7 @@ EditorCanvasViewProto._handleSelectedCell = function(clickedRect, sprite) {
 EditorCanvasViewProto.resizeSelectedSprite = function(oldRect, newRect){
 	const alreadySelectedSpriteIndex = this._selectedCells.findIndex(sprite => JSON.stringify(sprite.rect) == JSON.stringify(oldRect));
 	if(alreadySelectedSpriteIndex > -1) {
-		this._selectedCells[alreadySelectedSpriteIndex].reselect(newRect);
+		this._selectedCells[alreadySelectedSpriteIndex].selectNew(newRect);
 	}
 
 	//this.trigger('selectedSpritesChange', this._selectedCells);

@@ -26,6 +26,7 @@ class SpriteCanvasView extends MicroEvent {
 		this._selectArea = selectArea;
 		this._selectColor = selectColor;
 		this._selectedSprites = selectedSprites;
+		this._history = [];
 
 		$container.appendTo($appendToElm);
 
@@ -38,8 +39,8 @@ class SpriteCanvasView extends MicroEvent {
 				
 				spriteCanvasView._handleSelectedSprite(clickedRect, spriteRect);
 			} 
-			//Clicked background
 			else {
+				//Clicked background clears selections
 				//spriteCanvasView.unselectAllSprites();
 			}
 		});
@@ -58,6 +59,9 @@ class SpriteCanvasView extends MicroEvent {
 var SpriteCanvasViewProto = SpriteCanvasView.prototype;
 
 SpriteCanvasViewProto._handleSelectedSprite = function(clickedRect, spriteRect) {
+	//Store previous state in history
+	this._history.push([...this._selectedSprites]);
+
 	const alreadySelectedSpriteIndex = this._selectedSprites.findIndex(sprite => JSON.stringify(sprite.rect) == JSON.stringify(spriteRect));
 	if(alreadySelectedSpriteIndex > -1) {
 		this._selectedSprites[alreadySelectedSpriteIndex].unselect();
@@ -72,7 +76,7 @@ SpriteCanvasViewProto._handleSelectedSprite = function(clickedRect, spriteRect) 
 SpriteCanvasViewProto.resizeSelectedSprite = function(oldRect, newRect){
 	const alreadySelectedSpriteIndex = this._selectedSprites.findIndex(sprite => JSON.stringify(sprite.rect) == JSON.stringify(oldRect));
 	if(alreadySelectedSpriteIndex > -1) {
-		this._selectedSprites[alreadySelectedSpriteIndex].reselect(newRect);
+		this._selectedSprites[alreadySelectedSpriteIndex].selectNew(newRect);
 	}
 
 	this.trigger('selectedSpritesChange', this._selectedSprites);
@@ -85,7 +89,12 @@ SpriteCanvasViewProto._selectSprite = function(clickedRect, spriteRect) {
 	return new Selected(spriteRect, highlight);
 }
 
-SpriteCanvasViewProto.unselectAllSprites = function() {
+SpriteCanvasViewProto.unselectAllSprites = function(isHistoric = false) {
+	//Store previous state in history
+	if(isHistoric){
+		this._history.push([...this._selectedSprites]);
+	}
+
 	this._selectedSprites.forEach(sprite => sprite.unselect());
 	this._selectedSprites = [];
 
@@ -121,5 +130,41 @@ SpriteCanvasViewProto.setBg = function(color, anim = true) {
 	
 	this._highlight.setHighVisOnDark( color === '#000' );
 };
+
+SpriteCanvasViewProto.clearBg = function() {
+	//Store previous state in history before destructive operation
+	let currentState = this._spriteCanvas.getCurrentState();
+	this._history.push(currentState);
+
+	this._spriteCanvas.pixelsToAlpha();
+}
+
+SpriteCanvasViewProto.clearRect = function() {
+	//Store previous state in history before destructive operation
+	let currentState = this._spriteCanvas.getCurrentState();
+	this._history.push(currentState);
+
+	this._spriteCanvas.pixelsToBg(this._selectedSprites);
+	this.unselectAllSprites();
+}
+
+SpriteCanvasViewProto.undo = function() {
+	const lastState = this._history.pop();
+
+	if (lastState) {
+		if(lastState instanceof ImageData) {
+			this._spriteCanvas.undoPixels(lastState);
+		} else {
+			this.unselectAllSprites();
+			this._selectedSprites = lastState;
+
+			for(let i=0; i<this._selectedSprites.length; i++){
+				this._selectedSprites[i].reselect(this._$container);
+			}
+
+			return this._selectedSprites;
+		}
+	}
+}
 
 export default SpriteCanvasView;

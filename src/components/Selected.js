@@ -1,3 +1,5 @@
+import Highlight from './highlight';
+
 class Selected {
     constructor(rect, highlight) {
         this.rect = rect;
@@ -10,9 +12,15 @@ class Selected {
         this.highlight.remove();
     }
 
-    reselect(newRect) {
-        this.rect = newRect;
-        this.highlight.moveTo(newRect, true);
+    selectNew(newRect) {
+         this.rect = newRect;
+         this.highlight.moveTo(newRect, true);
+    }
+
+    reselect(container) {
+        const highlight = new Highlight(container);
+        this.highlight = highlight;
+        this.highlight.moveTo(this.rect, false);
     }
 }
 
