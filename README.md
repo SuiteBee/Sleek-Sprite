@@ -1,12 +1,12 @@
 > [!IMPORTANT]
-> This is being actively developeed and will evolve over time
+> This is being actively developed and will evolve over time
 
 # Sleek-Sprite (WIP)
 
-This project was inspired by the dissatisfaction with existing software and tools to modify sprite sheets, many locked behind paywalls or expensive subscriptions. It started as a personal project with a specific use case in mind, however once it was in progress the ideas for features just kept coming.
+This project was inspired by the dissatisfaction with existing software and tools to modify sprite-sheets, many locked behind paywalls or expensive subscriptions. It started as a personal project with a specific use case in mind, however once it was in progress the ideas for features just kept coming.
 
 > [!Caution]
-> Only tested with very small pixel graphic spritesheets
+> Only tested with small pixel graphics
 >
 > Attempting to use high definition images may be slow or crash your browser
 
@@ -19,7 +19,7 @@ The project diverged so far from both, that I decided to remove the fork and hav
 
 - [spritesheet-cutter](https://github.com/yeoji/spritesheet-cutter)
   - streamlined the build process
-  - sped up development significantly with yarn and github page deployment support
+  - sped up development significantly with yarn and Github Pages deployment support
 
 - [Sprite Cow](https://github.com/jakearchibald/sprite-cow)
   - supplied some essential logic for automatically detecting image slices on a background
