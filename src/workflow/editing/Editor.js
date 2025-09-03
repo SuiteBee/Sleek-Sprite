@@ -12,7 +12,7 @@ class Editor {
 		this.$editorContainer   = $('.editor-inner');
 		this.editorCanvas       = new EditorCanvas(srcCanvas);
         this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, this.$editorContainer );
-        this.editPreview        = new EditPreview(this.$editorContainer);
+        //this.editPreview        = new EditPreview(this.$editorContainer);
 
         this.selectedSprites    = [];
         

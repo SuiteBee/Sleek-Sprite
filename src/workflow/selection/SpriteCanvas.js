@@ -1,4 +1,5 @@
 import MicroEvent from '../../utilities/MicroEvent';
+import Rect from '../../utilities/Rect';
 
 export default (function() {
 	function pixelsEquivalent(pixels1, offset1, pixels2, offset2) {
@@ -25,6 +26,12 @@ export default (function() {
 			return false;
 		}
 		return true;
+	}
+
+	function intersect(element){
+		let xIntersect = element.x < this.rect.x + this.rect.width && this.rect.x < element.x + element.width;
+		let yIntersect = element.y < this.rect.y + this.rect.height && this.rect.y < element.y + element.height;
+		return xIntersect && yIntersect;
 	}
 	
 	function SpriteCanvas() {
@@ -98,7 +105,65 @@ export default (function() {
 			this._context.putImageData(imgDat, toClear.x, toClear.y);
 		}
 	}
-	
+
+	SpriteCanvasProto.findAllBounds = function(rects, chunkSize = 1) {
+		let toSelect = rects;
+		var chunkWidth = chunkSize,
+			chunkHieght = chunkSize;
+
+		//Move from left to right, then top to bottom
+		for(let y=0; y < this.canvas.height; y += chunkSize){
+			chunkHieght = chunkSize;
+			if(y + chunkSize > this.canvas.height) {chunkHieght = this.canvas.height - y}
+
+			for(let x=0; x < this.canvas.width; x += chunkSize){
+				chunkWidth = chunkSize;
+				if(x + chunkSize > this.canvas.width) {chunkWidth = this.canvas.width - x}
+
+				//Search image in chunks
+				const pixels = this._context.getImageData(x, y, chunkWidth, chunkHieght).data;
+				const chunkRect = new Rect(x, y, chunkWidth, chunkHieght);
+
+				//Skip if chunk only contains bg or intersects with already selected sprites
+				if (this._pixelsContainOnlyBg(pixels) || toSelect.some(intersect, { rect: chunkRect })){ continue }
+				
+				let pixelRect = this._findChunkPixel(chunkRect, pixels);
+				let spriteRect = this._getSpriteBounds(pixelRect);
+				toSelect.push(spriteRect);
+			}
+		}
+
+		return toSelect;
+	}
+
+	SpriteCanvasProto._findChunkPixel = function(chunkRect, pixels){
+		let chunkX = chunkRect.x,
+			chunkY = chunkRect.y;
+
+		//Find first non bg pixel
+		for(let i=0; i < pixels.length; i += 4){
+			//Return simulated click position
+			if ( !pixelsEquivalent(this._bgData, 0, pixels, i) ) {
+				return new Rect(chunkX, chunkY, 1, 1);
+			}
+
+			//Track chunk coordinates
+			chunkX += 1;
+			if(chunkX >= chunkRect.x + chunkRect.width){
+				chunkX = chunkRect.x;
+				chunkY += 1;
+			}
+		}
+	}
+
+	SpriteCanvasProto._getSpriteBounds = function(pixelRect){
+		const rect = Object.assign({}, pixelRect);
+		let spriteRect = this.trimBg(rect);
+		spriteRect = this.expandToSpriteBoundry(rect);
+
+		return spriteRect;
+	}
+
 	SpriteCanvasProto.setBg = function(pixelArr) {
 		this._bgData = pixelArr;
 	};

@@ -30,7 +30,7 @@ import Editor from '../editing/Editor';
 		var toolbarTop        = new Toolbar('.selection-tab', '.toolbar-container');
 		var toolbarBottom     = new Toolbar('.selection-tab', '.toolbar-bottom-container');
 
-		var previewPanel      = new PreviewPanel( spriteCanvas, spriteCanvasView, $codeContainer );
+		//var previewPanel      = new PreviewPanel( spriteCanvas, spriteCanvasView, $codeContainer );
 		var editor		  	  = new Editor(spriteCanvas, toolbarTop);
 		
 		toolbarTop.
@@ -91,8 +91,8 @@ import Editor from '../editing/Editor';
 				return;
 			}
 
-			previewPanel.selectedSprites = selectedSprites;
-			previewPanel.update();
+			//previewPanel.selectedSprites = selectedSprites;
+			//previewPanel.update();
 
 			selectedSprites.forEach(({rect}) => {
 				if (rect.width === spriteCanvas.canvas.width && rect.height === spriteCanvas.canvas.height) {
@@ -135,6 +135,11 @@ import Editor from '../editing/Editor';
 		
 		toolbarTop.bind('reload-img', function(event) {
 			imgInput.reloadLastFile();
+			event.preventDefault();
+		});
+
+		toolbarTop.bind('select-all', function(event) {
+			spriteCanvasView.findAllSprites();
 			event.preventDefault();
 		});
 

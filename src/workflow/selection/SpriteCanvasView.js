@@ -6,6 +6,7 @@ import Selected from '../../components/Selected';
 import Highlight from '../../components/highlight';
 import SelectArea from '../../components/selectArea';
 import SelectColor from '../../components/selectColor';
+import Rect from '../../utilities/Rect';
 
 class SpriteCanvasView extends MicroEvent {
 	constructor(spriteCanvas, $appendToElm) {
@@ -13,7 +14,7 @@ class SpriteCanvasView extends MicroEvent {
 		var spriteCanvasView = this,
 			$container = $('<div class="sprite-canvas-container"/>'),
 			$canvas = $( spriteCanvas.canvas ).appendTo( $container ),
-			// this cannot be $appendToElm, as browsers pick up clicks on scrollbars, some don't pick up mouseup http://code.google.com/p/chromium/issues/detail?id=14204#makechanges
+
 			highlight = new Highlight($container),
 			selectArea = new SelectArea($container, $canvas, highlight),
 			selectColor = new SelectColor($canvas, $canvas),
@@ -37,7 +38,7 @@ class SpriteCanvasView extends MicroEvent {
 			if (spriteRect.width && spriteRect.height) {
 				spriteRect = spriteCanvas.expandToSpriteBoundry(rect);
 				
-				spriteCanvasView._handleSelectedSprite(clickedRect, spriteRect);
+				spriteCanvasView._handleSelectedSprite(clickedRect, spriteRect, true);
 			} 
 			else {
 				//Clicked background clears selections
@@ -58,9 +59,11 @@ class SpriteCanvasView extends MicroEvent {
 
 var SpriteCanvasViewProto = SpriteCanvasView.prototype;
 
-SpriteCanvasViewProto._handleSelectedSprite = function(clickedRect, spriteRect) {
+SpriteCanvasViewProto._handleSelectedSprite = function(clickedRect, spriteRect, isHistoric = false) {
 	//Store previous state in history
-	this._history.push([...this._selectedSprites]);
+	if(isHistoric) {
+		this._history.push([...this._selectedSprites]);
+	}
 
 	const alreadySelectedSpriteIndex = this._selectedSprites.findIndex(sprite => JSON.stringify(sprite.rect) == JSON.stringify(spriteRect));
 	if(alreadySelectedSpriteIndex > -1) {
@@ -87,6 +90,23 @@ SpriteCanvasViewProto._selectSprite = function(clickedRect, spriteRect) {
 	highlight.moveTo(clickedRect); // move to clicked area so the animation starts from click position
 
 	return new Selected(spriteRect, highlight);
+}
+
+SpriteCanvasViewProto.findAllSprites = function() {
+	this._history.push([...this._selectedSprites]);
+
+	//Find all sprite bounds excluding current selections from search
+	let currentSelections = this._selectedSprites.map(current => current.rect);
+	let selectable = this._spriteCanvas.findAllBounds(Array.from(currentSelections));
+
+	//Filter out the current selections for next step
+	selectable = selectable.filter(existing => !currentSelections.includes(existing));
+
+	//Highlight and add to selected
+	selectable.forEach(spriteRect => {
+		let clickedRect = new Rect(spriteRect.x, spriteRect.y, 1, 1);
+		this._selectedSprites.push(this._selectSprite(clickedRect, spriteRect));
+	});
 }
 
 SpriteCanvasViewProto.unselectAllSprites = function(isHistoric = false) {
