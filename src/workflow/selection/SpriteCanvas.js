@@ -114,11 +114,15 @@ export default (function() {
 		//Move from left to right, then top to bottom
 		for(let y=0; y < this.canvas.height; y += chunkSize){
 			chunkHieght = chunkSize;
-			if(y + chunkSize > this.canvas.height) {chunkHieght = this.canvas.height - y}
+
+			//Handle end of height
+			if(y + chunkSize > this.canvas.height) { chunkHieght = this.canvas.height - y }
 
 			for(let x=0; x < this.canvas.width; x += chunkSize){
 				chunkWidth = chunkSize;
-				if(x + chunkSize > this.canvas.width) {chunkWidth = this.canvas.width - x}
+				
+				//Handle end of width
+				if(x + chunkSize > this.canvas.width) { chunkWidth = this.canvas.width - x }
 
 				//Search image in chunks
 				const pixels = this._context.getImageData(x, y, chunkWidth, chunkHieght).data;
@@ -129,6 +133,10 @@ export default (function() {
 				
 				let pixelRect = this._findChunkPixel(chunkRect, pixels);
 				let spriteRect = this._getSpriteBounds(pixelRect);
+
+				//Skip if sprite size is smaller than a chunk
+				if((spriteRect.width * spriteRect.height) < (chunkWidth * chunkHieght)) { continue }
+
 				toSelect.push(spriteRect);
 			}
 		}

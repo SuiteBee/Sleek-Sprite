@@ -48,6 +48,7 @@ class SpriteCanvasView extends MicroEvent {
 
 		selectColor.bind('select', function (color) {
 			spriteCanvasView.trigger('bgColorSelect', color);
+			spriteCanvasView._history.push(spriteCanvas.getBg());
 			spriteCanvas.setBg(color);
 		});
 
@@ -92,12 +93,12 @@ SpriteCanvasViewProto._selectSprite = function(clickedRect, spriteRect) {
 	return new Selected(spriteRect, highlight);
 }
 
-SpriteCanvasViewProto.findAllSprites = function() {
+SpriteCanvasViewProto.findAllSprites = function(spriteGap) {
 	this._history.push([...this._selectedSprites]);
 
 	//Find all sprite bounds excluding current selections from search
 	let currentSelections = this._selectedSprites.map(current => current.rect);
-	let selectable = this._spriteCanvas.findAllBounds(Array.from(currentSelections));
+	let selectable = this._spriteCanvas.findAllBounds(Array.from(currentSelections), spriteGap);
 
 	//Filter out the current selections for next step
 	selectable = selectable.filter(existing => !currentSelections.includes(existing));
@@ -138,7 +139,7 @@ SpriteCanvasViewProto.setTool = function(mode) {
 	}
 };
 
-SpriteCanvasViewProto.setBg = function(color, anim = true) {
+SpriteCanvasViewProto.setDarkMode = function(color, anim = true) {
 	if ( $.support.transition && anim ) {
 		this._$bgElm.transition({ 'background-color': color }, {
 			duration: 500
@@ -174,6 +175,9 @@ SpriteCanvasViewProto.undo = function() {
 	if (lastState) {
 		if(lastState instanceof ImageData) {
 			this._spriteCanvas.undoPixels(lastState);
+		} else if(lastState.length == 4 && !(lastState[0] instanceof Selected)){
+			this._spriteCanvas.setBg(lastState);
+			this.trigger('bgColorSelect', lastState);
 		} else {
 			this.unselectAllSprites();
 			this._selectedSprites = lastState;
@@ -183,7 +187,7 @@ SpriteCanvasViewProto.undo = function() {
 			}
 
 			return this._selectedSprites;
-		}
+		} 
 	}
 }
 

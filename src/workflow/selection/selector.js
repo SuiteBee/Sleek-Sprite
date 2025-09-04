@@ -36,7 +36,11 @@ import Editor from '../editing/Editor';
 		toolbarTop.
 			addItem('open-img', 'Open Image', {noLabel: true}).
 			addItem('reload-img', 'Reload Current Image', {noLabel: true}).
-			addItem('select-all', 'Find All', {noLabel: true}).
+			addItem(
+				new ToolbarGroup('select-find').
+					addInput('select-size', '', 'Minimum Gap Between Sprites (larger is faster)', '4', '10').
+					addItem('select-all', 'Find All', {noLabel: true})
+			).
 			addItem('select-none', 'Unselect All', {noLabel: true}).
 			addItem(
 				new ToolbarGroup().
@@ -139,7 +143,14 @@ import Editor from '../editing/Editor';
 		});
 
 		toolbarTop.bind('select-all', function(event) {
-			spriteCanvasView.findAllSprites();
+			let txtGap = $('#select-size').val();
+			let spriteGap = Number(txtGap);
+
+			if(isNaN(spriteGap) || spriteGap < 1){
+				toolbarTop.feedback('Chunk size must be a number greater than 0');
+			} else{
+				spriteCanvasView.findAllSprites(spriteGap);
+			}
 			event.preventDefault();
 		});
 
@@ -171,10 +182,10 @@ import Editor from '../editing/Editor';
 
 		toolbarTop.bind('invert-bg', function(event) {
 			if ( event.isActive ) {
-				spriteCanvasView.setBg('#fff');
+				spriteCanvasView.setDarkMode('#fff');
 			}
 			else {
-				spriteCanvasView.setBg('#000');
+				spriteCanvasView.setDarkMode('#000');
 			}
 		});
 
@@ -200,10 +211,10 @@ import Editor from '../editing/Editor';
 
 			if(editorDark){
 				toolbarTop.activate('invert-bg');
-				spriteCanvasView.setBg('#000', false);
+				spriteCanvasView.setDarkMode('#000', false);
 			} else{
 				toolbarTop.deactivate('invert-bg');
-				spriteCanvasView.setBg('#fff', false);
+				spriteCanvasView.setDarkMode('#fff', false);
 			}
         });
 		

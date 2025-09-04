@@ -84,7 +84,7 @@ EditorCanvasViewProto.unselectAllCells = function() {
 	this.trigger('editNone');
 }
 
-EditorCanvasViewProto.setBg = function(color, anim = true) {
+EditorCanvasViewProto.setDarkMode = function(color, anim = true) {
 	if ( $.support.transition && anim ) {
 		this._$bgElm.transition({ 'background-color': color }, {
 			duration: 500

@@ -79,10 +79,10 @@ class Editor {
 
         this.toolbarTop.bind('invert-bg', function(event) {
 			if ( event.isActive ) {
-				this.editorCanvasView.setBg('#fff');
+				this.editorCanvasView.setDarkMode('#fff');
 			}
 			else {
-				this.editorCanvasView.setBg('#000');
+				this.editorCanvasView.setDarkMode('#000');
 			}
 		}.bind(this));
 
@@ -155,10 +155,10 @@ class Editor {
 
 			if(selectDark){
 				this.toolbarTop.activate('invert-bg');
-				this.editorCanvasView.setBg('#000', false);
+				this.editorCanvasView.setDarkMode('#000', false);
 			} else{
 				this.toolbarTop.deactivate('invert-bg');
-				this.editorCanvasView.setBg('#fff', false);
+				this.editorCanvasView.setDarkMode('#fff', false);
 			}
 
             //Unselect all highlighted cells in editor

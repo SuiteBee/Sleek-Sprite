@@ -333,9 +333,15 @@
 				padding: 6px 0;
 				text-indent: -5000px;
 			}
+			&.select-all {
+				float:right;
+				margin: 0px;
+				border:none;
+				border-left: 1px solid #888;
+			}
 			&.select-all::before {
 				top: 4px;
-				left: 4px;
+				left: 7px;
 				@include utils.icon("search", 0px, 20px, 20px);
 			}
 			&.select-none::before {
@@ -434,6 +440,17 @@
 				position: absolute;
 				right: 20px;
 			}
+			&.select-size {
+				top: 0px;
+				height: 26px;
+			}
+			#select-size {
+				border: none;
+				border-top-right-radius: 0px;
+				border-bottom-right-radius: 0px;
+				margin: 0px;
+				height: 100%;
+			}
 			#edit-x {
 				margin-left: 30px;
 			}
@@ -531,6 +548,16 @@
 	}
 
 	//Specific Toolbargroup containers
+	.select-find {
+		margin: 0 5px 5px 0;
+		border: 1px solid #888;
+		border-radius: 4px;
+		float: left;
+		width: fit-content;
+
+		@include utils.linear-gradient((top, #fefefe, #b8b8b8));
+	}
+
 	.edit-selected, .edit-all, .edit-grid {
 		padding: 3px 5px;
 		margin: 0 5px 5px 0;
