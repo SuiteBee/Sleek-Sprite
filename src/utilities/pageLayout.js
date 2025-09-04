@@ -45,7 +45,8 @@ export default (function() {
 					[$footerP, {
 						padding: $footerP.css('padding')
 					}],
-					[$startButtons, { opacity: 0 }]
+					[$startButtons, { opacity: 0 }],
+					[$canvasCell, { border: 0 }]
 				],
 				before: function() {
 					$container.width(containerWidth);

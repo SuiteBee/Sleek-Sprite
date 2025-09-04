@@ -5,6 +5,7 @@ import EditorCanvas from './EditorCanvas';
 import EditorCanvasView from './EditorCanvasView';
 import EditPreview from './EditPreview';
 import MockSprite from './MockSprite';
+import Exporter from '../export/Exporter';
 
 class Editor {
 
@@ -13,8 +14,8 @@ class Editor {
 		this.editorCanvas       = new EditorCanvas(srcCanvas);
         this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, this.$editorContainer );
         //this.editPreview        = new EditPreview(this.$editorContainer);
-
         this.selectedSprites    = [];
+        this.exporter           = new Exporter(this.selectedSprites);
         
         this.nRows = -1;
         this.nCols = -1;
