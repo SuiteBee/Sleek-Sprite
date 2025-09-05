@@ -5,7 +5,7 @@ import EditorCanvas from './EditorCanvas';
 import EditorCanvasView from './EditorCanvasView';
 import EditPreview from './EditPreview';
 import MockSprite from './MockSprite';
-import Exporter from '../export/Exporter';
+import Exporter from '../exporting/Exporter';
 
 class Editor {
 
@@ -15,7 +15,7 @@ class Editor {
         this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, this.$editorContainer );
         //this.editPreview        = new EditPreview(this.$editorContainer);
         this.selectedSprites    = [];
-        this.exporter           = new Exporter(this.selectedSprites);
+        this.exporter           = new Exporter(this.editorCanvas);
         
         this.nRows = -1;
         this.nCols = -1;
@@ -168,19 +168,21 @@ class Editor {
             //Pack any selected sprites into mockup[]
             this.pack();
 
-            //Default rows/cols setting on editor
-            var defRows = 1, defCols = this.mockup.length;
-            if(this.nRows <= 0 || this.nCols <= 0){
-                 $('#set-rows').val(defRows.toString());
-                 $('#set-columns').val(defCols.toString());
+            //Set automatic grid dimensions
+            if(this.mockup.length > 0){
+                let nearestRoot = Math.sqrt(this.mockup.length);
+                let nearestSquare = Math.ceil(nearestRoot);
 
-                 this.nRows = defRows;
-                 this.nCols = defCols;
+                $('#set-rows').val(nearestSquare.toString());
+                $('#set-columns').val(nearestSquare.toString());
+
+                this.nRows = nearestSquare;
+                this.nCols = nearestSquare;
+
+                //Draw sliced sprites in editor
+                this.place();
             }
 
-            //Draw sliced sprites in editor
-            this.place();
-            
         }.bind(this));
 
     }
