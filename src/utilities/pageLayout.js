@@ -1,7 +1,8 @@
 import $ from 'jquery';
 
 export default (function() {
-	var $container = $('.selection-tab'),
+	var $content = $('.content'),
+		$container = $('.selection-tab'),
 		$workflow = $('.workflow'),
 		$header = $('.container > header'),
 		$canvasCell = $('.canvas-cell'),
@@ -29,6 +30,7 @@ export default (function() {
 		var transitions,
 			containerWidth = getContainerWidthPercent();
 		
+		$content.removeClass('intro');
 		$container.removeClass('intro');
 		$footerMain.removeClass('intro');
 		$workflow.removeClass('intro');
@@ -81,6 +83,13 @@ export default (function() {
 						'padding-bottom': $toolbarBottom.css('padding-bottom'),
 						'border-top-width': $toolbarBottom.css('border-top-width'),
 						'border-bottom-width': $toolbarBottom.css('border-bottom-width')
+					}],
+					[$footerMain, {
+						width: $footerMain.width(),
+						'padding-top': $footerMain.css('padding-top'),
+						'padding-bottom': $footerMain.css('padding-bottom'),
+						'border-top-width': $footerMain.css('border-top-width'),
+						'border-bottom-width': $footerMain.css('border-bottom-width')
 					}]
 				],
 				before: function() {
@@ -96,6 +105,7 @@ export default (function() {
 			}
 		];
 		
+		$content.addClass('intro');
 		$container.addClass('intro');
 		$footerMain.addClass('intro');
 		$workflow.addClass('intro');
@@ -151,6 +161,7 @@ export default (function() {
 				doAnimStep(steps, 0, function() {
 					var targets = [];
 					
+					$content.removeClass('intro');
 					$container.removeClass('intro');
 					$footerMain.removeClass('intro');
 					$workflow.removeClass('intro');
@@ -167,6 +178,7 @@ export default (function() {
 				});
 			}
 			else {
+				$content.removeClass('intro');
 				$container.removeClass('intro');
 				$footerMain.removeClass('intro');
 				$workflow.removeClass('intro');
