@@ -3,26 +3,25 @@ import { Toolbar, ToolbarGroup } from '../../components/Toolbar';
 
 import EditorCanvas from './EditorCanvas';
 import EditorCanvasView from './EditorCanvasView';
-import EditPreview from './EditPreview';
 import MockSprite from './MockSprite';
-import Exporter from '../exporting/Exporter';
+import MicroEvent from '../../utilities/MicroEvent';
 
-class Editor {
+class Editor extends MicroEvent {
 
-    constructor(srcCanvas, srcTools) {
-		this.$editorContainer   = $('.editor-inner');
-		this.editorCanvas       = new EditorCanvas(srcCanvas);
-        this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, this.$editorContainer );
-        //this.editPreview        = new EditPreview(this.$editorContainer);
+    constructor(srcCanvas) {
+        super();
+		var $editorContainer   = $('.editor-inner');
+		
+        this.editorCanvas       = new EditorCanvas(srcCanvas);
+        this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, $editorContainer );
+
         this.selectedSprites    = [];
-        this.exporter           = new Exporter(this.editorCanvas);
         
         this.nRows = -1;
         this.nCols = -1;
 
         this.editSelected;
         this.mockup = [];
-        this.saved = [];
 
         this.toolbarTop         = new Toolbar('.editor-tab', '.toolbar-container');
 		this.toolbarBottom      = new Toolbar('.editor-tab', '.toolbar-bottom-container');
@@ -55,7 +54,7 @@ class Editor {
                 this.toolbarTop.feedback("Columns must be a number between 1-100");
             } else{
                 this.nCols = cols;
-                this.place();
+                this.#place();
             }
 		}.bind(this));
 
@@ -66,31 +65,27 @@ class Editor {
                 this.toolbarTop.feedback("Rows must be a number between 1-100");
             } else{
                 this.nRows = rows;
-                this.place();
+                this.#place();
             }
 		}.bind(this));
 
         this.toolbarTop.bind('set-all-align', function(evt, option) {
             if(this.mockup.length > 0){
-                this.anchorAll(option);
-                this.place();
+                this.#anchorAll(option);
+                this.#place();
                 this.editorCanvasView.unselectAllCells();
             }
         }.bind(this));
 
-        this.toolbarTop.bind('invert-bg', function(event) {
-			if ( event.isActive ) {
-				this.editorCanvasView.setDarkMode('#fff');
-			}
-			else {
-				this.editorCanvasView.setDarkMode('#000');
-			}
+        this.toolbarTop.bind('invert-bg', function(evt) {
+			this.setMode(!evt.isActive, true);
+			this.trigger('modeChange', !evt.isActive);
 		}.bind(this));
 
         this.toolbarTop.bind('edit-anchor', function(evt, option) {
             if(this.editSelected){
                 this.editSelected.anchor = option;
-                this.place();
+                this.#place();
             }
         }.bind(this));
 
@@ -104,7 +99,7 @@ class Editor {
                     this.toolbarTop.feedback(`Must be within cell bounds: ${this.editSelected.xRangeStr}`);
                 } else{  
                     this.editSelected.nudgeX = newX;
-                    this.place();
+                    this.#place();
                 }
             }
         }.bind(this));
@@ -119,7 +114,7 @@ class Editor {
                     this.toolbarTop.feedback(`Must be within cell bounds: ${this.editSelected.yRangeStr}`);
                 } else{
                     this.editSelected.nudgeY = newY;
-                    this.place();
+                    this.#place();
                 }
             }
         }.bind(this));
@@ -127,127 +122,120 @@ class Editor {
         this.toolbarTop.bind('edit-flip-x', function(evt, chk) {
             if(this.editSelected){
                 this.editSelected.flipX = chk;
-                this.place();
+                this.#place();
             }
         }.bind(this));
 
         this.toolbarTop.bind('edit-flip-y', function(evt, chk) {
             if(this.editSelected){
                 this.editSelected.flipY = chk;
-                this.place();
+                this.#place();
             }
         }.bind(this));
 
         //Cell selected
         this.editorCanvasView.bind('editCellChange', function(sprite) {
-            this.editing(sprite);
+            this.#editing(sprite);
         }.bind(this));
 
         //Cells unselected
         this.editorCanvasView.bind('editNone', function(){
-            this.notEditing();
+            this.#notEditing();
         }.bind(this));
-
-        //Editor tab activated
-        var $editorTabBtn = $('#tabEditor');
-        $editorTabBtn.on("click", function() {
-
-			let selectDark = srcTools.isActive('invert-bg');
-
-			if(selectDark){
-				this.toolbarTop.activate('invert-bg');
-				this.editorCanvasView.setDarkMode('#000', false);
-			} else{
-				this.toolbarTop.deactivate('invert-bg');
-				this.editorCanvasView.setDarkMode('#fff', false);
-			}
-
-            //Unselect all highlighted cells in editor
-            this.editorCanvasView.unselectAllCells();
-
-            //Pack any selected sprites into mockup[]
-            this.pack();
-
-            //Set automatic grid dimensions
-            if(this.mockup.length > 0){
-                let nearestRoot = Math.sqrt(this.mockup.length);
-                let nearestSquare = Math.ceil(nearestRoot);
-
-                $('#set-rows').val(nearestSquare.toString());
-                $('#set-columns').val(nearestSquare.toString());
-
-                this.nRows = nearestSquare;
-                this.nCols = nearestSquare;
-
-                //Draw sliced sprites in editor
-                this.place();
-            }
-
-        }.bind(this));
-
     }
-}
 
-var EditorProto = Editor.prototype;
+    activeTab(){
+        //Unselect all highlighted cells in editor
+        this.editorCanvasView.unselectAllCells();
 
-EditorProto.editing = function(sprite){
-    this.editSelected = sprite;
+        //Pack any selected sprites into mockup[]
+        this.#pack();
 
-    if(sprite){
-        this.toolbarTop.
-        addItem(
-            new ToolbarGroup('edit-selected').
-            addInput('edit-x', 'Nudge |', `Valid X-Range: ${sprite.xRangeStr}`, '5', sprite.nudgeX.toString()).
-            addInput('edit-y', '', `Valid Y-Range: ${sprite.yRangeStr}`, '5', sprite.nudgeY.toString())
-        ).
-        addItem(
-            new ToolbarGroup('edit-selected').
-            addRadio('edit-anchor', 'anchor-center', 'Center', 'Anchor |', 'Anchor Selected Sprite: Center', sprite.anchor == "Center").
-            addRadio('edit-anchor', 'anchor-bottom', 'Bottom', '', 'Anchor Selected Sprite: Bottom', sprite.anchor == "Bottom").
-            addRadio('edit-anchor', 'anchor-previous', 'Previous', '', 'Anchor Selected Sprite: Previous', sprite.anchor == "Previous")
-        ).
-        addItem(
-            new ToolbarGroup('edit-selected').
-                addCheckbox('edit-flip-x', 'Flip |', 'Flip Sprite on X-Axis', sprite.flipX).
-                addCheckbox('edit-flip-y', '', 'Flip Sprite on Y-Axis', sprite.flipY)
-        );
+        //Set automatic grid dimensions
+        if(this.mockup.length > 0){
+            let nearestRoot = Math.sqrt(this.mockup.length);
+            let nearestSquare = Math.ceil(nearestRoot);
+
+            $('#set-rows').val(nearestSquare.toString());
+            $('#set-columns').val(nearestSquare.toString());
+
+            this.nRows = nearestSquare;
+            this.nCols = nearestSquare;
+
+            //Draw sliced sprites in editor
+            this.#place();
+        }
     }
-}
 
-EditorProto.notEditing = function() {
-    this.editSelected = null;
+    setMode(dark, anim){
+		if(dark){
+			this.toolbarTop.activate('invert-bg');
+			this.editorCanvasView.setDarkMode('#000', anim);
+		} else{
+			this.toolbarTop.deactivate('invert-bg');
+			this.editorCanvasView.setDarkMode('#fff', anim);
+		}
+	};
 
-    $('.lbl-edit-x').remove();
-    $('.lbl-edit-y').remove();
-    $('.edit-selected').remove();
-}
+    //Update sprites from selector
+    gather(selectedSprites) {
+        this.selectedSprites = selectedSprites;
+    }
 
-//Update sprites from selector
-EditorProto.gather = function(selectedSprites) {
-    this.selectedSprites = selectedSprites;
-}
+    #editing(sprite){
+        this.editSelected = sprite;
 
-//Pack selected sprites into an object array
-EditorProto.pack = function() {
-    this.mockup = [];
-    
-    this.selectedSprites.forEach(function(sprite, i) {
-        this.mockup.push(new MockSprite(sprite.rect, i));
-    }.bind(this)); 
-}
+        if(sprite){
+            this.toolbarTop.
+            addItem(
+                new ToolbarGroup('edit-selected').
+                addInput('edit-x', 'Nudge |', `Valid X-Range: ${sprite.xRangeStr}`, '5', sprite.nudgeX.toString()).
+                addInput('edit-y', '', `Valid Y-Range: ${sprite.yRangeStr}`, '5', sprite.nudgeY.toString())
+            ).
+            addItem(
+                new ToolbarGroup('edit-selected').
+                addRadio('edit-anchor', 'anchor-center', 'Center', 'Anchor |', 'Anchor Selected Sprite: Center', sprite.anchor == "Center").
+                addRadio('edit-anchor', 'anchor-bottom', 'Bottom', '', 'Anchor Selected Sprite: Bottom', sprite.anchor == "Bottom").
+                addRadio('edit-anchor', 'anchor-previous', 'Previous', '', 'Anchor Selected Sprite: Previous', sprite.anchor == "Previous")
+            ).
+            addItem(
+                new ToolbarGroup('edit-selected').
+                    addCheckbox('edit-flip-x', 'Flip |', 'Flip Sprite on X-Axis', sprite.flipX).
+                    addCheckbox('edit-flip-y', '', 'Flip Sprite on Y-Axis', sprite.flipY)
+            );
+        }
+    }
 
-EditorProto.anchorAll = function(anchorPos) {
-    this.mockup.forEach(function(sprite) {
-        sprite.anchor = anchorPos;
-        sprite.nudgeY = 0;
-    }.bind(this)); 
-}
+    #notEditing(){
+        this.editSelected = null;
 
-//Place sprites from mockup array onto editor canvas and draw a grid
-EditorProto.place = function() {
-    this.editorCanvas.reset(this.mockup, this.nRows, this.nCols);
-    this.editorCanvas.drawSprites(); 
-    this.editorCanvas.drawGrid();
+        $('.lbl-edit-x').remove();
+        $('.lbl-edit-y').remove();
+        $('.edit-selected').remove();
+    }
+
+    //Pack selected sprites into an object array
+    #pack() {
+        this.mockup = [];
+        
+        this.selectedSprites.forEach(function(sprite, i) {
+            this.mockup.push(new MockSprite(sprite.rect, i));
+        }.bind(this)); 
+    }
+
+    //Place sprites from mockup array onto editor canvas and draw a grid
+    #place() {
+        this.editorCanvas.reset(this.mockup, this.nRows, this.nCols);
+        this.editorCanvas.drawSprites(); 
+        this.editorCanvas.drawGrid();
+    }
+
+    #anchorAll(anchorPos) {
+        this.mockup.forEach(function(sprite) {
+            sprite.anchor = anchorPos;
+            sprite.nudgeY = 0;
+        }.bind(this)); 
+    }
 }
 
 export default Editor;

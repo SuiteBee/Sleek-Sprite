@@ -1,5 +1,5 @@
 import MicroEvent from '../../utilities/MicroEvent';
-import Rect from '../../utilities/Rect';
+import Rect from '../../components/Rect';
 
 export default (function() {
 	function pixelsEquivalent(pixels1, offset1, pixels2, offset2) {
@@ -34,16 +34,16 @@ export default (function() {
 		return xIntersect && yIntersect;
 	}
 	
-	function SpriteCanvas() {
+	function SelectorCanvas() {
 		var canvas = document.createElement('canvas');
 		this.canvas = canvas;
 		this._context = canvas.getContext('2d');
 		this._bgData = [0, 0, 0, 0];
 	}
 	
-	var SpriteCanvasProto = SpriteCanvas.prototype = new MicroEvent;
+	var SelectorCanvasProto = SelectorCanvas.prototype = new MicroEvent;
 	
-	SpriteCanvasProto.setImg = function(img) {
+	SelectorCanvasProto.setImg = function(img) {
 		var canvas = this.canvas,
 			context = this._context;
 		
@@ -55,19 +55,19 @@ export default (function() {
 		this._img = img;
 	};
 
-	SpriteCanvasProto.getFirstPixelColor = function() {
+	SelectorCanvasProto.getFirstPixelColor = function() {
 		return this._context.getImageData(0,0, 1, 1).data;
 	}
 
-	SpriteCanvasProto.getCurrentState = function() {
+	SelectorCanvasProto.getCurrentState = function() {
 		return this._context.getImageData(0,0, this.canvas.width, this.canvas.height);
 	}
 
-	SpriteCanvasProto.undoPixels = function(lastState) {
+	SelectorCanvasProto.undoPixels = function(lastState) {
 		this._context.putImageData(lastState, 0, 0);
 	}
 
-	SpriteCanvasProto.pixelsToAlpha = function(){
+	SelectorCanvasProto.pixelsToAlpha = function(){
 		const imgDat = this._context.getImageData(0,0, this.canvas.width, this.canvas.height);
 		const pixels = imgDat.data;
 		const targetBg = this._bgData;
@@ -86,7 +86,7 @@ export default (function() {
 		this._bgData = [0,0,0,0];
 	}
 
-	SpriteCanvasProto.pixelsToBg = function(selected) {
+	SelectorCanvasProto.pixelsToBg = function(selected) {
 		const targetBg = this._bgData;
 
 		for(let i=0; i < selected.length; i++){
@@ -106,7 +106,7 @@ export default (function() {
 		}
 	}
 
-	SpriteCanvasProto.findAllBounds = function(rects, chunkSize = 1) {
+	SelectorCanvasProto.findAllBounds = function(rects, chunkSize = 1) {
 		let toSelect = rects;
 		var chunkWidth = chunkSize,
 			chunkHieght = chunkSize;
@@ -144,7 +144,7 @@ export default (function() {
 		return toSelect;
 	}
 
-	SpriteCanvasProto._findChunkPixel = function(chunkRect, pixels){
+	SelectorCanvasProto._findChunkPixel = function(chunkRect, pixels){
 		let chunkX = chunkRect.x,
 			chunkY = chunkRect.y;
 
@@ -164,7 +164,7 @@ export default (function() {
 		}
 	}
 
-	SpriteCanvasProto._getSpriteBounds = function(pixelRect){
+	SelectorCanvasProto._getSpriteBounds = function(pixelRect){
 		const rect = Object.assign({}, pixelRect);
 		let spriteRect = this.trimBg(rect);
 		spriteRect = this.expandToSpriteBoundry(rect);
@@ -172,15 +172,15 @@ export default (function() {
 		return spriteRect;
 	}
 
-	SpriteCanvasProto.setBg = function(pixelArr) {
+	SelectorCanvasProto.setBg = function(pixelArr) {
 		this._bgData = pixelArr;
 	};
 	
-	SpriteCanvasProto.getBg = function() {
+	SelectorCanvasProto.getBg = function() {
 		return this._bgData;
 	};
 	
-	SpriteCanvasProto.trimBg = function(rect) {
+	SelectorCanvasProto.trimBg = function(rect) {
 		var edgeBgResult;
 		
 		rect = this._restrictRectToBoundry(rect);
@@ -193,7 +193,7 @@ export default (function() {
 		return rect;
 	};
 	
-	SpriteCanvasProto._restrictRectToBoundry = function(rect) {
+	SelectorCanvasProto._restrictRectToBoundry = function(rect) {
 		var canvas = this.canvas,
 			restrictedX = Math.min( Math.max(rect.x, 0), canvas.width ),
 			restrictedY = Math.min( Math.max(rect.y, 0), canvas.height );
@@ -211,7 +211,7 @@ export default (function() {
 		return rect;
 	}
 	
-	SpriteCanvasProto.expandToSpriteBoundry = function(rect, callback) {
+	SelectorCanvasProto.expandToSpriteBoundry = function(rect, callback) {
 		var edgeBgResult = this._edgesAreBg(rect),
 			edgeBoundsResult = this._edgesAtBounds(rect);
 			
@@ -229,7 +229,7 @@ export default (function() {
 		return rect;
 	};
 	
-	SpriteCanvasProto._edgesAreBg = function(rect) {
+	SelectorCanvasProto._edgesAreBg = function(rect) {
 		// look at the pixels around the edges
 		var canvas = this.canvas,
 			context = this._context,
@@ -247,7 +247,7 @@ export default (function() {
 		];
 	};
 	
-	SpriteCanvasProto._edgesAtBounds = function(rect) {
+	SelectorCanvasProto._edgesAtBounds = function(rect) {
 		var canvas = this.canvas;
 		
 		return [
@@ -258,7 +258,7 @@ export default (function() {
 		];
 	};
 	
-	SpriteCanvasProto._pixelsContainOnlyBg = function(pixels) {
+	SelectorCanvasProto._pixelsContainOnlyBg = function(pixels) {
 		var bg = this._bgData;
 		
 		for (var i = 0, len = pixels.length; i < len; i += 4) {
@@ -269,7 +269,7 @@ export default (function() {
 		return true;
 	};
 	
-	SpriteCanvasProto._expandRect = function(rect, edgeBgResult, edgeBoundsResult) {
+	SelectorCanvasProto._expandRect = function(rect, edgeBgResult, edgeBoundsResult) {
 		if ( !edgeBgResult[0] && !edgeBoundsResult[0] ) {
 			rect.y--;
 			rect.height++;
@@ -288,7 +288,7 @@ export default (function() {
 		return rect;
 	};
 	
-	SpriteCanvasProto._contractRect = function(rect, edgeBgResult) {
+	SelectorCanvasProto._contractRect = function(rect, edgeBgResult) {
 		if ( edgeBgResult[0] && rect.height ) {
 			rect.y++;
 			rect.height--;
@@ -307,5 +307,5 @@ export default (function() {
 		return rect;
 	};
 	
-	return SpriteCanvas;
+	return SelectorCanvas;
 })();

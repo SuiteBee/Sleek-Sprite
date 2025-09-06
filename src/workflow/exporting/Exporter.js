@@ -1,77 +1,52 @@
 import $ from 'jquery';
 
-class Exporter {
+import MicroEvent from '../../utilities/MicroEvent';
 
-    constructor(editorCanvas) {
+class Exporter extends MicroEvent {
+
+    constructor(selectorCanvas, editorCanvas) {
+        super();
 		this.$exportContainer   = $('.export-container');
+        this.$exportCell        = $('.export-cell');
         this.editorCanvas = editorCanvas;
-
-        //Exporter tab activated
-        var $exportTabBtn = $('#tabExport');
-        $exportTabBtn.on("click", function() {
-            $('.export-table').remove();
-            $('.export-options').remove();
-
-            this.$tableContainer = this.createExportTable().appendTo(this.$exportContainer);
-            this.$options = this.createExportOptions().appendTo(this.$exportContainer);
-
-        }.bind(this));
     }
 
-    createExportTable() {
-        const container = $('<div class="export-table"></div>');
-        var $table = $('<table>');
-        var $tHead = $('<thead>');
+    activeTab() {
+        $('.export-items').remove();
+        $('.export-options').remove();
 
-        $table.append($tHead);
-
-        var $headerRow = $('<tr>');
-        $headerRow.append('<th>Sprite</th>');
-        $headerRow.append('<th>Name</th>');
-        $tHead.append($headerRow);
-
-        var $tBody = this.gatherExportRows();
-        $table.append($tBody);
-
-        $table.appendTo(container);
-        return container;
+        this.$tableContainer = this.$exportCell.append(this.createFlexContainer()).appendTo(this.$exportContainer);
+        this.$options = this.createExportOptions().appendTo(this.$exportContainer);
     }
 
-    gatherExportRows() {
-        var $tBody = $('<tbody>');
+    createFlexContainer(){
+        const container = $('<div class="export-items"></div>');
 
         let sprites = [...this.editorCanvas.sprites];
         for(let i=0; i<sprites.length; i++){
-            let $row = this.createExportRow(sprites[i]);
-            $tBody.append($row);
+            let sprite = sprites[i];
+            let $item = this.createFlexItem(sprite);
+            $item.appendTo(container);
         }
 
-        return $tBody;
+        return container;
     }
 
-    createExportRow(sprite) {
-        var $dataRow = $('<tr>');
-
-        var $previewCell = $('<td>');
+    createFlexItem(sprite){
+        let $item = $('<div class="export-item"></div>');
+            
         let $smallPreview = $('<canvas width="100" height="100"></canvas>');
         let smallContext = $smallPreview[0].getContext('2d');
         smallContext.drawImage(
-            this.editorCanvas.canvas, sprite.cell.x, sprite.cell.y, sprite.cell.width, sprite.cell.height,
+            this.editorCanvas.canvas, sprite.rect.x, sprite.rect.y, sprite.rect.width, sprite.rect.height,
             0, 0, 100, 100
         );
+        $smallPreview.addClass('small-preview').appendTo($item);
 
-        $smallPreview.addClass('small-preview').appendTo($previewCell);
-        $previewCell.appendTo($dataRow);
+        let $txtInput = $(`<input type="text" name="export-item-${sprite.n}" id="export-item-${sprite.n}"/>`).val(sprite.n);
+        $txtInput.appendTo($item);
 
-        var $nameCell = $('<td>');
-        var $txtInput = $(`<input type="text" name="export-cell-${sprite.n}" id="export-cell-${sprite.n}"/>`).
-			addClass('export-cell').
-			val(sprite.n);
-
-        $txtInput.appendTo($nameCell);
-        $nameCell.appendTo($dataRow);
-
-        return $dataRow;
+        return $item;
     }
 
     createExportOptions() {
@@ -82,7 +57,5 @@ class Exporter {
         return container;
     }
 }
-
-var ExporterProto = Exporter.prototype;
 
 export default Exporter;

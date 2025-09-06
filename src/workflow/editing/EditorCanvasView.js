@@ -9,8 +9,7 @@ import SelectArea from '../../components/selectArea';
 class EditorCanvasView extends MicroEvent {
 	constructor(editorCanvas, $appendToElm) {
 		super();
-		var EditorCanvasView = this,
-			$container = $('<div class="sprite-canvas-container"/>'),
+		var $container = $('<div class="sprite-canvas-container"/>'),
 			$canvas = $( editorCanvas.canvas ).appendTo( $container ),
 			// this cannot be $appendToElm, as browsers pick up clicks on scrollbars, some don't pick up mouseup http://code.google.com/p/chromium/issues/detail?id=14204#makechanges
 			highlight = new Highlight($container),
@@ -34,9 +33,9 @@ class EditorCanvasView extends MicroEvent {
 
             if(index >= 0 && index < this._editorCanvas.sprites.length){
 				let sprite = this._editorCanvas.sprites[index];
-                EditorCanvasView._handleSelectedCell(clickedRect, sprite);
+                this._handleSelectedCell(clickedRect, sprite);
             }else{
-                EditorCanvasView.unselectAllCells()
+                this.unselectAllCells()
             }
             
 

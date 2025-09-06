@@ -1,4 +1,4 @@
-import Rect from '../../utilities/Rect';
+import Rect from '../../components/Rect';
 
 class MockSprite {
 	constructor(rect, index) {

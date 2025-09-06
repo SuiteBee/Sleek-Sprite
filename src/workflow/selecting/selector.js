@@ -4,36 +4,24 @@ import ImgInput from '../../utilities/ImgInput';
 import {Toolbar, ToolbarGroup} from '../../components/Toolbar';
 import pageLayout from '../../utilities/pageLayout';
 
-import SpriteCanvas from './SpriteCanvas';
-import SpriteCanvasView from './SpriteCanvasView';
+import SelectorCanvas from './SelectorCanvas';
+import SelectorCanvasView from './SelectorCanvasView';
+import MicroEvent from '../../utilities/MicroEvent';
 
-import PreviewPanel from '../../cutter/PreviewPanel';
-import Editor from '../editing/Editor';
+class Selector extends MicroEvent {
 
-(function() {
-	// init
-	(function() {
-		function colourBytesToCss(color) {
-			if (color[3] === 0) {
-				return 'transparent';
-			}
-			return 'rgba(' + color[0] + ', ' + color[1] + ', ' + color[2] + ', ' + String( color[3] / 255 ).slice(0, 5) + ')';
-		}
+	constructor() {
+		super();
+		var $selectorContainer  = $('.selection-inner'),
+			imgInput            = new ImgInput( $selectorContainer, $selectorContainer);
+
+		this.selectorCanvas      = new SelectorCanvas();
+		this.selectorCanvasView  = new SelectorCanvasView(this.selectorCanvas, $selectorContainer);
+
+		this.toolbarTop          = new Toolbar('.selection-tab', '.toolbar-container'),
+		this.toolbarBottom       = new Toolbar('.selection-tab', '.toolbar-bottom-container');
 		
-		var $canvasContainer  = $('.selection-inner');
-		var $codeContainer    = $('.code-container');
-		var $tutorialLink     = $('.tutorial');
-		var spriteCanvas      = new SpriteCanvas();
-		var spriteCanvasView  = new SpriteCanvasView( spriteCanvas, $canvasContainer );
-		var imgInput          = new ImgInput( $canvasContainer, $canvasContainer, $tutorialLink.attr('href') );
-
-		var toolbarTop        = new Toolbar('.selection-tab', '.toolbar-container');
-		var toolbarBottom     = new Toolbar('.selection-tab', '.toolbar-bottom-container');
-
-		//var previewPanel      = new PreviewPanel( spriteCanvas, spriteCanvasView, $codeContainer );
-		var editor		  	  = new Editor(spriteCanvas, toolbarTop);
-		
-		toolbarTop.
+		this.toolbarTop.
 			addItem('open-img', 'Open Image', {noLabel: true}).
 			addItem('reload-img', 'Reload Current Image', {noLabel: true}).
 			addItem(
@@ -53,66 +41,38 @@ import Editor from '../editing/Editor';
 			addItem('undo', 'Undo Last Operation', {noLabel: true}).
 			addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
 
-		toolbarTop.$container.addClass('top');
-		toolbarBottom.$container.addClass('bottom');
+		this.toolbarTop.$container.addClass('top');
+		this.toolbarBottom.$container.addClass('bottom');
 
 		pageLayout.init();
-		function init_selection_tools(){
-			//Set background as top left pixel
-			let colArr = spriteCanvas.getFirstPixelColor();
-			spriteCanvas.setBg(colArr);
-
-			spriteCanvasView.unselectAllSprites();
-			spriteCanvasView.setTool('select-sprite');
-
-			//Set background status
-			let $selectedBg = $('.selected-bg');
-			let colorStr = colourBytesToCss(colArr);
-			if (colorStr == 'transparent'){
-				$selectedBg.css('background-color', '');
-				$selectedBg.addClass('none');
-			} else {
-				$selectedBg.removeClass('none');
-				$selectedBg.css('background-color', colorStr);
-			}
-		}
-		
-		// listeners
+		imgInput.fileClickjackFor( this.toolbarTop.$container.find('div.open-img') );
+				
 		imgInput.bind('load', function(img) {
 			//Send image to canvas
-			spriteCanvas.setImg(img);
+			this.selectorCanvas.setImg(img);
 			
 			//Prepare toolbar
-			init_selection_tools();
+			this.#init_selection_tools();
 
 			pageLayout.toAppView();
-		});
-		
-		spriteCanvasView.bind('selectedSpritesChange', function(selectedSprites) {
-			editor.gather(selectedSprites);
+		}.bind(this));
 			
-			if(selectedSprites.length === 0) {
-				return;
-			}
-
-			//previewPanel.selectedSprites = selectedSprites;
-			//previewPanel.update();
-
+		this.selectorCanvasView.bind('selectedSpritesChange', function(selectedSprites) {
+			this.trigger('spriteChange', selectedSprites);
+			if(selectedSprites.length === 0) { return; }
+			
 			selectedSprites.forEach(({rect}) => {
-				if (rect.width === spriteCanvas.canvas.width && rect.height === spriteCanvas.canvas.height) {
-					// if the rect is the same size as the whole canvas,
-					// it's probably because the background is set wrong
-					// let's be kind...
+				if (rect.width === this.selectorCanvas.canvas.width && rect.height === this.selectorCanvas.canvas.height) {
 					toolbarTop.feedback( 'Incorrect background colour set?', true );
 				}
 			});
-		});
+		}.bind(this));
 		
-		spriteCanvasView.bind('bgColorHover', function(color) {
-			toolbarTop.feedbackColor(color, colourBytesToCss(color) );
-		});
+		this.selectorCanvasView.bind('bgColorHover', function(color) {
+			this.toolbarTop.feedbackColor(color, colourBytesToCss(color) );
+		}.bind(this));
 		
-		spriteCanvasView.bind('bgColorSelect', function(color) {
+		this.selectorCanvasView.bind('bgColorSelect', function(color) {
 			var $selectedBg = $('.selected-bg');
 			var colorStr = colourBytesToCss(color);
 			if (colorStr == 'transparent'){
@@ -122,101 +82,115 @@ import Editor from '../editing/Editor';
 				$selectedBg.removeClass('none');
 				$selectedBg.css('background-color', colorStr);
 			}
-			toolbarTop.feedback( 'Background set to ' + colorStr );
-		});
+			this.toolbarTop.feedback( 'Background set to ' + colorStr );
+		}.bind(this));
 		
-		toolbarTop.bind('open-img', function(event) {
+		this.toolbarTop.bind('open-img', function(event) {
 			event.preventDefault();
 		});
 
-		toolbarTop.bind('select-bg', function() {
-			spriteCanvasView.setTool('select-bg');
-		});
+		this.toolbarTop.bind('select-bg', function() {
+			this.selectorCanvasView.setTool('select-bg');
+		}.bind(this));
 		
-		toolbarTop.bind('select-sprite', function() {
-			spriteCanvasView.setTool('select-sprite');
-		});
+		this.toolbarTop.bind('select-sprite', function() {
+			this.selectorCanvasView.setTool('select-sprite');
+		}.bind(this));
 		
-		toolbarTop.bind('reload-img', function(event) {
+		this.toolbarTop.bind('reload-img', function(event) {
 			imgInput.reloadLastFile();
 			event.preventDefault();
 		});
 
-		toolbarTop.bind('select-all', function(event) {
+		this.toolbarTop.bind('select-all', function(event) {
 			let txtGap = $('#select-size').val();
 			let spriteGap = Number(txtGap);
 
 			if(isNaN(spriteGap) || spriteGap < 1){
 				toolbarTop.feedback('Chunk size must be a number greater than 0');
 			} else{
-				spriteCanvasView.findAllSprites(spriteGap);
+				this.selectorCanvasView.findAllSprites(spriteGap);
 			}
 			event.preventDefault();
-		});
+		}.bind(this));
 
-		toolbarTop.bind('select-none', function(event) {
-			spriteCanvasView.unselectAllSprites(true);
+		this.toolbarTop.bind('select-none', function(event) {
+			this.selectorCanvasView.unselectAllSprites(true);
 			event.preventDefault();
-		});
+		}.bind(this));
 		
-		imgInput.fileClickjackFor( toolbarTop.$container.find('div.open-img') );
-		
-		toolbarTop.bind('remove-bg', function(event) {
-			spriteCanvasView.clearBg();
-			event.preventDefault();
-		});
 
-		toolbarTop.bind('remove-rect', function(event) {
-			spriteCanvasView.clearRect();
+		this.toolbarTop.bind('remove-bg', function(event) {
+			this.selectorCanvasView.clearBg();
 			event.preventDefault();
-		});
+		}.bind(this));
 
-		toolbarTop.bind('undo', function(event) {
-			let selectedSprites = spriteCanvasView.undo();
+		this.toolbarTop.bind('remove-rect', function(event) {
+			this.selectorCanvasView.clearRect();
+			event.preventDefault();
+		}.bind(this));
+
+		this.toolbarTop.bind('undo', function(event) {
+			let selectedSprites = this.selectorCanvasView.undo();
 			if(selectedSprites){
-				editor.gather(selectedSprites);
+				this.trigger('selectedSpritesChange', selectedSprites);
 			}
 			
 			event.preventDefault();
-		});
+		}.bind(this));
 
-		toolbarTop.bind('invert-bg', function(event) {
-			if ( event.isActive ) {
-				spriteCanvasView.setDarkMode('#fff');
-			}
-			else {
-				spriteCanvasView.setDarkMode('#000');
-			}
-		});
+		this.toolbarTop.bind('invert-bg', function(event) {
+			this.setMode(!event.isActive, true);
+			this.trigger('modeChange', !event.isActive);
+		}.bind(this));
 
-		toolbarBottom.bind('percent', function(event) {
+		this.toolbarBottom.bind('percent', function(event) {
 			cssOutput.percentPos = !event.isActive;
 			cssOutput.update();
 		});
 
-		toolbarBottom.bind('bg-size', function(event) {
+		this.toolbarBottom.bind('bg-size', function(event) {
 			cssOutput.bgSize = !event.isActive;
 			cssOutput.update();
 		});
-		
-		$tutorialLink.click(function(event) {
-			imgInput.loadImgUrl( this.href );
-			event.preventDefault();
-		});
+	}
 
-		//Selector tab activated
-        var $selectorTabBtn = $('#tabSelection');
-        $selectorTabBtn.on("click", function() {
-			let editorDark = editor.toolbarTop.isActive('invert-bg');
+	setMode(dark, anim){
+		if(dark){
+			this.toolbarTop.activate('invert-bg');
+			this.selectorCanvasView.setDarkMode('#000', anim);
+		} else{
+			this.toolbarTop.deactivate('invert-bg');
+			this.selectorCanvasView.setDarkMode('#fff', anim);
+		}
+	};
 
-			if(editorDark){
-				toolbarTop.activate('invert-bg');
-				spriteCanvasView.setDarkMode('#000', false);
-			} else{
-				toolbarTop.deactivate('invert-bg');
-				spriteCanvasView.setDarkMode('#fff', false);
-			}
-        });
-		
-	})();
-})();
+	static #colourBytesToCss(color) {
+		if (color[3] === 0) {
+			return 'transparent';
+		}
+		return 'rgba(' + color[0] + ', ' + color[1] + ', ' + color[2] + ', ' + String( color[3] / 255 ).slice(0, 5) + ')';
+	}
+
+	#init_selection_tools (){
+		//Set background as top left pixel
+		let colArr = this.selectorCanvas.getFirstPixelColor();
+		this.selectorCanvas.setBg(colArr);
+
+		this.selectorCanvasView.unselectAllSprites();
+		this.selectorCanvasView.setTool('select-sprite');
+
+		//Set background status
+		let $selectedBg = $('.selected-bg');
+		let colorStr = Selector.#colourBytesToCss(colArr);
+		if (colorStr == 'transparent'){
+			$selectedBg.css('background-color', '');
+			$selectedBg.addClass('none');
+		} else {
+			$selectedBg.removeClass('none');
+			$selectedBg.css('background-color', colorStr);
+		}
+	}
+}
+
+export default Selector;

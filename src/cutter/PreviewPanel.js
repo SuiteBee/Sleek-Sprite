@@ -2,7 +2,7 @@ import $ from 'jquery';
 import JSZip from 'jszip';
 
 import PreviewAnimation from '../mapper/PreviewAnimation';
-import Rect from '../utilities/Rect';
+import Rect from '../components/Rect';
 
 class PreviewPanel {
 

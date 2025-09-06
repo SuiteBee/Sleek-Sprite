@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import MicroEvent from '../utilities/MicroEvent';
-import Rect from '../utilities/Rect';
+import Rect from './Rect';
 
 export default (function() {
 	function SelectArea($eventArea, $area, highlight) {

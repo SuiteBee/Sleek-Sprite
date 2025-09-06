@@ -7,6 +7,4 @@ class Rect {
 	}
 }
 
-var RectProto = Rect.prototype;
-
 export default Rect;
