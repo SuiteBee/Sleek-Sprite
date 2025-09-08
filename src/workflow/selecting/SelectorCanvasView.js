@@ -11,7 +11,7 @@ import Rect from '../../components/Rect';
 class SelectorCanvasView extends MicroEvent {
 	constructor(spriteCanvas, $appendToElm) {
 		super();
-		var $container = $('<div class="sprite-canvas-container"/>'),
+		var $container = $('<div class="selector-canvas-container"/>'),
 			$canvas = $( spriteCanvas.canvas ).appendTo( $container ),
 
 			highlight = new Highlight($container),

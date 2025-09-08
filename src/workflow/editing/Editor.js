@@ -43,6 +43,24 @@ class Editor extends MicroEvent {
             ).
             addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
 
+        //Selected Tools
+        this.toolbarTop.
+            addItem(
+                new ToolbarGroup('edit-selected').
+                addInput('edit-x', 'Nudge |', '', '5', '').
+                addInput('edit-y', '', '', '5', '')
+            ).
+            addItem(
+                new ToolbarGroup('edit-selected').
+                addRadio('edit-anchor', 'anchor-center', 'Center', 'Anchor |', 'Anchor Selected Sprite: Center', true).
+                addRadio('edit-anchor', 'anchor-bottom', 'Bottom', '', 'Anchor Selected Sprite: Bottom', false).
+                addRadio('edit-anchor', 'anchor-previous', 'Previous', '', 'Anchor Selected Sprite: Previous', false)
+            ).
+            addItem(
+                new ToolbarGroup('edit-selected').
+                addCheckbox('edit-flip-x', 'Flip |', 'Flip Sprite on X-Axis', false).
+                addCheckbox('edit-flip-y', '', 'Flip Sprite on Y-Axis', false));
+
 		this.toolbarTop.$container.addClass('top');
 		this.toolbarBottom.$container.addClass('bottom');
 
@@ -184,34 +202,24 @@ class Editor extends MicroEvent {
 
     #editing(sprite){
         this.editSelected = sprite;
-
+        
         if(sprite){
-            this.toolbarTop.
-            addItem(
-                new ToolbarGroup('edit-selected').
-                addInput('edit-x', 'Nudge |', `Valid X-Range: ${sprite.xRangeStr}`, '5', sprite.nudgeX.toString()).
-                addInput('edit-y', '', `Valid Y-Range: ${sprite.yRangeStr}`, '5', sprite.nudgeY.toString())
-            ).
-            addItem(
-                new ToolbarGroup('edit-selected').
-                addRadio('edit-anchor', 'anchor-center', 'Center', 'Anchor |', 'Anchor Selected Sprite: Center', sprite.anchor == "Center").
-                addRadio('edit-anchor', 'anchor-bottom', 'Bottom', '', 'Anchor Selected Sprite: Bottom', sprite.anchor == "Bottom").
-                addRadio('edit-anchor', 'anchor-previous', 'Previous', '', 'Anchor Selected Sprite: Previous', sprite.anchor == "Previous")
-            ).
-            addItem(
-                new ToolbarGroup('edit-selected').
-                    addCheckbox('edit-flip-x', 'Flip |', 'Flip Sprite on X-Axis', sprite.flipX).
-                    addCheckbox('edit-flip-y', '', 'Flip Sprite on Y-Axis', sprite.flipY)
-            );
+            $('#edit-x').data('hint', `Valid X-Range: ${sprite.xRangeStr}`).val(sprite.nudgeX.toString());
+            $('#edit-y').data('hint', `Valid Y-Range: ${sprite.yRangeStr}`).val(sprite.nudgeY.toString());
+            
+            $('#anchor-center').prop('checked', sprite.anchor == "Center");
+            $('#anchor-bottom').prop('checked', sprite.anchor == "Bottom");
+            $('#anchor-previous').prop('checked', sprite.anchor == "Previous");
+
+            $('#edit-flip-x').prop('checked', sprite.flipX);
+            $('#edit-flip-y').prop('checked', sprite.flipY);
         }
+        $('.edit-selected').show();
     }
 
     #notEditing(){
         this.editSelected = null;
-
-        $('.lbl-edit-x').remove();
-        $('.lbl-edit-y').remove();
-        $('.edit-selected').remove();
+        $('.edit-selected').hide();
     }
 
     //Pack selected sprites into an object array
@@ -226,8 +234,7 @@ class Editor extends MicroEvent {
     //Place sprites from mockup array onto editor canvas and draw a grid
     #place() {
         this.editorCanvas.reset(this.mockup, this.nRows, this.nCols);
-        this.editorCanvas.drawSprites(); 
-        this.editorCanvas.drawGrid();
+        this.editorCanvas.drawSprites(true); 
     }
 
     #anchorAll(anchorPos) {

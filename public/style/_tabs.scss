@@ -57,13 +57,14 @@
         overflow: hidden;
     }
 }
-.sprite-canvas-container {
+.selector-canvas-container, .editor-canvas-container {
     position: absolute;
     min-width: 100%;
     min-height: 100%;
 
     & canvas {
         display: block;
+        position: absolute;
     }
 
     & .highlight {
@@ -220,6 +221,7 @@
 
         padding: 15px;
         justify-content: start;
+        align-content: baseline;
 
         .export-item {
             display: flex;
@@ -236,10 +238,16 @@
         display: table-cell;
         width:20%;
         text-align: center;
+        padding: 15px;
 
         border: 1px solid #4e4e4e;
         border-right: none;
         border-radius: 5px;
+
+        & button {
+            width: 100px;
+            height: 50px;
+        }
         
         @include utils.linear-gradient((top, #f0efef, #a7a7a7));
     }

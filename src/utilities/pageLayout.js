@@ -5,7 +5,7 @@ export default (function() {
 		$container = $('.selection-tab'),
 		$workflow = $('.workflow'),
 		$header = $('.container > header'),
-		$canvasCell = $('.canvas-cell'),
+		$canvasCell = $('.selection-cell'),
 		$canvasInner = $('.canvas-inner'),
 		$footerMain = $('.main-footer'),
 		$footerUl = $('.main-footer ul'),
@@ -147,7 +147,7 @@ export default (function() {
 			$toolbarBottom = $('.toolbar.bottom');
 			$startButtons = $('.start-buttons');
 			$cssOutput = $('.css-output');
-			$spriteCanvasContainer = $('.sprite-canvas-container');
+			$spriteCanvasContainer = $('.selector-canvas-container');
 		},
 		toAppView: function() {
 			if (currentView === 'app') { return; }

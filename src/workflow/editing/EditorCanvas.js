@@ -3,24 +3,24 @@ import Grid from './Grid';
 export default (function() {
 
 	function EditorCanvas(srcCanvas) {
-		var canvas = document.createElement('canvas');
-		this.canvas = canvas;
-		this.context = canvas.getContext('2d');
+		this.canvas = document.createElement('canvas');
+		this.context = this.canvas.getContext('2d');
         this._bgData = [0, 0, 0, 0];
 
         this.srcCanvas = srcCanvas.canvas;
         this.srcContext = srcCanvas.canvas.getContext('2d');
 
-        this.grid = new Grid(this.context);
+        this.grid = new Grid();
         this.sprites = [];
 	}
 	
 	var EditorCanvasProto = EditorCanvas.prototype;
 
     EditorCanvasProto.reset = function(spriteArr, rows, cols) {
-        this.sprites = spriteArr;
-        this.grid.set(spriteArr, rows, cols);
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.sprites = spriteArr;
+        this.grid.reset(spriteArr, rows, cols);
 
         this.canvas.width = this.grid.width;
         this.canvas.height = this.grid.height;
@@ -29,9 +29,11 @@ export default (function() {
         this.context.imageSmoothingEnabled = false;
     }
 
-    EditorCanvasProto.drawSprites = function() {
+    EditorCanvasProto.drawSprites = function(showGrid) {
         var curX, curY, nCols;
         curX = curY = nCols = 0;
+
+        if(showGrid) { this.grid.draw() }
         
         for(let i=0; i<this.sprites.length; i++){
             let sprite = this.sprites[i];
@@ -92,10 +94,6 @@ export default (function() {
         
         this.context.drawImage(this.srcCanvas, s.x, s.y, s.width, s.height, posX, posY, d.width, d.height);
         this.context.restore();
-    }
-
-    EditorCanvasProto.drawGrid = function() {
-        this.grid.draw()
     }
 
 	return EditorCanvas;

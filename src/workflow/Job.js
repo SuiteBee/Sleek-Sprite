@@ -13,7 +13,7 @@ class Job {
 
         this.selector = new Selector();
         this.editor   = new Editor(this.selector.selectorCanvas);
-        this.exporter = new Exporter(this.selector.selectorCanvas, this.editor.editorCanvas);
+        this.exporter = new Exporter(this.editor.editorCanvas);
 
         this.darkMode = false;
 
@@ -42,6 +42,9 @@ class Job {
 
         //Exporter tab activated
         $exportTabBtn.on('click', function() {
+            if(this.editor.editorCanvas.sprites.length == 0){
+                this.editor.activeTab();
+            }
             this.exporter.activeTab();
         }.bind(this));
     }

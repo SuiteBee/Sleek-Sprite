@@ -1,10 +1,11 @@
 import $ from 'jquery';
 
+import ExportSprite from './ExportSprite';
 import MicroEvent from '../../utilities/MicroEvent';
 
 class Exporter extends MicroEvent {
 
-    constructor(selectorCanvas, editorCanvas) {
+    constructor(editorCanvas) {
         super();
 		this.$exportContainer   = $('.export-container');
         this.$exportCell        = $('.export-cell');
@@ -17,6 +18,14 @@ class Exporter extends MicroEvent {
 
         this.$tableContainer = this.$exportCell.append(this.createFlexContainer()).appendTo(this.$exportContainer);
         this.$options = this.createExportOptions().appendTo(this.$exportContainer);
+
+        $('#export-submit').on('click', function() {
+            let sprites = [...this.editorCanvas.sprites];
+            for(let i=0; i<sprites.length; i++){
+                let exSprite = new ExportSprite(sprites[i], 'test');
+                var jString = JSON.stringify(exSprite.dat);
+            }
+        }.bind(this));
     }
 
     createFlexContainer(){
@@ -51,7 +60,7 @@ class Exporter extends MicroEvent {
 
     createExportOptions() {
         const container = $('<div class="export-options"></div>');
-        var $btnExport = $('<button>Export</button>');
+        var $btnExport = $('<button id="export-submit">Export</button>');
         $btnExport.appendTo(container);
         
         return container;

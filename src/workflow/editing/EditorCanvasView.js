@@ -9,8 +9,8 @@ import SelectArea from '../../components/selectArea';
 class EditorCanvasView extends MicroEvent {
 	constructor(editorCanvas, $appendToElm) {
 		super();
-		var $container = $('<div class="sprite-canvas-container"/>'),
-			$canvas = $( editorCanvas.canvas ).appendTo( $container ),
+		var $container = $('<div class="editor-canvas-container"/>'),
+			$canvas = $container.append($(editorCanvas.canvas)).append($(editorCanvas.grid.canvas)),
 			// this cannot be $appendToElm, as browsers pick up clicks on scrollbars, some don't pick up mouseup http://code.google.com/p/chromium/issues/detail?id=14204#makechanges
 			highlight = new Highlight($container),
 			selectArea = new SelectArea($container, $canvas, highlight),
