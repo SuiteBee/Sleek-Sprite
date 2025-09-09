@@ -3,6 +3,7 @@ import Rect from '../../components/Rect';
 class MockSprite {
 	constructor(rect, index) {
 		this.n = index;
+		this.name = index.toString();
 
 		this.src = rect;
 		this.rect = new Rect(rect.x, rect.y, rect.width, rect.height);
