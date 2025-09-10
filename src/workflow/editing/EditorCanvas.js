@@ -2,13 +2,13 @@ import Grid from './Grid';
 
 export default (function() {
 
-	function EditorCanvas(srcCanvas) {
+	function EditorCanvas(src) {
 		this.canvas = document.createElement('canvas');
 		this.context = this.canvas.getContext('2d');
-        this._bgData = [0, 0, 0, 0];
 
-        this.srcCanvas = srcCanvas.canvas;
-        this.srcContext = srcCanvas.canvas.getContext('2d');
+        this.src = src;
+        this.srcCanvas = src.canvas;
+        this.srcContext = src.canvas.getContext('2d');
 
         this.grid = new Grid();
         this.sprites = [];
@@ -42,6 +42,8 @@ export default (function() {
             let previous = i > 0 ? this.sprites[i-1] : sprite;
             sprite.update(curX, curY, this.grid.cellSize, previous);
 
+            this.fillCell(curX, curY, this.grid.cellSize);
+
             if(sprite.flipped){
                 this.drawFlipped(sprite);
             }else{
@@ -57,6 +59,16 @@ export default (function() {
             } else{
                 curX += this.grid.cellSize;
             }
+        }
+    }
+
+    EditorCanvasProto.fillCell = function(x, y, cellSize) {
+        let bg = this.src.getBg();
+
+        //If background is not transparent
+        if(bg.reduce((acc, cur) => acc + cur, 0) > 0){
+            this.context.fillStyle = `rgba(${bg[0]}, ${bg[1]}, ${bg[2]}, ${bg[3]})`;
+            this.context.fillRect(x, y, cellSize, cellSize);
         }
     }
 

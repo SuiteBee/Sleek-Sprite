@@ -49,7 +49,7 @@ class SelectorCanvasView extends MicroEvent {
 			this.trigger('bgColorSelect', color);
 			this._history.push(spriteCanvas.getBg());
 			spriteCanvas.setBg(color);
-		});
+		}.bind(this));
 
 		selectColor.bind('move', function (color) {
 			this.trigger('bgColorHover', color);

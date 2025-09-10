@@ -69,12 +69,12 @@ class Selector extends MicroEvent {
 		}.bind(this));
 		
 		this.selectorCanvasView.bind('bgColorHover', function(color) {
-			this.toolbarTop.feedbackColor(color, colourBytesToCss(color) );
+			this.toolbarTop.feedbackColor(color, Selector.#colourBytesToCss(color) );
 		}.bind(this));
 		
 		this.selectorCanvasView.bind('bgColorSelect', function(color) {
 			var $selectedBg = $('.selected-bg');
-			var colorStr = colourBytesToCss(color);
+			var colorStr = Selector.#colourBytesToCss(color);
 			if (colorStr == 'transparent'){
 				$selectedBg.css('background-color', '');
 				$selectedBg.addClass('none');
@@ -121,6 +121,10 @@ class Selector extends MicroEvent {
 		
 
 		this.toolbarTop.bind('remove-bg', function(event) {
+			var $selectedBg = $('.selected-bg');
+			$selectedBg.css('background-color', '');
+			$selectedBg.addClass('none');
+
 			this.selectorCanvasView.clearBg();
 			event.preventDefault();
 		}.bind(this));
