@@ -1,13 +1,8 @@
 @use "utils";
 
-// Headings
-	.h-main {
-		font: normal 59px/1 oswald, sans-serif;
-		color: white;
-		text-shadow: #004A86 0 4px 1px;
-		text-align: center;
-	}
+@include utils.font-face('oswald', normal, sans-serif);
 
+// Intro
 	.select-btn {
 		margin: 0 48px 0 0;
 	}

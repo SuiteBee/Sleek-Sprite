@@ -3,6 +3,17 @@
 		#{$prefix}user-select: $type;
 	}
 }
+
+// Font 
+	@mixin font-face($name, $weight: normal, $style: normal) {
+		@font-face {
+			font-family: $name;
+			src: url('fonts/#{$name}.ttf') format('truetype');
+			font-weight: $weight;
+			font-style: $style;
+		}
+	}
+
 // Transform
 	@mixin transform($transformation) {
 		@each $prefix in -webkit-, -moz-, -ms-, -o-, '' {

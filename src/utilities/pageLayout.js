@@ -7,6 +7,7 @@ export default (function() {
 		$header = $('.container > header'),
 		$canvasCell = $('.selection-cell'),
 		$canvasInner = $('.canvas-inner'),
+		$headerMain = $('.main-header'),
 		$footerMain = $('.main-footer'),
 		$footerUl = $('.main-footer ul'),
 		$footerP = $('.main-footer p'),
@@ -30,11 +31,12 @@ export default (function() {
 		var transitions,
 			containerWidth = getContainerWidthPercent();
 		
+		$headerMain.removeClass('intro');
 		$content.removeClass('intro');
 		$container.removeClass('intro');
 		$footerMain.removeClass('intro');
 		$workflow.removeClass('intro');
-		
+
 		transitions = [
 			{
 				duration: 300,
@@ -48,7 +50,12 @@ export default (function() {
 						padding: $footerP.css('padding')
 					}],
 					[$startButtons, { opacity: 0 }],
-					[$canvasCell, { border: 0 }]
+					[$canvasCell, { border: 0 }],
+					[$headerMain, { 
+						height: $headerMain.height(),
+						'font': $headerMain.css('font'),
+						'position': $headerMain.css('position')
+					}]
 				],
 				before: function() {
 					$container.width(containerWidth);
@@ -105,6 +112,7 @@ export default (function() {
 			}
 		];
 		
+		$headerMain.addClass('intro');
 		$content.addClass('intro');
 		$container.addClass('intro');
 		$footerMain.addClass('intro');
@@ -161,6 +169,7 @@ export default (function() {
 				doAnimStep(steps, 0, function() {
 					var targets = [];
 					
+					$headerMain.removeClass('intro');
 					$content.removeClass('intro');
 					$container.removeClass('intro');
 					$footerMain.removeClass('intro');
@@ -178,6 +187,7 @@ export default (function() {
 				});
 			}
 			else {
+				$headerMain.removeClass('intro');
 				$content.removeClass('intro');
 				$container.removeClass('intro');
 				$footerMain.removeClass('intro');

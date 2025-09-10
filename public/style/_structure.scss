@@ -1,5 +1,7 @@
 @use "utils";
 
+@include utils.font-face('lobster', normal, sans-serif);
+
 // Background
 	html {
 		height: 100%;
@@ -30,42 +32,49 @@
 		display: grid;
 
 		grid-template-areas: 
-		"main-header" 
-		"workflow" 
-		"tabcontent"
-		"main-footer";
+		"title"
+		"tab"
+		"footer";
 
 		grid-template-rows:
-		0.5fr 
-		0.25fr
-		9fr
-		0.25fr;
+		1fr
+		20fr
+		1fr;
 
 		&.intro {
 			grid-template-rows:
-				1fr 
-				0fr
-				1fr
-				15fr
-			}
+			1fr
+			0fr
+			0fr
+			10fr
+		}
 	}
 
 // Main header
 	.main-header {
-		display: inline-block;
-		text-align: center;
-		height: 50px;
+		position: absolute;
 		width: 100%;
-		
-		& .h-main {
-			display: none;
+
+		font: normal 18px/1 lobster;
+		color: white;
+		text-shadow: #000000 0 4px 1px;
+		text-align: center;
+		line-height: 0px;
+
+		&.intro {
+			position: relative;
+			font: normal 59px/1 lobster;
+			line-height: 0px;
 		}
+		
 	}
 	
 // Workflow 
 	.workflow {
 		display: flex;
 		color: black;
+		align-items: end;
+		padding-top: 24px;
 
 		& [role=button] {
 			width: 50px;
