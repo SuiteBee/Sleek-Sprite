@@ -10,18 +10,18 @@ class Editor extends MicroEvent {
 
     constructor(srcCanvas) {
         super();
-		var $editorContainer   = $('.editor-inner');
+		var $editorContainer    = $('.editor-inner');
 		
         this.editorCanvas       = new EditorCanvas(srcCanvas);
         this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, $editorContainer );
 
-        this.selectedSprites    = [];
-        
-        this.nRows = -1;
-        this.nCols = -1;
+        this.nRows              = -1;
+        this.nCols              = -1;
 
         this.editSelected;
-        this.mockup = [];
+        this.selectedSprites    = [];
+        this.updateEdit         = false;
+        this.mockup             = [];
 
         this.toolbarTop         = new Toolbar('.editor-tab', '.toolbar-container');
 		this.toolbarBottom      = new Toolbar('.editor-tab', '.toolbar-bottom-container');
@@ -38,10 +38,13 @@ class Editor extends MicroEvent {
             ).
             addItem(
                 new ToolbarGroup('edit-grid').
-                    addInput('set-rows', 'Rows:', '', '3').
-                    addInput('set-columns', 'Cols:', '', '3')
+                addInput('set-rows', 'Rows:', '', '3').
+                addInput('set-columns', 'Cols:', '', '3')
             ).
             addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
+
+        this.toolbarBottom.
+            addSlider('zoom', '0', '100');
 
         //Selected Tools
         this.toolbarTop.
@@ -100,10 +103,11 @@ class Editor extends MicroEvent {
 			this.trigger('modeChange', !evt.isActive);
 		}.bind(this));
 
+        //Selected Events
         this.toolbarTop.bind('edit-anchor', function(evt, option) {
             if(this.editSelected){
                 this.editSelected.anchor = option;
-                this.#place();
+                this.#placeSingle(this.editSelected.n);
             }
         }.bind(this));
 
@@ -117,7 +121,7 @@ class Editor extends MicroEvent {
                     this.toolbarTop.feedback(`Must be within cell bounds: ${this.editSelected.xRangeStr}`);
                 } else{  
                     this.editSelected.nudgeX = newX;
-                    this.#place();
+                    this.#placeSingle(this.editSelected.n);
                 }
             }
         }.bind(this));
@@ -132,7 +136,7 @@ class Editor extends MicroEvent {
                     this.toolbarTop.feedback(`Must be within cell bounds: ${this.editSelected.yRangeStr}`);
                 } else{
                     this.editSelected.nudgeY = newY;
-                    this.#place();
+                    this.#placeSingle(this.editSelected.n);
                 }
             }
         }.bind(this));
@@ -140,14 +144,14 @@ class Editor extends MicroEvent {
         this.toolbarTop.bind('edit-flip-x', function(evt, chk) {
             if(this.editSelected){
                 this.editSelected.flipX = chk;
-                this.#place();
+                this.#placeSingle(this.editSelected.n);
             }
         }.bind(this));
 
         this.toolbarTop.bind('edit-flip-y', function(evt, chk) {
             if(this.editSelected){
                 this.editSelected.flipY = chk;
-                this.#place();
+                this.#placeSingle(this.editSelected.n);
             }
         }.bind(this));
 
@@ -166,22 +170,27 @@ class Editor extends MicroEvent {
         //Unselect all highlighted cells in editor
         this.editorCanvasView.unselectAllCells();
 
-        //Pack any selected sprites into mockup[]
-        this.#pack();
+        //Don't redraw grid unless sprite selection changed
+        if(this.updateEdit){
+            //Pack any selected sprites into mockup[]
+            this.#pack();
 
-        //Set automatic grid dimensions
-        if(this.mockup.length > 0){
-            let nearestRoot = Math.sqrt(this.mockup.length);
-            let nearestSquare = Math.ceil(nearestRoot);
+            //Set automatic grid dimensions
+            if(this.mockup.length > 0){
+                let nearestRoot = Math.sqrt(this.mockup.length);
+                let nearestSquare = Math.ceil(nearestRoot);
 
-            $('#set-rows').val(nearestSquare.toString());
-            $('#set-columns').val(nearestSquare.toString());
+                $('#set-rows').val(nearestSquare.toString());
+                $('#set-columns').val(nearestSquare.toString());
 
-            this.nRows = nearestSquare;
-            this.nCols = nearestSquare;
+                this.nRows = nearestSquare;
+                this.nCols = nearestSquare;
+            }
 
             //Draw sliced sprites in editor
             this.#place();
+
+            this.updateEdit = false;
         }
     }
 
@@ -234,7 +243,11 @@ class Editor extends MicroEvent {
     //Place sprites from mockup array onto editor canvas and draw a grid
     #place() {
         this.editorCanvas.reset(this.mockup, this.nRows, this.nCols);
-        this.editorCanvas.drawSprites(true); 
+        this.editorCanvas.drawAll(true); 
+    }
+
+    #placeSingle(index) {
+        this.editorCanvas.drawSingle(index);
     }
 
     #anchorAll(anchorPos) {

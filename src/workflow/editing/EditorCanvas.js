@@ -29,27 +29,14 @@ export default (function() {
         this.context.imageSmoothingEnabled = false;
     }
 
-    EditorCanvasProto.drawSprites = function(showGrid) {
+    EditorCanvasProto.drawAll = function(showGrid) {
         var curX, curY, nCols;
         curX = curY = nCols = 0;
 
-        if(showGrid) { this.grid.draw() }
+        if(showGrid && this.sprites.length > 0) { this.grid.draw() }
         
         for(let i=0; i<this.sprites.length; i++){
-            let sprite = this.sprites[i];
-
-            //Update mock sprite rect and cell rect
-            let previous = i > 0 ? this.sprites[i-1] : sprite;
-            sprite.update(curX, curY, this.grid.cellSize, previous);
-
-            this.fillCell(curX, curY, this.grid.cellSize);
-
-            if(sprite.flipped){
-                this.drawFlipped(sprite);
-            }else{
-                this.draw(sprite);
-            }
-
+            this._update(i, curX, curY);
             nCols++;
 
             if(nCols >= this.grid.cols){
@@ -62,7 +49,11 @@ export default (function() {
         }
     }
 
-    EditorCanvasProto.fillCell = function(x, y, cellSize) {
+    EditorCanvasProto.drawSingle = function(n) {
+        this._update(n)
+    }
+
+    EditorCanvasProto._fillCell = function(x, y, cellSize) {
         let bg = this.src.getBg();
 
         //If background is not transparent
@@ -72,14 +63,34 @@ export default (function() {
         }
     }
 
-    EditorCanvasProto.draw = function(sprite){
+    EditorCanvasProto._update = function(index, x = -1, y = -1){
+        let sprite = this.sprites[index];
+        
+        //Updating in place
+        if((x + y) < 0){ x = sprite.cell.x, y = sprite.cell.y }
+
+        //Update mock sprite rect and cell rect
+        let previous = index > 0 ? this.sprites[index-1] : sprite;
+        sprite.update(x, y, this.grid.cellSize, previous);
+
+        this.context.clearRect(x, y, this.grid.cellSize, this.grid.cellSize);
+        this._fillCell(x, y, this.grid.cellSize);
+
+        if(sprite.flipped){
+            this._drawFlipped(sprite);
+        }else{
+            this._draw(sprite);
+        }
+    }
+
+    EditorCanvasProto._draw = function(sprite){
         let s = sprite.src;
         let d = sprite.pos;
 
         this.context.drawImage(this.srcCanvas, s.x, s.y, s.width, s.height, d.x, d.y, d.width, d.height);
     }
 
-    EditorCanvasProto.drawFlipped = function(sprite){
+    EditorCanvasProto._drawFlipped = function(sprite){
         this.context.save();
 
         let s = sprite.src;

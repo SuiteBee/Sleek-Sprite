@@ -107,6 +107,8 @@ SelectorCanvasViewProto.findAllSprites = function(spriteGap) {
 		let clickedRect = new Rect(spriteRect.x, spriteRect.y, 1, 1);
 		this._selectedSprites.push(this._selectSprite(clickedRect, spriteRect));
 	});
+
+	this.trigger('selectedSpritesChange', this._selectedSprites);
 }
 
 SelectorCanvasViewProto.unselectAllSprites = function(isHistoric = false) {

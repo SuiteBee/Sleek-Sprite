@@ -63,7 +63,7 @@ class Selector extends MicroEvent {
 			
 			selectedSprites.forEach(({rect}) => {
 				if (rect.width === this.selectorCanvas.canvas.width && rect.height === this.selectorCanvas.canvas.height) {
-					toolbarTop.feedback( 'Incorrect background colour set?', true );
+					this.toolbarTop.feedback( 'Incorrect background colour set?', true );
 				}
 			});
 		}.bind(this));
@@ -107,7 +107,7 @@ class Selector extends MicroEvent {
 			let spriteGap = Number(txtGap);
 
 			if(isNaN(spriteGap) || spriteGap < 1){
-				toolbarTop.feedback('Chunk size must be a number greater than 0');
+				this.toolbarTop.feedback('Chunk size must be a number greater than 0');
 			} else{
 				this.selectorCanvasView.findAllSprites(spriteGap);
 			}
@@ -115,6 +115,7 @@ class Selector extends MicroEvent {
 		}.bind(this));
 
 		this.toolbarTop.bind('select-none', function(event) {
+			this.trigger('spriteChange', []);
 			this.selectorCanvasView.unselectAllSprites(true);
 			event.preventDefault();
 		}.bind(this));

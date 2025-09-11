@@ -41,6 +41,41 @@
         }
     }
 
+    & [role=slider]{
+
+        & input {
+            -webkit-appearance: none;  /* Override default CSS styles */
+            appearance: none;
+            width: 10%; /* Full-width */
+            height: 7px; /* Specified height */
+            background: #fff; /* Grey background */
+            border: 1px solid #888;
+            border-radius: 4px;
+            -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+            transition: opacity .2s;
+
+            &::-webkit-slider-thumb {
+                -webkit-appearance: none; /* Override default look */
+                appearance: none;
+                width: 15px; /* Set a specific slider handle width */
+                height: 15px; /* Slider handle height */
+                border: 1px solid #888;
+                border-radius: 50%;
+                cursor: pointer; /* Cursor on hover */
+                @include utils.linear-gradient((top, #d0d0d0, #a7a7a7));
+            }
+
+            &::-moz-range-thumb {
+                width: 15px; /* Set a specific slider handle width */
+                height: 15px; /* Slider handle height */
+                border: 1px solid #888;
+                border-radius: 50%;
+                cursor: pointer; /* Cursor on hover */
+                @include utils.linear-gradient((top, #d0d0d0, #a7a7a7));
+            }
+        }
+    }
+
     & [role=button] {
         float: left;
         margin: 0 5px 5px 0;

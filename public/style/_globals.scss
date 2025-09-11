@@ -62,6 +62,7 @@
 	
 	input[type="radio"] { vertical-align: text-bottom; }
 	input[type="checkbox"] { vertical-align: bottom; *vertical-align: baseline; }
+	input[type="range"] { vertical-align: baseline; }
 	
 	button.custom {
 		padding: 0;
@@ -83,6 +84,8 @@
 		outline-width: 1px;
 		outline-color: #0871f7;
 		outline-style:inset; 
+
+		&[type="range"] {outline-style: none;}
 	}
 // Typography
 	body {

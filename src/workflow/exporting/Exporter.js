@@ -9,50 +9,55 @@ class Exporter extends MicroEvent {
 
     constructor(editorCanvas) {
         super();
-		this.$exportContainer   = $('.export-container');
+		this.$exportContainer    = $('.export-container');
         this.$previewCell        = $('.export-preview-cell');
-        this.$optionsCell       = $('.export-options-cell');
-        this.editorCanvas = editorCanvas;
+        this.$optionsCell        = $('.export-options-cell');
+        this.editorCanvas        = editorCanvas;
 
-        this.exportName = 'texture';
+        this.updateExport        = false;
+        this.exportName          = 'texture';
     }
 
     activeTab() {
-        $('.export-items').remove();
-        $('.export-options').remove();
+        if(this.updateExport){
+            this.$previewCell.empty();
+            this.$optionsCell.empty();
 
-        this.$previewContainer = this.#fillPreview();
-        this.$preview = this.$previewCell.append(this.$previewContainer).appendTo(this.$exportContainer);
+            this.$previewContainer = this.#fillPreview();
+            this.$preview = this.$previewCell.append(this.$previewContainer).appendTo(this.$exportContainer);
 
-        this.$optionsContainer = this.#createExportOptions();
-        this.$options = this.$optionsCell.append(this.$optionsContainer).appendTo(this.$exportContainer);
+            this.$optionsContainer = this.#createExportOptions();
+            this.$options = this.$optionsCell.append(this.$optionsContainer).appendTo(this.$exportContainer);
 
-        $('#export-all').on('click', function() {
-            this.#bundleExport().then(zipped => {
-                this.#downloadBundle(zipped);
-            });
-        }.bind(this));
+            $('#export-all').on('click', function() {
+                this.#bundleExport().then(zipped => {
+                    this.#downloadBundle(zipped);
+                });
+            }.bind(this));
 
-        $('.export-single').on('click', function(evt) {
-            let idx = $(evt.target).data('index');
-            let sprite = this.editorCanvas.sprites[idx];
+            $('.export-single').on('click', function(evt) {
+                let idx = $(evt.target).data('index');
+                let sprite = this.editorCanvas.sprites[idx];
 
-            let url = this.#getSpriteDat(sprite);
-            this.#download(url, sprite.name, '.png');
-        }.bind(this));
+                let url = this.#getSpriteDat(sprite);
+                this.#download(url, sprite.name, '.png');
+            }.bind(this));
 
-        $('input.item-name[type=text]').on('input', function(evt) {
-            let $txtInput = $(evt.target);
-            let idx = $txtInput.data('index');
+            $('input.item-name[type=text]').on('input', function(evt) {
+                let $txtInput = $(evt.target);
+                let idx = $txtInput.data('index');
 
-            let sprite = this.editorCanvas.sprites[idx];
-            sprite.name = $txtInput.val();
-        }.bind(this));
+                let sprite = this.editorCanvas.sprites[idx];
+                sprite.name = $txtInput.val();
+            }.bind(this));
 
-        $('input.export-name[type=text]').on('input', function(evt) {
-            let $txtInput = $(evt.target);
-            this.exportName = $txtInput.val();
-        }.bind(this));
+            $('input.export-name[type=text]').on('input', function(evt) {
+                let $txtInput = $(evt.target);
+                this.exportName = $txtInput.val();
+            }.bind(this));
+
+            this.updateExport = false;
+        }
     }
 
     #fillPreview(){
@@ -73,8 +78,13 @@ class Exporter extends MicroEvent {
             
         let $smallPreview = $('<canvas width="100" height="100"></canvas>');
         let smallContext = $smallPreview[0].getContext('2d');
+
+        //Disable aliasing (has to be done on each resize or pixels get murdered)
+        smallContext.imageSmoothingEnabled = false;
+
+        let pos = sprite.pos;
         smallContext.drawImage(
-            this.editorCanvas.canvas, sprite.rect.x, sprite.rect.y, sprite.rect.width, sprite.rect.height,
+            this.editorCanvas.canvas, pos.x, pos.y, pos.width, pos.height,
             0, 0, 100, 100
         );
         $smallPreview.addClass('small-preview').appendTo($item);
@@ -130,8 +140,12 @@ class Exporter extends MicroEvent {
         tmpCanvas.width = sprite.rect.width;
         tmpCanvas.height = sprite.rect.height;
 
+        //Disable aliasing (has to be done on each resize or pixels get murdered)
+        tmpContext.imageSmoothingEnabled = false;
+
+        let pos = sprite.pos;
         tmpContext.drawImage(
-            this.editorCanvas.canvas, sprite.rect.x, sprite.rect.y, sprite.rect.width, sprite.rect.height,
+            this.editorCanvas.canvas, pos.x, pos.y, pos.width, pos.height,
             0, 0, tmpCanvas.width, tmpCanvas.height
         );
 

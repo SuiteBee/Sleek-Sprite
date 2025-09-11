@@ -19,6 +19,8 @@ class Job {
 
         this.selector.bind('spriteChange', function(selectedSprites) {
 			this.editor.gather(selectedSprites);
+            this.editor.updateEdit = true;
+            this.exporter.updateExport = true;
 		}.bind(this));
 
         this.selector.bind('modeChange', function(isDark) {
@@ -42,7 +44,7 @@ class Job {
 
         //Exporter tab activated
         $exportTabBtn.on('click', function() {
-            if(this.editor.editorCanvas.sprites.length == 0){
+            if(this.editor.updateEdit){
                 this.editor.activeTab();
             }
             this.exporter.activeTab();

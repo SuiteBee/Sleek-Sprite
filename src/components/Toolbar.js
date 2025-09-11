@@ -91,6 +91,13 @@ class Toolbar extends MicroEvent {
 			toolbar.trigger(rdChange, rdOption);
 		});
 
+		$container.on('change', 'input[type=range]', function() {
+			var $slider = $(this),
+			scrName = $slider.data('scrName'),
+			scrChange = new $.Event(scrName);
+			toolbar.trigger(scrChange, $slider.val());
+		});
+
 		toolbar.$container = $container;
 		toolbar._$feedback = $feed;
 	}
@@ -165,6 +172,15 @@ class Toolbar extends MicroEvent {
 
 		return $container;
 	}
+
+	static createSlider(scrName, limitLow, limitHigh){
+		var $container = $('<div role="slider"/>').addClass(scrName);
+		var $scrollBar = $(`<input type="range" min="${limitLow}" max="${limitHigh}" value="50" id="${scrName}"/>`);
+		$scrollBar.data('scrName', scrName);
+		$scrollBar.appendTo($container);
+
+		return $container;
+	}
 }
 
 var ToolbarProto = Toolbar.prototype;
@@ -205,6 +221,12 @@ ToolbarProto.addCheckbox = function(chkName, text, hint, defVal = false) {
 
 ToolbarProto.addRadio = function(rdName, option, optionVal, text, hint, defVal = false) {
 	Toolbar.createRadio(rdName, option, optionVal, text, hint, defVal).appendTo( this.$container );
+
+	return this;
+}
+
+ToolbarProto.addSlider = function(scrName, limitLow, limitHigh) {
+	Toolbar.createSlider(scrName, limitLow, limitHigh).appendTo( this.$container );
 
 	return this;
 }
