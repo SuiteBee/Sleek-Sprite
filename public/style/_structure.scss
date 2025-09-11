@@ -29,25 +29,8 @@
 		height: 100%;
 		margin: 0 auto;
 		position: relative;
-		display: grid;
-
-		grid-template-areas: 
-		"title"
-		"tab"
-		"footer";
-
-		grid-template-rows:
-		1fr
-		20fr
-		1fr;
-
-		&.intro {
-			grid-template-rows:
-			1fr
-			0fr
-			0fr
-			10fr
-		}
+		display: flex;
+		flex-direction: column;
 	}
 
 // Main header
@@ -62,9 +45,8 @@
 		line-height: 0px;
 
 		&.intro {
-			position: relative;
-			font: normal 59px/1 lobster;
-			line-height: 0px;
+			font: normal 40px/1 lobster;
+			line-height: 15px;
 		}
 		
 	}
@@ -98,6 +80,7 @@
 		}
 
 		&.intro {
+			padding-top: 100px;
 			opacity: 0;
 		}
 		

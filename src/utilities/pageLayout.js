@@ -53,8 +53,11 @@ export default (function() {
 					[$canvasCell, { border: 0 }],
 					[$headerMain, { 
 						height: $headerMain.height(),
-						'font': $headerMain.css('font'),
-						'position': $headerMain.css('position')
+						'line-height': $headerMain.css('line-height'),
+						'font-size': $headerMain.css('font-size'),
+					}],
+					[$workflow, {
+						'padding-top': $workflow.css('padding-top')
 					}]
 				],
 				before: function() {
@@ -68,7 +71,6 @@ export default (function() {
 				easing: 'easeInOutQuad',
 				targets: [
 					[$container, { width: '100%' }],
-					[$header, { height: $header.height() }],
 					[$cssOutput, {
 						height: $cssOutput.height(),
 						'padding-top': $cssOutput.css('padding-top'),
