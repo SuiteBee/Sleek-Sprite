@@ -46,8 +46,9 @@ class EditorCanvasView extends MicroEvent {
 var EditorCanvasViewProto = EditorCanvasView.prototype;
 
 EditorCanvasViewProto._handleSelectedCell = function(clickedRect, sprite) {
-	let cellRect = sprite.cell;
-	const cellSelected = this._selectedCells.findIndex(cell => JSON.stringify(cell.rect) == JSON.stringify(cellRect));
+	let scaledRect = sprite.cell.scaled(this._grid.zoomScale);
+
+	const cellSelected = this._selectedCells.findIndex(cell => JSON.stringify(cell.rect) == JSON.stringify(scaledRect));
 	if(cellSelected > -1) {
 		this._selectedCells[cellSelected].unselect();
 		this._selectedCells.splice(cellSelected, 1);
@@ -55,7 +56,7 @@ EditorCanvasViewProto._handleSelectedCell = function(clickedRect, sprite) {
 	} else {
 		this.unselectAllCells();
 
-		this._selectedCells.push(this._selectCell(clickedRect, cellRect));
+		this._selectedCells.push(this._selectCell(clickedRect, scaledRect));
 		this.trigger('editCellChange', sprite);
 	}
 }
@@ -77,10 +78,12 @@ EditorCanvasViewProto._selectCell = function(clickedRect, cellRect) {
 }
 
 EditorCanvasViewProto.unselectAllCells = function() {
-	this._selectedCells.forEach(cell => cell.unselect());
-	this._selectedCells = [];
+	if(this._selectedCells.length > 0) {
+		this._selectedCells.forEach(cell => cell.unselect());
+		this._selectedCells = [];
 
-	this.trigger('editNone');
+		this.trigger('editNone');
+	}
 }
 
 EditorCanvasViewProto.setDarkMode = function(color, anim = true) {
@@ -95,5 +98,10 @@ EditorCanvasViewProto.setDarkMode = function(color, anim = true) {
 	
 	this._highlight.setHighVisOnDark( color === '#000' );
 };
+
+EditorCanvasViewProto.zoom = function(pct) {
+	this.unselectAllCells();
+	this._editorCanvas.zoom(pct);
+}
 
 export default EditorCanvasView;

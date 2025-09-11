@@ -91,7 +91,7 @@ class Toolbar extends MicroEvent {
 			toolbar.trigger(rdChange, rdOption);
 		});
 
-		$container.on('change', 'input[type=range]', function() {
+		$container.on('input', 'input[type=range]', function() {
 			var $slider = $(this),
 			scrName = $slider.data('scrName'),
 			scrChange = new $.Event(scrName);
@@ -173,9 +173,9 @@ class Toolbar extends MicroEvent {
 		return $container;
 	}
 
-	static createSlider(scrName, limitLow, limitHigh){
+	static createSlider(scrName, limitLow, limitHigh, initial){
 		var $container = $('<div role="slider"/>').addClass(scrName);
-		var $scrollBar = $(`<input type="range" min="${limitLow}" max="${limitHigh}" value="50" id="${scrName}"/>`);
+		var $scrollBar = $(`<input type="range" min="${limitLow}" max="${limitHigh}" value="${initial}" id="${scrName}"/>`);
 		$scrollBar.data('scrName', scrName);
 		$scrollBar.appendTo($container);
 
@@ -225,8 +225,8 @@ ToolbarProto.addRadio = function(rdName, option, optionVal, text, hint, defVal =
 	return this;
 }
 
-ToolbarProto.addSlider = function(scrName, limitLow, limitHigh) {
-	Toolbar.createSlider(scrName, limitLow, limitHigh).appendTo( this.$container );
+ToolbarProto.addSlider = function(scrName, limitLow, limitHigh, initial) {
+	Toolbar.createSlider(scrName, limitLow, limitHigh, initial).appendTo( this.$container );
 
 	return this;
 }

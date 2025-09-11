@@ -9,6 +9,8 @@ class Grid {
         this.cellSize = 0;
         this.rows = 0;
         this.cols = 0;
+
+        this.zoomScale = 1;
     }
 }
 
@@ -57,13 +59,18 @@ GridProto.draw = function() {
 
 GridProto.find = function(mousePos) {
     if(mousePos.x <= this.width && mousePos.y <= this.height){
-        let findCol = Math.floor(mousePos.x / this.cellSize);
-        let findRow = Math.floor(mousePos.y / this.cellSize);
+        let findCol = Math.floor(mousePos.x / (this.cellSize * this.zoomScale));
+        let findRow = Math.floor(mousePos.y / (this.cellSize * this.zoomScale));
 
         let i = (findRow * this.cols) + findCol;
         return i;
     }
-    
+}
+
+GridProto.zoom = function(scl, origin, transform) {
+    this.zoomScale = scl;
+    this.canvas.style.transformOrigin = origin;
+    this.canvas.style.transform = transform;
 }
 
 export default Grid;

@@ -44,7 +44,7 @@ class Editor extends MicroEvent {
             addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
 
         this.toolbarBottom.
-            addSlider('zoom', '0', '100');
+            addSlider('zoom', '0', '200', '100');
 
         //Selected Tools
         this.toolbarTop.
@@ -163,6 +163,11 @@ class Editor extends MicroEvent {
         //Cells unselected
         this.editorCanvasView.bind('editNone', function(){
             this.#notEditing();
+        }.bind(this));
+
+        //Zoom 
+        this.toolbarBottom.bind('zoom', function(evt, pct){
+            this.editorCanvasView.zoom(pct);
         }.bind(this));
     }
 

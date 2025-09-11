@@ -53,6 +53,17 @@ export default (function() {
         this._update(n)
     }
 
+    EditorCanvasProto.zoom = function(pct){
+        let scl = pct/100;
+        let tOrigin = 'top left';
+        let trans = `scale(${scl}, ${scl})`;
+
+        this.canvas.style.transformOrigin = tOrigin;
+        this.canvas.style.transform = trans;
+
+        this.grid.zoom(scl, tOrigin, trans)
+    }
+
     EditorCanvasProto._fillCell = function(x, y, cellSize) {
         let bg = this.src.getBg();
 
@@ -118,6 +129,7 @@ export default (function() {
         this.context.drawImage(this.srcCanvas, s.x, s.y, s.width, s.height, posX, posY, d.width, d.height);
         this.context.restore();
     }
+
 
 	return EditorCanvas;
 })();
