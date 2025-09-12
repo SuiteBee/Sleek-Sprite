@@ -1,8 +1,8 @@
 import $ from 'jquery';
 
-import Selector from './selecting/Selector';
-import Editor from './editing/Editor';
-import Exporter from './exporting/Exporter';
+import SelectorView from './selecting/SelectorView';
+import EditorView from './editing/EditorView';
+import ExporterView from './exporting/ExporterView';
 
 class Job {
 
@@ -11,16 +11,16 @@ class Job {
             $editorTabBtn   = $('#tabEditor'),
             $exportTabBtn   = $('#tabExport');
 
-        this.selector = new Selector();
-        this.editor   = new Editor(this.selector.selectorCanvas);
-        this.exporter = new Exporter(this.editor.editorCanvas);
+        this.selector = new SelectorView();
+        this.editor   = new EditorView(this.selector.selectorCanvas);
+        this.exporter = new ExporterView(this.editor.editorCanvas);
 
         this.darkMode = false;
 
         this.selector.bind('spriteChange', function(selectedSprites) {
 			this.editor.gather(selectedSprites);
-            this.editor.updateEdit = true;
-            this.exporter.updateExport = true;
+            this.editor.refresh = true;
+            this.exporter.refresh = true;
 		}.bind(this));
 
         this.selector.bind('modeChange', function(isDark) {
@@ -44,7 +44,7 @@ class Job {
 
         //Exporter tab activated
         $exportTabBtn.on('click', function() {
-            if(this.editor.updateEdit){
+            if(this.editor.refresh){
                 this.editor.activeTab();
             }
             this.exporter.activeTab();

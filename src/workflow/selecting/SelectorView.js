@@ -8,12 +8,12 @@ import SelectorCanvas from './SelectorCanvas';
 import SelectorCanvasView from './SelectorCanvasView';
 import MicroEvent from '../../utilities/MicroEvent';
 
-class Selector extends MicroEvent {
+class SelectorView extends MicroEvent {
 
 	constructor() {
 		super();
-		var $selectorContainer  = $('.selection-inner'),
-			imgInput            = new ImgInput( $selectorContainer, $selectorContainer);
+		var $selectorContainer   = $('.selection-inner'),
+			imgInput             = new ImgInput( $selectorContainer, $selectorContainer);
 
 		this.selectorCanvas      = new SelectorCanvas();
 		this.selectorCanvasView  = new SelectorCanvasView(this.selectorCanvas, $selectorContainer);
@@ -52,7 +52,7 @@ class Selector extends MicroEvent {
 			this.selectorCanvas.setImg(img);
 			
 			//Prepare toolbar
-			this.#init_selection_tools();
+			this.#init();
 
 			pageLayout.toAppView();
 		}.bind(this));
@@ -69,12 +69,13 @@ class Selector extends MicroEvent {
 		}.bind(this));
 		
 		this.selectorCanvasView.bind('bgColorHover', function(color) {
-			this.toolbarTop.feedbackColor(color, Selector.#colourBytesToCss(color) );
+			let msg = SelectorView.#colourBytesToCss(color);
+			this.toolbarTop.feedbackColor(color, msg);
 		}.bind(this));
 		
 		this.selectorCanvasView.bind('bgColorSelect', function(color) {
 			var $selectedBg = $('.selected-bg');
-			var colorStr = Selector.#colourBytesToCss(color);
+			var colorStr = SelectorView.#colourBytesToCss(color);
 			if (colorStr == 'transparent'){
 				$selectedBg.css('background-color', '');
 				$selectedBg.addClass('none');
@@ -177,7 +178,7 @@ class Selector extends MicroEvent {
 		return 'rgba(' + color[0] + ', ' + color[1] + ', ' + color[2] + ', ' + String( color[3] / 255 ).slice(0, 5) + ')';
 	}
 
-	#init_selection_tools (){
+	#init (){
 		//Set background as top left pixel
 		let colArr = this.selectorCanvas.getFirstPixelColor();
 		this.selectorCanvas.setBg(colArr);
@@ -187,7 +188,7 @@ class Selector extends MicroEvent {
 
 		//Set background status
 		let $selectedBg = $('.selected-bg');
-		let colorStr = Selector.#colourBytesToCss(colArr);
+		let colorStr = SelectorView.#colourBytesToCss(colArr);
 		if (colorStr == 'transparent'){
 			$selectedBg.css('background-color', '');
 			$selectedBg.addClass('none');
@@ -198,4 +199,4 @@ class Selector extends MicroEvent {
 	}
 }
 
-export default Selector;
+export default SelectorView;

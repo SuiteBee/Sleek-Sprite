@@ -1,12 +1,17 @@
 import $ from 'jquery';
 
-export default (function() {
+import Animator from './Animator';
 
-	function EditPreview($appendTo) {
+class AnimatorView {
+    constructor() {
         this.$preview = createPreviewComponent().appendTo($appendTo);
         
         this.canvas = this.$preview.find('canvas')[0];
         this.context = this.canvas.getContext('2d');
+
+        this.fps = 5;
+        this.frames = [];
+        this.animation = new Animator(this.$preview)
 
         function createPreviewComponent() {
             const container = $('<div class="edit-preview-container"></div>');
@@ -15,9 +20,7 @@ export default (function() {
 
             return container;
         }
-	}
-	
-	var EditPreviewProto = EditPreview.prototype;
-
-	return EditPreview;
-})();
+    }
+}
+        
+export default AnimatorView

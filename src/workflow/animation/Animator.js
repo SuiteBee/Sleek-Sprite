@@ -1,15 +1,25 @@
-class PreviewAnimation {
+class Animator {
 
-    constructor(canvas, draw) {
+constructor(canvas) {
         this.canvas = canvas;
-        this.draw = draw;
-
         this.interval = 0;
         this.then = Date.now();
 
         this.animIndex = 0;
         this.animSprites = [];
         this.handle;
+
+        //Animation callback
+        this.draw = (canvas, rect) => {
+            // the preview canvas has a fixed size and the sprite is resized to fit the preview panel
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(
+                canvas, rect.x, rect.y, rect.width, rect.height,
+                0, 0, canvas.width, canvas.height
+                //0, 0, rect.width, rect.height 
+            );
+        };
     }
 
     Queue = (sprites, fps) => {
@@ -64,4 +74,4 @@ class PreviewAnimation {
 
 }
 
-export default PreviewAnimation;
+export default Animator;

@@ -53,7 +53,7 @@ class SelectorCanvasView extends MicroEvent {
 
 		selectColor.bind('move', function (color) {
 			this.trigger('bgColorHover', color);
-		});
+		}.bind(this));
 	}
 }
 

@@ -5,7 +5,7 @@ import ExportSprite from './ExportSprite';
 import MicroEvent from '../../utilities/MicroEvent';
 import ExportData from './ExportData';
 
-class Exporter extends MicroEvent {
+class ExporterView extends MicroEvent {
 
     constructor(editorCanvas) {
         super();
@@ -14,12 +14,12 @@ class Exporter extends MicroEvent {
         this.$optionsCell        = $('.export-options-cell');
         this.editorCanvas        = editorCanvas;
 
-        this.updateExport        = false;
+        this.refresh             = false;
         this.exportName          = 'texture';
     }
 
     activeTab() {
-        if(this.updateExport){
+        if(this.refresh){
             this.$previewCell.empty();
             this.$optionsCell.empty();
 
@@ -56,7 +56,7 @@ class Exporter extends MicroEvent {
                 this.exportName = $txtInput.val();
             }.bind(this));
 
-            this.updateExport = false;
+            this.refresh = false;
         }
     }
 
@@ -188,4 +188,4 @@ class Exporter extends MicroEvent {
     }
 }
 
-export default Exporter;
+export default ExporterView;

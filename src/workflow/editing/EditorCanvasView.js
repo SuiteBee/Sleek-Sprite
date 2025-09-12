@@ -37,8 +37,6 @@ class EditorCanvasView extends MicroEvent {
             }else{
                 this.unselectAllCells()
             }
-            
-
 		}.bind(this));
 	}
 }

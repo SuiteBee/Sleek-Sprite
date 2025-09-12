@@ -6,7 +6,7 @@ import EditorCanvasView from './EditorCanvasView';
 import MockSprite from './MockSprite';
 import MicroEvent from '../../utilities/MicroEvent';
 
-class Editor extends MicroEvent {
+class EditorView extends MicroEvent {
 
     constructor(srcCanvas) {
         super();
@@ -15,12 +15,13 @@ class Editor extends MicroEvent {
         this.editorCanvas       = new EditorCanvas(srcCanvas);
         this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, $editorContainer );
 
+        this.refresh            = false;
+
         this.nRows              = -1;
         this.nCols              = -1;
 
         this.editSelected;
         this.selectedSprites    = [];
-        this.updateEdit         = false;
         this.mockup             = [];
 
         this.toolbarTop         = new Toolbar('.editor-tab', '.toolbar-container');
@@ -174,9 +175,10 @@ class Editor extends MicroEvent {
     activeTab(){
         //Unselect all highlighted cells in editor
         this.editorCanvasView.unselectAllCells();
+        this.#notEditing();
 
         //Don't redraw grid unless sprite selection changed
-        if(this.updateEdit){
+        if(this.refresh){
             //Pack any selected sprites into mockup[]
             this.#pack();
 
@@ -194,8 +196,7 @@ class Editor extends MicroEvent {
 
             //Draw sliced sprites in editor
             this.#place();
-
-            this.updateEdit = false;
+            this.refresh = false;
         }
     }
 
@@ -263,4 +264,4 @@ class Editor extends MicroEvent {
     }
 }
 
-export default Editor;
+export default EditorView;
