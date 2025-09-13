@@ -3,7 +3,7 @@ import { Toolbar, ToolbarGroup } from '../../components/Toolbar';
 
 import EditorCanvas from './EditorCanvas';
 import EditorCanvasView from './EditorCanvasView';
-import MockSprite from './MockSprite';
+import EditSprite from './EditSprite';
 import MicroEvent from '../../utilities/MicroEvent';
 
 class EditorView extends MicroEvent {
@@ -20,9 +20,9 @@ class EditorView extends MicroEvent {
         this.nRows              = -1;
         this.nCols              = -1;
 
-        this.editSelected;
         this.selectedSprites    = [];
-        this.mockup             = [];
+        this.editSelected;
+        this.editedSprites      = [];
 
         this.toolbarTop         = new Toolbar('.editor-tab', '.toolbar-container');
 		this.toolbarBottom      = new Toolbar('.editor-tab', '.toolbar-bottom-container');
@@ -92,7 +92,7 @@ class EditorView extends MicroEvent {
 		}.bind(this));
 
         this.toolbarTop.bind('set-all-align', function(evt, option) {
-            if(this.mockup.length > 0){
+            if(this.editedSprites.length > 0){
                 this.#anchorAll(option);
                 this.#place();
                 this.editorCanvasView.unselectAllCells();
@@ -179,12 +179,12 @@ class EditorView extends MicroEvent {
 
         //Don't redraw grid unless sprite selection changed
         if(this.refresh){
-            //Pack any selected sprites into mockup[]
+            //Pack any selected sprites into editedSprites[]
             this.#pack();
 
             //Set automatic grid dimensions
-            if(this.mockup.length > 0){
-                let nearestRoot = Math.sqrt(this.mockup.length);
+            if(this.editedSprites.length > 0){
+                let nearestRoot = Math.sqrt(this.editedSprites.length);
                 let nearestSquare = Math.ceil(nearestRoot);
 
                 $('#set-rows').val(nearestSquare.toString());
@@ -239,16 +239,16 @@ class EditorView extends MicroEvent {
 
     //Pack selected sprites into an object array
     #pack() {
-        this.mockup = [];
+        this.editedSprites = [];
         
         this.selectedSprites.forEach(function(sprite, i) {
-            this.mockup.push(new MockSprite(sprite.rect, i));
+            this.editedSprites.push(new EditSprite(sprite.rect, i));
         }.bind(this)); 
     }
 
-    //Place sprites from mockup array onto editor canvas and draw a grid
+    //Place sprites from editedSprites array onto editor canvas and draw a grid
     #place() {
-        this.editorCanvas.reset(this.mockup, this.nRows, this.nCols);
+        this.editorCanvas.reset(this.editedSprites, this.nRows, this.nCols);
         this.editorCanvas.drawAll(true); 
     }
 
@@ -257,7 +257,7 @@ class EditorView extends MicroEvent {
     }
 
     #anchorAll(anchorPos) {
-        this.mockup.forEach(function(sprite) {
+        this.editedSprites.forEach(function(sprite) {
             sprite.anchor = anchorPos;
             sprite.nudgeY = 0;
         }.bind(this)); 

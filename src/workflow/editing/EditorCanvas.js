@@ -80,7 +80,7 @@ export default (function() {
         //Updating in place
         if((x + y) < 0){ x = sprite.cell.x, y = sprite.cell.y }
 
-        //Update mock sprite rect and cell rect
+        //Update sprite rect and cell rect
         let previous = index > 0 ? this.sprites[index-1] : sprite;
         sprite.update(x, y, this.grid.cellSize, previous);
 

@@ -12,8 +12,8 @@ class SelectorView extends MicroEvent {
 
 	constructor() {
 		super();
-		var $selectorContainer   = $('.selection-inner'),
-			imgInput             = new ImgInput( $selectorContainer, $selectorContainer);
+		var $selectorContainer   = $('.selection-inner');
+		this.imgInput            = new ImgInput( $selectorContainer, $selectorContainer);
 
 		this.selectorCanvas      = new SelectorCanvas();
 		this.selectorCanvasView  = new SelectorCanvasView(this.selectorCanvas, $selectorContainer);
@@ -45,9 +45,9 @@ class SelectorView extends MicroEvent {
 		this.toolbarBottom.$container.addClass('bottom');
 
 		pageLayout.init();
-		imgInput.fileClickjackFor( this.toolbarTop.$container.find('div.open-img') );
+		this.imgInput.fileClickjackFor( this.toolbarTop.$container.find('div.open-img') );
 				
-		imgInput.bind('load', function(img) {
+		this.imgInput.bind('load', function(img) {
 			//Send image to canvas
 			this.selectorCanvas.setImg(img);
 			
@@ -99,7 +99,7 @@ class SelectorView extends MicroEvent {
 		}.bind(this));
 		
 		this.toolbarTop.bind('reload-img', function(event) {
-			imgInput.reloadLastFile();
+			this.imgInput.reloadLastFile();
 			event.preventDefault();
 		});
 

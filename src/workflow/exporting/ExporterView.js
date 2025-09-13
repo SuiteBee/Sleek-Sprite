@@ -23,11 +23,25 @@ class ExporterView extends MicroEvent {
             this.$previewCell.empty();
             this.$optionsCell.empty();
 
-            this.$previewContainer = this.#fillPreview();
-            this.$preview = this.$previewCell.append(this.$previewContainer).appendTo(this.$exportContainer);
+            var $previewToolbar = $('<div class="toolbar top"></div>'),
+                $lblName = $('<div><h2>Naming</h2></div>'),
+                $tipName = $('<div class="tooltip tipName"></div>'),
+                $tipTxt = $('<div class="tooltipText">Note: Images here may be stretched. This is for display purposes only. Download and export sprites will be remain in perspective.</div>'),
+                $previewItems   = this.#fillPreview();
+            
+            $tipName.append($tipTxt);
+            $lblName.append($tipName);
+            $previewToolbar.append($lblName);
+            this.$previewCell.append($previewToolbar);
+            this.$previewCell.append($previewItems);
+            this.$previewCell.appendTo(this.$exportContainer);
 
-            this.$optionsContainer = this.#createExportOptions();
-            this.$options = this.$optionsCell.append(this.$optionsContainer).appendTo(this.$exportContainer);
+            var $optionsToolbar   = $('<div class="toolbar top"><h2>Options</h2></div>'),
+                $optionsContainer = this.#createExportOptions();
+
+            this.$optionsCell.append($optionsToolbar);
+            this.$optionsCell.append($optionsContainer);
+            this.$optionsCell.appendTo(this.$exportContainer);
 
             $('#export-all').on('click', function() {
                 this.#bundleExport().then(zipped => {

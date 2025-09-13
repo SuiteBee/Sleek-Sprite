@@ -7,21 +7,21 @@ class Selected {
         
         this.highlight.moveTo(rect, true);
     }
+}
 
-    unselect() {
-        this.highlight.remove();
-    }
+Selected.prototype.unselect = function() {
+    this.highlight.remove();
+}
 
-    selectNew(newRect) {
-         this.rect = newRect;
-         this.highlight.moveTo(newRect, true);
-    }
+Selected.prototype.selectNew = function(newRect) {
+    this.rect = newRect;
+    this.highlight.moveTo(newRect, true);
+}
 
-    reselect(container) {
-        const highlight = new Highlight(container);
-        this.highlight = highlight;
-        this.highlight.moveTo(this.rect, false);
-    }
+Selected.prototype.reselect = function(container) {
+    const highlight = new Highlight(container);
+    this.highlight = highlight;
+    this.highlight.moveTo(this.rect, false);
 }
 
 export default Selected;

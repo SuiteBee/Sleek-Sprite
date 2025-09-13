@@ -1,6 +1,6 @@
 import Rect from '../../components/Rect';
 
-class MockSprite {
+class EditSprite {
 	constructor(rect, index) {
 		this.n = index;
 		this.name = index.toString();
@@ -60,24 +60,24 @@ class MockSprite {
 	}
 }
 
-var MockProto = MockSprite.prototype;
+var EditProto = EditSprite.prototype;
 
-MockProto.validNudgeX = function(val) {
+EditProto.validNudgeX = function(val) {
 	let range = this.xRange;
 	return (val >= range[0] && val <= range[1]);
 }
 
-MockProto.validNudgeY = function(val) {
+EditProto.validNudgeY = function(val) {
 	let range = this.yRange;
 	return (val >= range[0] && val <= range[1]);
 }
 
-MockProto.update = function(x, y, cellSize, previous){
+EditProto.update = function(x, y, cellSize, previous){
 	this._setAlignment(x, y, cellSize, previous);
 	this._setCell(x, y, cellSize);
 }
 
-MockProto._setAlignment = function(x, y, cellSize, previous) {
+EditProto._setAlignment = function(x, y, cellSize, previous) {
 	let halfWidth = this.rect.width/2;
 	let halfHeight = this.rect.height/2;
 	let halfCell = cellSize/2;
@@ -108,11 +108,11 @@ MockProto._setAlignment = function(x, y, cellSize, previous) {
 }
 
 //Cell size/pos sprite is contained in
-MockProto._setCell = function(x, y, size) {
+EditProto._setCell = function(x, y, size) {
 	this.cell.x = x;
 	this.cell.y = y;
 	this.cell.width = size;
 	this.cell.height = size;
 }
 
-export default MockSprite;
+export default EditSprite;

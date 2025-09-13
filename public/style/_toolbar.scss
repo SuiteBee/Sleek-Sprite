@@ -342,3 +342,10 @@
         background: url('imgs/trans.png');
     }
 }
+
+.toolbar-container,
+.toolbar-bottom-container {
+    display: table-row;
+    position: relative;
+    @include utils.user-select(none);
+}

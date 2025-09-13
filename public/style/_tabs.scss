@@ -198,6 +198,17 @@
 .export-container {
     color: black;
 
+    .toolbar {
+        line-height: 5px;
+        margin: 0px;
+        height:40px;
+
+        .tipName {
+            top: 12px;
+            left: 85px;
+        }
+    }
+
     .export-preview-cell {
         display: table-cell;
         height:100%;
@@ -219,7 +230,7 @@
         overflow: auto;
         box-sizing: border-box;
 
-        padding: 15px;
+        padding: 5px 5px 60px 5px;
         justify-content: start;
         align-content: baseline;
 
@@ -232,14 +243,28 @@
 
             border: 2px solid #4e4e4e;
             border-radius: 5px;
+
+            .item-name {
+                border: 1px solid #4e4e4e;
+                border-radius: 5px;
+            }
+
+            .export-single {
+                border: 1px solid #4e4e4e;
+                border-radius: 5px;
+                @include utils.linear-gradient((top, #f0efef, #a7a7a7));
+            }
+
+            .small-preview {
+                background: url('imgs/trans.png');
+            }
         }
     }
 
     .export-options-cell {
         display: table-cell;
-        width:15%;
+        width:20%;
         text-align: center;
-        padding: 15px;
 
         border: 1px solid #4e4e4e;
         border-right: none;
@@ -255,6 +280,7 @@
             flex-direction: column;
             gap: 5px;
             align-items: center;
+            padding-top: 10px;
         }
         
         @include utils.linear-gradient((top, #f0efef, #a7a7a7));
