@@ -33,15 +33,17 @@ class SelectorCanvasView extends MicroEvent {
 		selectArea.bind('select', function (clickedRect) {
 			const rect = Object.assign({}, clickedRect);
 
-			var spriteRect = spriteCanvas.trimBg(rect);
-			if (spriteRect.width && spriteRect.height) {
-				spriteRect = spriteCanvas.expandToSpriteBoundry(rect);
-				
-				this._handleSelectedSprite(clickedRect, spriteRect, true);
-			} 
-			else {
-				//Clicked background clears selections
-				//this.unselectAllSprites();
+			//Clicking highlighted rect will unselect
+			let isSelected = spriteCanvas.getHighlighted(this._selectedSprites, clickedRect);
+			if(isSelected) {
+				this._handleSelectedSprite(clickedRect, isSelected, true);
+			} else{
+				var spriteRect = spriteCanvas.trimBg(rect);
+				if (spriteRect.width && spriteRect.height) {
+					spriteRect = spriteCanvas.expandToSpriteBoundry(rect);
+					
+					this._handleSelectedSprite(clickedRect, spriteRect, true);
+				} 
 			}
 		}.bind(this));
 

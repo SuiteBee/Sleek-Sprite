@@ -101,7 +101,7 @@ class SelectorView extends MicroEvent {
 		this.toolbarTop.bind('reload-img', function(event) {
 			this.imgInput.reloadLastFile();
 			event.preventDefault();
-		});
+		}.bind(this));
 
 		this.toolbarTop.bind('select-all', function(event) {
 			let txtGap = $('#select-size').val();

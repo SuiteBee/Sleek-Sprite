@@ -31,7 +31,11 @@ class ImgInput extends MicroEvent {
 	}
 
 	reloadLastFile() {
-		this._lastFile && this.#openFileAsImg( this._lastFile );
+		if(this._lastFile) { 
+			this.#openFileAsImg( this._lastFile )
+		} else { 
+			this.#loadImgUrl($('.tutorial').attr('href')); 
+		}
 	};
 
 	fileClickjackFor($elm) {

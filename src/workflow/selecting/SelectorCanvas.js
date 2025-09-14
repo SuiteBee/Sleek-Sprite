@@ -55,6 +55,11 @@ export default (function() {
 		this._img = img;
 	};
 
+	SelectorCanvasProto.getHighlighted = function(selectedSprites, clickRect) {
+		let currentSelections = selectedSprites.map(current => current.rect);
+		return currentSelections.find(intersect, { rect: clickRect });
+	}
+
 	SelectorCanvasProto.getFirstPixelColor = function() {
 		return this._context.getImageData(0,0, 1, 1).data;
 	}
