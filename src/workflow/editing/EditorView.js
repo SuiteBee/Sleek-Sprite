@@ -3,7 +3,7 @@ import { Toolbar, ToolbarGroup } from '../../components/Toolbar';
 
 import EditorCanvas from './EditorCanvas';
 import EditorCanvasView from './EditorCanvasView';
-import EditSprite from './EditSprite';
+import EditSprite from './components/EditSprite';
 import MicroEvent from '../../utilities/MicroEvent';
 
 class EditorView extends MicroEvent {

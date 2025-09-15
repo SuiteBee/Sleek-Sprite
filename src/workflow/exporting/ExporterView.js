@@ -1,14 +1,15 @@
 import $ from 'jquery';
-import JSZip from 'jszip';
 
-import ExportSprite from './ExportSprite';
+import Exporter from './Exporter';
 import MicroEvent from '../../utilities/MicroEvent';
-import ExportData from './ExportData';
+
 
 class ExporterView extends MicroEvent {
 
     constructor(editorCanvas) {
         super();
+
+        this.exporter            = new Exporter(editorCanvas);
 		this.$exportContainer    = $('.export-container');
         this.$previewCell        = $('.export-preview-cell');
         this.$optionsCell        = $('.export-options-cell');
@@ -16,45 +17,48 @@ class ExporterView extends MicroEvent {
 
         this.refresh             = false;
         this.exportName          = 'texture';
+        this.hasMap              = true;
+        this.isSeparate          = false;
+
+        this.#buildExportOptions();
     }
 
     activeTab() {
         if(this.refresh){
+            //Clear previews
             this.$previewCell.empty();
-            this.$optionsCell.empty();
-
-            var $previewToolbar = $('<div class="toolbar top"></div>'),
-                $lblName = $('<div><h2>Naming</h2></div>'),
-                $tipName = $('<div class="tooltip tipName"></div>'),
-                $tipTxt = $('<div class="tooltipText">Note: Images here may be stretched. This is for display purposes only. Download and export sprites will be remain in perspective.</div>'),
-                $previewItems   = this.#fillPreview();
-            
-            $tipName.append($tipTxt);
-            $lblName.append($tipName);
-            $previewToolbar.append($lblName);
-            this.$previewCell.append($previewToolbar);
-            this.$previewCell.append($previewItems);
-            this.$previewCell.appendTo(this.$exportContainer);
-
-            var $optionsToolbar   = $('<div class="toolbar top"><h2>Options</h2></div>'),
-                $optionsContainer = this.#createExportOptions();
-
-            this.$optionsCell.append($optionsToolbar);
-            this.$optionsCell.append($optionsContainer);
-            this.$optionsCell.appendTo(this.$exportContainer);
+            this.#buildExportPreview();
 
             $('#export-all').on('click', function() {
-                this.#bundleExport().then(zipped => {
-                    this.#downloadBundle(zipped);
+                this.exporter.bundleExport(this.exportName, this.hasMap, this.isSeparate).then(zipped => {
+                    this.exporter.downloadBundle(zipped, this.exportName);
                 });
             }.bind(this));
 
-            $('.export-single').on('click', function(evt) {
+            $('.download-single').on('click', function(evt) {
                 let idx = $(evt.target).data('index');
                 let sprite = this.editorCanvas.sprites[idx];
 
-                let url = this.#getSpriteDat(sprite);
-                this.#download(url, sprite.name, '.png');
+                let tmpCanvas = $(`<canvas style="display:none"/>`)[0];
+                let url = this.exporter.getSpriteData(sprite, tmpCanvas);
+                this.exporter.download(url, sprite.name, '.png');
+            }.bind(this));
+
+            $('#download-all').on('click', function(evt) {            
+                let urls = [],   
+                    names = [];
+
+                for(let i=0; i<this.editorCanvas.sprites.length; i++){
+                    let sprite = this.editorCanvas.sprites[i];
+
+                    let tmpCanvas = $(`<canvas style="display:none"/>`)[0];
+                    urls.push(this.exporter.getSpriteData(sprite, tmpCanvas));
+                    names.push(sprite.name);
+                }
+
+                this.exporter.bundleDownload(urls, names).then(zipped => {
+                    this.exporter.downloadBundle(zipped, this.exportName);
+                });
             }.bind(this));
 
             $('input.item-name[type=text]').on('input', function(evt) {
@@ -70,8 +74,44 @@ class ExporterView extends MicroEvent {
                 this.exportName = $txtInput.val();
             }.bind(this));
 
+            $('input.export-json[type=checkbox]').on('change', function(evt) {
+                let $chkJson = $(evt.target);
+                this.hasMap = $chkJson.prop('checked');
+
+                let $chkDependent = $('#export-separate');
+                $chkDependent.prop('disabled', !this.hasMap);
+
+                if(!this.hasMap){
+                    $chkDependent.prop('checked', false);
+                } 
+            }.bind(this));
+
+             $('input.export-separate[type=checkbox]').on('change', function(evt) {
+                let $chkSeparate = $(evt.target);
+                this.isSeparate = $chkSeparate.prop('checked');
+            }.bind(this));
+
             this.refresh = false;
         }
+    }
+
+    #buildExportPreview() {
+        var $previewToolbar = $('<div class="toolbar top"></div>'),
+            $lblName = $('<div><h2>Naming</h2></div>'),
+            
+            $tipName = $('<div class="tooltip tipName"></div>'),
+            txtTipName = 'Note: Images here may be stretched. This is for display purposes only. Download and export sprites will remain in perspective.',
+            $tipTxt = $(`<div class="tooltipText">${txtTipName}</div>`),
+            
+            $previewItems   = this.#fillPreview();
+            
+            $tipName.append($tipTxt);
+            $lblName.append($tipName);
+            $previewToolbar.append($lblName);
+
+            this.$previewCell.append($previewToolbar);
+            this.$previewCell.append($previewItems);
+            this.$previewCell.prependTo(this.$exportContainer);
     }
 
     #fillPreview(){
@@ -107,98 +147,57 @@ class ExporterView extends MicroEvent {
         $txtInput.data('index', sprite.n);
         $txtInput.appendTo($item);
 
-        let $btnExportSingle = $(`<button class="export-single" id="export-single-${sprite.n}">Download</button>`);
-        $btnExportSingle.data('index', sprite.n);
-        $btnExportSingle.appendTo($item);
+        let $btnDownloadSingle = $(`<button class="download-single" id="download-single-${sprite.n}">Download</button>`);
+        $btnDownloadSingle.data('index', sprite.n);
+        $btnDownloadSingle.appendTo($item);
 
         return $item;
+    }
+
+    #buildExportOptions() {
+        var $optionsToolbar   = $('<div class="toolbar top"><h2>Options</h2></div>'),
+            $optionsContainer = this.#createExportOptions();
+
+        this.$optionsCell.append($optionsToolbar);
+        this.$optionsCell.append($optionsContainer);
+        this.$optionsCell.appendTo(this.$exportContainer);
     }
 
     #createExportOptions() {
         const container = $('<div class="export-options"></div>');
 
-        let $lblExportName = $(`<label>File Name</label>`);
+        let $lblExportName = $(`<label>File Name</label>`).css('font-weight', 'bold');
         $lblExportName.appendTo(container);
 
-        let $txtInput = $(`<input type="text" class="export-name" name="export-name" id="export-name"/>`).val(this.exportName);
+        let $txtInput = $(`<input type="text" class="export-name" name="export-name" id="export-name"/><hr>`).val(this.exportName);
         $txtInput.appendTo(container);
 
-        var $btnExport = $('<button id="export-all">Export</button>');
-        $btnExport.appendTo(container);
+        let $spnJson = $('<span></span>');
+        let $chkJson = $(`<input type="checkbox" class="export-json" name="export-json" id="export-json"/>`).prop('checked', true);
+        $chkJson.appendTo($spnJson);
         
+        let $lblJson = $(`<label>Include JSON</label>`);
+        $lblJson.appendTo($spnJson);
+        $spnJson.appendTo(container);
+
+        let $spnSeparate = $('<span></span>');
+        let $chkSeparate = $(`<input type="checkbox" class="export-separate" name="export-separate" id="export-separate"/>`);
+        $chkSeparate.appendTo($spnSeparate);
+
+        let $lblSeparate = $(`<label>Separate Data Directory</label>`);
+        $lblSeparate.appendTo($spnSeparate);
+        $spnSeparate.appendTo(container);
+
+        let $btnExport = $('<button id="export-all">Export</button>');
+        $btnExport.appendTo(container);
+
+        let $lblDownload = $(`<hr><label>Individual Sprites</label>`).css('font-weight', 'bold');
+        $lblDownload.appendTo(container);
+        
+        let $btnDownload = $('<button id="download-all">Download All</button>');
+        $btnDownload.appendTo(container);
+
         return container;
-    }
-
-    #getJson(sprites) {
-        let exSprites = [];
-
-        for(let i=0; i<sprites.length; i++){
-            let exSprite = new ExportSprite(sprites[i], sprites[i].name);
-            exSprites.push(exSprite);
-        }
-
-        let dat = new ExportData(exSprites);
-        return JSON.stringify(dat, null, 2);
-    }
-
-    #getJsonUrl(jString){
-        let content = new Blob([jString], {type: "application/json" });
-        return URL.createObjectURL(content);
-    }
-
-    #getSpriteDat(sprite) {
-        let tmpCanvas = $(`<canvas style="display:none"/>`)[0];
-        let tmpContext = tmpCanvas.getContext('2d');
-
-        tmpContext.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
-        tmpCanvas.width = sprite.rect.width;
-        tmpCanvas.height = sprite.rect.height;
-
-        //Disable aliasing (has to be done on each resize or pixels get murdered)
-        tmpContext.imageSmoothingEnabled = false;
-
-        let pos = sprite.pos;
-        tmpContext.drawImage(
-            this.editorCanvas.canvas, pos.x, pos.y, pos.width, pos.height,
-            0, 0, tmpCanvas.width, tmpCanvas.height
-        );
-
-        return tmpCanvas.toDataURL("image/png");
-    }
-
-    #getEditorDat() {
-        return this.editorCanvas.canvas.toDataURL("image/png");
-    }
-
-    #download(url, fileName, ext) {
-        var link = document.createElement('a');
-        link.download = fileName + ext;
-        link.href = url;
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    #bundleExport() {
-        var zip = new JSZip();
-
-        let imgName = this.exportName + '.png';
-        let imgData = this.#getEditorDat();
-        let imgBase64 = imgData.split(';base64,')[1];
-        zip.file(imgName, imgBase64, {base64: true});
-
-        let jsonName = this.exportName + '.json';
-        let jsonData = this.#getJson(this.editorCanvas.sprites);
-        let jsonBase64 = btoa(jsonData);
-        zip.file(jsonName, jsonBase64, {base64: true});
-
-        return zip.generateAsync({type:"base64"});
-    }
-
-    #downloadBundle(zipped) {
-        const dataUrl = "data:application/zip;base64," + zipped;
-        this.#download(dataUrl, this.exportName, '.zip');
     }
 }
 

@@ -248,7 +248,7 @@
                 border-radius: 5px;
             }
 
-            .export-single {
+            .download-single {
                 border: 1px solid #4e4e4e;
                 border-radius: 5px;
                 @include utils.linear-gradient((top, #f0efef, #a7a7a7));
@@ -266,20 +266,33 @@
         text-align: center;
 
         border: 1px solid #4e4e4e;
-        border-right: none;
         border-radius: 5px;
 
         & button {
             width: 100px;
-            height: 50px;
+            height: 30px;
+            @include utils.linear-gradient((top, #f0efef, #a7a7a7));
         }
 
         .export-options {
             display: flex;
             flex-direction: column;
             gap: 5px;
-            align-items: center;
-            padding-top: 10px;
+            align-items: start;
+            padding: 10px 20px 0px 20px;
+
+            input[type=checkbox] {
+                margin-right: 10px;
+            }
+
+            input, button {
+                border: 1px solid #4e4e4e;
+                border-radius: 5px;
+            }
+
+            hr {
+                width: 100%;
+            }
         }
         
         @include utils.linear-gradient((top, #f0efef, #a7a7a7));

@@ -1,4 +1,4 @@
-import Rect from '../../components/Rect';
+import Rect from '../../../components/Rect';
 
 class EditSprite {
 	constructor(rect, index) {
