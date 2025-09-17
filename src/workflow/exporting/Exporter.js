@@ -11,7 +11,7 @@ export default (function() {
     
     var ExporterProto = Exporter.prototype;
 
-    ExporterProto.getJson = function(sprites) {
+    ExporterProto.getJson = function(sprites, fileName) {
         let exSprites = [];
 
         for(let i=0; i<sprites.length; i++){
@@ -19,7 +19,7 @@ export default (function() {
             exSprites.push(exSprite);
         }
 
-        let dat = new ExportData(exSprites);
+        let dat = new ExportData(exSprites, fileName, this.src.canvas.width, this.src.canvas.height);
         return JSON.stringify(dat, null, 2);
     }
 
@@ -84,7 +84,7 @@ export default (function() {
 
         if(hasMap) {
             let jsonPath = name + '.json';
-            let jsonData = this.getJson(this.src.sprites);
+            let jsonData = this.getJson(this.src.sprites, imgName);
             let jsonBase64 = btoa(jsonData);
 
             if(isSeparate){

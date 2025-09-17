@@ -46,6 +46,7 @@ import $ from 'jquery';
         var $selectionBtn = addButton('Selector', 'tabSelection', '.selection-tab');
         $selectionBtn.appendTo($workflow);
         addButton('Editor', 'tabEditor', '.editor-tab').appendTo($workflow);
+        addButton('Animator', 'tabAnimate', '.animator-tab').appendTo($workflow);
         addButton('Export', 'tabExport', '.export-tab').appendTo($workflow);
 
         //Set initial state

@@ -2,6 +2,7 @@ import $ from 'jquery';
 
 import SelectorView from './selecting/SelectorView';
 import EditorView from './editing/EditorView';
+import AnimatorView from './animation/AnimatorView';
 import ExporterView from './exporting/ExporterView';
 
 class Job {
@@ -9,10 +10,12 @@ class Job {
     constructor() {
         var $selectorTabBtn = $('#tabSelection'),
             $editorTabBtn   = $('#tabEditor'),
+            $animatorTabBtn = $('#tabAnimate'),
             $exportTabBtn   = $('#tabExport');
 
         this.selector = new SelectorView();
         this.editor   = new EditorView(this.selector.selectorCanvas);
+        this.animator = new AnimatorView(this.editor.editorCanvas);
         this.exporter = new ExporterView(this.editor.editorCanvas);
 
         this.darkMode = false;
@@ -40,6 +43,12 @@ class Job {
         $editorTabBtn.on('click', function() {
             this.editor.setMode(this.darkMode, false);
             this.editor.activeTab();
+        }.bind(this));
+
+        //Animator tab activated
+        $animatorTabBtn.on('click', function() {
+            this.animator.setMode(this.darkMode, false);
+            this.animator.activeTab();
         }.bind(this));
 
         //Exporter tab activated

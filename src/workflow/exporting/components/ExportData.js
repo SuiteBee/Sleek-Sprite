@@ -1,11 +1,18 @@
 class ExportData {
-	constructor(exportSprites) {
-        this.sprites = exportSprites.reduce((accumulator, sprite) => {
-            accumulator[sprite.name] = {
-                rect: sprite.rect
-            }
-            return accumulator;
-        }, {});
+	constructor(exportSprites, fileName, width, height) {
+        this.textures = {
+            fileName: fileName,
+            size: {
+                w: width,
+                h: height
+            },
+            frames: exportSprites.reduce((accumulator, sprite) => {
+                accumulator[sprite.name] = {
+                    frame: sprite.rect
+                }
+                return accumulator;
+            }, {})
+        }
 	}
 }
 

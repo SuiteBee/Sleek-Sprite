@@ -58,9 +58,13 @@ GridProto.draw = function() {
 }
 
 GridProto.find = function(mousePos) {
-    if(mousePos.x <= this.width && mousePos.y <= this.height){
-        let findCol = Math.floor(mousePos.x / (this.cellSize * this.zoomScale));
-        let findRow = Math.floor(mousePos.y / (this.cellSize * this.zoomScale));
+    let scaledWidth  = this.width * this.zoomScale,
+        scaledHeight = this.height * this.zoomScale,
+        scaledCell   = this.cellSize * this.zoomScale;
+
+    if(mousePos.x <= scaledWidth && mousePos.y <= scaledHeight){
+        let findCol = Math.floor(mousePos.x / scaledCell);
+        let findRow = Math.floor(mousePos.y / scaledCell);
 
         let i = (findRow * this.cols) + findCol;
         return i;

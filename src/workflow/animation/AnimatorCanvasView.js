@@ -6,11 +6,12 @@ import Selected from '../../components/Selected';
 import Highlight from '../../components/highlight';
 import SelectArea from '../../components/selectArea';
 
-class EditorCanvasView extends MicroEvent {
-	constructor(editorCanvas, $appendToElm) {
+class AnimatorCanvasView extends MicroEvent {
+	constructor(animatorCanvas, $appendToElm) {
 		super();
-		var $container = $('<div class="editor-canvas-container"/>'),
-			$canvas = $container.append($(editorCanvas.canvas)).append($(editorCanvas.grid.canvas)),
+        
+		var $container = $('<div class="animator-canvas-container"/>'),
+			$canvas = $container.append($(animatorCanvas.canvas)).append($(animatorCanvas.gridCanvas)),
 			// this cannot be $appendToElm, as browsers pick up clicks on scrollbars, some don't pick up mouseup http://code.google.com/p/chromium/issues/detail?id=14204#makechanges
 			highlight = new Highlight($container),
 			selectArea = new SelectArea($container, $canvas, highlight),
@@ -22,8 +23,8 @@ class EditorCanvasView extends MicroEvent {
 		this._$bgElm = $appendToElm;
 		this._highlight = highlight;
 		this._selectedCells = selectedCells;
-        this._grid = editorCanvas.grid;
-        this._editorCanvas = editorCanvas;
+        this._grid = animatorCanvas.srcGrid;
+        this._animatorCanvas = animatorCanvas;
 
 		$container.appendTo($appendToElm);
 
@@ -31,8 +32,8 @@ class EditorCanvasView extends MicroEvent {
 			const rect = Object.assign({}, clickedRect);
 			let index = this._grid.find(rect);
 
-            if(index >= 0 && index < this._editorCanvas.sprites.length){
-				let sprite = this._editorCanvas.sprites[index];
+            if(index >= 0 && index < this._animatorCanvas.sprites.length){
+				let sprite = this._animatorCanvas.sprites[index];
                 this._handleSelectedCell(clickedRect, sprite);
             }else{
                 this.unselectAllCells()
@@ -41,9 +42,9 @@ class EditorCanvasView extends MicroEvent {
 	}
 }
 
-var EditorCanvasViewProto = EditorCanvasView.prototype;
+var AnimatorCanvasViewProto = AnimatorCanvasView.prototype;
 
-EditorCanvasViewProto._handleSelectedCell = function(clickedRect, sprite) {
+AnimatorCanvasViewProto._handleSelectedCell = function(clickedRect, sprite) {
 	let scaledRect = sprite.cell.scaled(this._grid.zoomScale);
 
 	const cellSelected = this._selectedCells.findIndex(cell => JSON.stringify(cell.rect) == JSON.stringify(scaledRect));
@@ -52,21 +53,19 @@ EditorCanvasViewProto._handleSelectedCell = function(clickedRect, sprite) {
 		this._selectedCells.splice(cellSelected, 1);
 		this.trigger('editNone');
 	} else {
-		this.unselectAllCells();
-
 		this._selectedCells.push(this._selectCell(clickedRect, scaledRect));
 		this.trigger('editCellChange', sprite);
 	}
 }
 
-EditorCanvasViewProto._selectCell = function(clickedRect, cellRect) {
+AnimatorCanvasViewProto._selectCell = function(clickedRect, cellRect) {
 	const highlight = new Highlight(this._$container);
 	highlight.moveTo(clickedRect); // move to clicked area so the animation starts from click position
 
 	return new Selected(cellRect, highlight);
 }
 
-EditorCanvasViewProto.unselectAllCells = function() {
+AnimatorCanvasViewProto.unselectAllCells = function() {
 	if(this._selectedCells.length > 0) {
 		this._selectedCells.forEach(cell => cell.unselect());
 		this._selectedCells = [];
@@ -75,7 +74,7 @@ EditorCanvasViewProto.unselectAllCells = function() {
 	}
 }
 
-EditorCanvasViewProto.setDarkMode = function(color, anim = true) {
+AnimatorCanvasViewProto.setDarkMode = function(color, anim = true) {
 	if ( $.support.transition && anim ) {
 		this._$bgElm.transition({ 'background-color': color }, {
 			duration: 500
@@ -88,9 +87,9 @@ EditorCanvasViewProto.setDarkMode = function(color, anim = true) {
 	this._highlight.setHighVisOnDark( color === '#000' );
 };
 
-EditorCanvasViewProto.zoom = function(pct) {
+AnimatorCanvasViewProto.zoom = function(pct) {
 	this.unselectAllCells();
-	this._editorCanvas.zoom(pct);
+	this._animatorCanvas.zoom(pct);
 }
 
-export default EditorCanvasView;
+export default AnimatorCanvasView;
