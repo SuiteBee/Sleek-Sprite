@@ -49,7 +49,10 @@ export default (function() {
         this.canvas.style.transformOrigin = tOrigin;
         this.canvas.style.transform = trans;
 
-        this.grid.zoom(scl, tOrigin, trans)
+        this.gridCanvas.style.transformOrigin = tOrigin;
+        this.gridCanvas.style.transform = trans;
+
+        this.srcGrid.zoom(scl, tOrigin, trans);
     }
 
 	return AnimatorCanvas;

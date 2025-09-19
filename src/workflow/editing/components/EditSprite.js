@@ -28,6 +28,15 @@ class EditSprite {
 		);
 	}
 
+	get nudge() {
+		return new Rect(
+			this.nudgeX,
+			this.nudgeY,
+			0,
+			0
+		)
+	}
+
 	get flipped(){
 		return this.flipX || this.flipY;
 	}

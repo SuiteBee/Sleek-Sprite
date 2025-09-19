@@ -51,10 +51,10 @@ AnimatorCanvasViewProto._handleSelectedCell = function(clickedRect, sprite) {
 	if(cellSelected > -1) {
 		this._selectedCells[cellSelected].unselect();
 		this._selectedCells.splice(cellSelected, 1);
-		this.trigger('editNone');
+		this.trigger('removeFrame', sprite);
 	} else {
 		this._selectedCells.push(this._selectCell(clickedRect, scaledRect));
-		this.trigger('editCellChange', sprite);
+		this.trigger('addFrame', sprite);
 	}
 }
 
@@ -69,9 +69,9 @@ AnimatorCanvasViewProto.unselectAllCells = function() {
 	if(this._selectedCells.length > 0) {
 		this._selectedCells.forEach(cell => cell.unselect());
 		this._selectedCells = [];
-
-		this.trigger('editNone');
 	}
+
+	this.trigger('removeAllFrames', this._selectedCells);
 }
 
 AnimatorCanvasViewProto.setDarkMode = function(color, anim = true) {

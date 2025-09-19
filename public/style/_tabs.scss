@@ -94,14 +94,12 @@
 }
 
 // Preview Panel
-.edit-preview-container {
+.animation-preview-container {
     position: absolute;
     right: 0;
     top: 0;
 
     color: black;
-
-    @include utils.linear-gradient((top, #f0efef, #a7a7a7));
 }
 
 .tabcontent {		

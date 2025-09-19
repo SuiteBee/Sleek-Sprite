@@ -45,7 +45,7 @@ class EditorView extends MicroEvent {
             addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
 
         this.toolbarBottom.
-            addSlider('zoom', '0', '200', '100');
+            addSlider('editor-zoom', '0', '200', '100');
 
         //Selected Tools
         this.toolbarTop.
@@ -167,12 +167,16 @@ class EditorView extends MicroEvent {
         }.bind(this));
 
         //Zoom 
-        this.toolbarBottom.bind('zoom', function(evt, pct){
-            this.editorCanvasView.zoom(pct);
+        this.toolbarBottom.bind('editor-zoom', function(evt, pct){
+            this.trigger('zoomChange', pct);
         }.bind(this));
     }
 
-    activeTab(){
+    activeTab(scale){
+        const slider = document.getElementById('editor-zoom');
+        slider.value = scale;
+        this.setScale(scale);
+
         //Unselect all highlighted cells in editor
         this.editorCanvasView.unselectAllCells();
         this.#notEditing();
@@ -209,6 +213,10 @@ class EditorView extends MicroEvent {
 			this.editorCanvasView.setDarkMode('#fff', anim);
 		}
 	};
+
+    setScale(pct) {
+        this.editorCanvasView.zoom(pct);
+    }
 
     //Update sprites from selector
     gather(selectedSprites) {

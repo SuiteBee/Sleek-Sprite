@@ -150,11 +150,6 @@ class SelectorView extends MicroEvent {
 			this.trigger('modeChange', !event.isActive);
 		}.bind(this));
 
-		this.toolbarBottom.bind('percent', function(event) {
-			cssOutput.percentPos = !event.isActive;
-			cssOutput.update();
-		});
-
 		this.toolbarBottom.bind('bg-size', function(event) {
 			cssOutput.bgSize = !event.isActive;
 			cssOutput.update();

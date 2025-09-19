@@ -49,10 +49,12 @@
 
     & [role=slider]{
 
+        width:15%;
+
         & input {
             -webkit-appearance: none;  /* Override default CSS styles */
             appearance: none;
-            width: 10%; /* Full-width */
+            width: 100%; /* Full-width */
             height: 7px; /* Specified height */
             background: #fff; /* Grey background */
             border: 1px solid #888;
@@ -79,6 +81,14 @@
                 cursor: pointer; /* Cursor on hover */
                 @include utils.linear-gradient((top, #d0d0d0, #a7a7a7));
             }
+        }
+
+        &.animate-zoom {
+            float:left;
+        }
+        &.animate-preview-zoom {
+            padding-right: 10px;
+            float:right;
         }
     }
 
@@ -119,6 +129,11 @@
             top: 4px;
             left: 7px;
             @include utils.icon("search", 0px, 20px, 20px);
+        }
+        &.save-anim::before {
+            top: 4px;
+            left: 4px;
+            @include utils.icon("save", 1px, 20px, 20px);
         }
         &.select-none::before {
             @include utils.icon("cancel", 1px);
@@ -220,6 +235,9 @@
             @include utils.icon("nudgeHoriz");	
             @include utils.rotate(270deg);		
         }
+        #animate-name {
+            width: 100px;
+        }
     }
     & [role=select]{
         float:left;
@@ -234,6 +252,9 @@
             cursor: pointer;
             border: 1px solid #888;
             border-radius: 4px;
+        }
+        #saved-animations {
+            width: 100px;
         }
     }
     & [role=checkbox]{
@@ -312,8 +333,9 @@
     @include utils.linear-gradient((top, #fefefe, #b8b8b8));
 }
 
-.edit-selected, .edit-all, .edit-grid {
-    padding: 3px 5px;
+.edit-selected, .edit-all, .edit-grid, .animate-settings, .animations {
+    font-weight: 300;
+    padding: 4px 5px;
     margin: 0 5px 5px 0;
     border: 1px solid #888;
     border-radius: 4px;
