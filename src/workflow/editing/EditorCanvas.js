@@ -98,7 +98,10 @@ export default (function() {
         let s = sprite.src;
         let d = sprite.pos;
 
-        this.context.drawImage(this.srcCanvas, s.x, s.y, s.width, s.height, d.x, d.y, d.width, d.height);
+        this.context.drawImage(
+            this.srcCanvas, s.x, s.y, s.width, s.height, 
+            d.x, d.y, d.width, d.height
+        );
     }
 
     EditorCanvasProto._drawFlipped = function(sprite){
@@ -125,8 +128,10 @@ export default (function() {
         this.context.translate(translateX, translateY);
         this.context.scale(scaleX, scaleY);
 
-        
-        this.context.drawImage(this.srcCanvas, s.x, s.y, s.width, s.height, posX, posY, d.width, d.height);
+        this.context.drawImage(
+            this.srcCanvas, s.x, s.y, s.width, s.height, 
+            posX, posY, d.width, d.height
+        );
         this.context.restore();
     }
 

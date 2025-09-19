@@ -19,6 +19,15 @@ class EditSprite {
 		this.nudgeY = 0;
 	}
 
+	get origin() {
+		return new Rect(
+			this.rect.x - this.cell.x,
+			this.rect.y - this.cell.y,
+			this.rect.width,
+			this.rect.height
+		)
+	}
+
 	get pos() {
 		return new Rect(
 			this.rect.x + this.nudgeX, 

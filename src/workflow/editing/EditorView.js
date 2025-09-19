@@ -94,6 +94,7 @@ class EditorView extends MicroEvent {
         this.toolbarTop.bind('set-all-align', function(evt, option) {
             if(this.editedSprites.length > 0){
                 this.#anchorAll(option);
+
                 this.#place();
                 this.editorCanvasView.unselectAllCells();
             }
@@ -185,6 +186,7 @@ class EditorView extends MicroEvent {
         if(this.refresh){
             //Pack any selected sprites into editedSprites[]
             this.#pack();
+            this.#anchorAll($('#set-all-align').val());
 
             //Set automatic grid dimensions
             if(this.editedSprites.length > 0){

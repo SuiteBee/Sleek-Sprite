@@ -8,18 +8,21 @@ constructor(src, target) {
 
         this.animIndex      = 0;
         this.frames         = [];
-        this.adjustments    = [];
+
         this.handle;
 
         //Animation callback
-        this.draw = function(src, target, rect, adjust) {
-            // the preview canvas has a fixed size and the sprite is resized to fit the preview panel
+        this.draw = function(src, target, frame) {
             const context = target.getContext('2d');
             context.imageSmoothingEnabled = false;
             context.clearRect(0, 0, target.width, target.height);
+
+            let pos = frame.pos;
+            let origin = frame.origin;
+
             context.drawImage(
-                src, rect.x, rect.y, rect.width, rect.height,
-                adjust.x, adjust.y, rect.width, rect.height 
+                src, pos.x, pos.y, pos.width, pos.height,
+                origin.x, origin.y, origin.width, origin.height
             );
         };
     }
@@ -29,12 +32,8 @@ constructor(src, target) {
         this.interval = 1000/fps;
         this.then = Date.now();
 
-        this.frames = sprites.map(s => s.pos);
-        this.adjustments = sprites.map(s => s.nudge);
-
-        let size = sprites[0].cell.width;
-        this.canvas.width = size;
-        this.canvas.height = size;
+        this.frames = sprites;
+        this.canvas.width = this.canvas.height = sprites[0].cell.width;
     }
 
     Update = (fps) => {
@@ -57,17 +56,15 @@ constructor(src, target) {
         self.cancelAnimationFrame(this.handle);
         this.animIndex = 0;
         this.frames = [];
-        this.adjustments = [];
 
         const context = this.canvas.getContext('2d');
         context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     animLoop = () => {
-        var rect = this.frames[this.animIndex];
-        var adjust = this.adjustments[this.animIndex];
-        if(rect){
-            this.draw(this.src, this.canvas, rect, adjust);
+        var frame = this.frames[this.animIndex];
+        if(frame){
+            this.draw(this.src, this.canvas, frame);
         }
 
         let now = Date.now();

@@ -159,6 +159,9 @@
         &.remove-rect::before {
             @include utils.icon("delete", 1px);
         }
+        &.delete-anim::before {
+            @include utils.icon("delete", 1px);
+        }
         &.undo::before {
             @include utils.icon("undo", 1px);
         }

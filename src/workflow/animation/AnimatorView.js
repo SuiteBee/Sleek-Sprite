@@ -6,6 +6,7 @@ import AnimatorCanvasView from './AnimatorCanvasView';
 import MicroEvent from '../../utilities/MicroEvent';
 
 import Animator from './components/Animator';
+import AnimSprite from './components/AnimSprite';
 
 class AnimatorView extends MicroEvent {
     constructor(srcCanvas) {
@@ -19,9 +20,11 @@ class AnimatorView extends MicroEvent {
         this.animatorCanvas       = new AnimatorCanvas(srcCanvas, srcCanvas.grid);
         this.animatorCanvasView   = new AnimatorCanvasView( this.animatorCanvas, $animatorContainer );
 
+        this.name               = 'new0';
         this.fps                = 5;
         this.sprites            = [];
-        this.animation          = new Animator(this.animatorCanvas.canvas, previewCanvas);
+        this.animations         = [];
+        this.animPreview        = new Animator(this.animatorCanvas.canvas, previewCanvas);
 
         this.toolbarTop         = new Toolbar('.animator-tab', '.toolbar-container');
 		this.toolbarBottom      = new Toolbar('.animator-tab', '.toolbar-bottom-container');
@@ -33,10 +36,11 @@ class AnimatorView extends MicroEvent {
 		this.toolbarTop.
             addItem('select-none', 'Unselect All', {noLabel: true}).
             addItem('save-anim', 'Save Current Animation', {noLabel: true}).
+            addItem('delete-anim', 'Delete Saved Animation', {noLabel: true}).
             addItem(
 				new ToolbarGroup('animate-settings').
 					addInput('animate-fps', 'FPS:', '', '3', '5').
-                    addInput('animate-name', 'Name:', '', '10', 'anim')
+                    addInput('animate-name', 'Name:', '', '10', 'new0')
 			).
             addItem(
                 new ToolbarGroup('animations').
@@ -70,13 +74,50 @@ class AnimatorView extends MicroEvent {
         }.bind(this));
 
         this.toolbarBottom.bind('animate-preview-zoom', function(evt, pct){
-            this.animation.zoom(pct);
+            this.animPreview.zoom(pct);
         }.bind(this));
 
         this.toolbarTop.bind('select-none', function(event) {
 			this.animatorCanvasView.unselectAllCells();
 			event.preventDefault();
 		}.bind(this));
+
+        this.toolbarTop.bind('save-anim', function(event) {
+            event.preventDefault();
+            if(this.sprites.length < 2) {return;}
+
+            let frameIndices = this.sprites.map(f => f.n);
+
+            //If animation is already saved replace
+            let exists = this.animations.find((a) => a.name == this.name)
+            if(this.animations.length > 0 && exists){
+                let existingIndex = this.animations.findIndex((a) => a.name == this.name);
+                this.animations[existingIndex] = new AnimSprite(this.name, this.fps, frameIndices);
+            } else {
+                let newAnim = new AnimSprite(this.name, this.fps, frameIndices);
+                this.animations.push(newAnim);
+            }
+ 
+            this.updateAnimations(this.name);
+			event.preventDefault();
+		}.bind(this));
+
+        this.toolbarTop.bind('delete-anim', function(event) {
+			this.animations = this.animations.filter(a => a.name != this.name);
+            this.updateAnimations();
+
+            if(this.animations.length > 0){
+                this.setAnimation(this.animations[0].name);
+            } else{
+                this.animatorCanvasView.unselectAllCells();
+            }
+
+			event.preventDefault();
+		}.bind(this));
+
+        this.toolbarTop.bind('saved-animations', function(evt, option) {
+            this.setAnimation(option);
+        }.bind(this));
 
         this.animatorCanvasView.bind('addFrame', function(sprite) {
 			this.sprites.push(sprite);
@@ -100,17 +141,51 @@ class AnimatorView extends MicroEvent {
                 this.toolbarTop.feedback(`FPS must be a number`);
             } else{  
                 this.fps = newFps;
-                this.animation.Update(this.fps);
+                this.animPreview.Update(this.fps);
             }
+        }.bind(this));
+
+        this.toolbarTop.bind('animate-name', function(evt, txt) {
+            this.name = txt;
         }.bind(this));
     }
 
     animate() {
         if(this.sprites.length == 0) {
-            this.animation.Stop();
+            this.animPreview.Stop();
         } else {
-            this.animation.Queue(this.sprites, this.fps);
-            this.animation.Start();
+            this.animPreview.Queue(this.sprites, this.fps);
+            this.animPreview.Start();
+        }
+    }
+
+    updateAnimations(currentSelection) {
+        let $ddlAnimations = $('#saved-animations');
+        let options = this.animations.map(a => a.name);
+
+        $ddlAnimations.empty();
+
+        for(let i=0; i<options.length;i++){
+			let $option = $(`<option value="${options[i]}">${options[i]}</option>`);
+			$option.appendTo($ddlAnimations);
+		}
+
+        if(currentSelection){
+            $ddlAnimations.val(currentSelection);
+        }
+    }
+
+    setAnimation(option){
+        let selected = this.animations.filter(a => a.name == option)[0];
+        if(selected){
+            $('#animate-name').val(selected.name);
+            this.name = selected.name;
+
+            $('#animate-fps').val(selected.fps);
+            this.fps = selected.fps;
+            this.animPreview.Update(this.fps);
+
+            this.animatorCanvasView.loadAnimation(selected.frames);
         }
     }
 

@@ -1,8 +1,9 @@
 import $ from 'jquery';
 
 import MicroEvent from '../../utilities/MicroEvent';
-import Selected from '../../components/Selected';
 
+import Rect from '../../components/Rect';
+import Selected from '../../components/Selected';
 import Highlight from '../../components/highlight';
 import SelectArea from '../../components/selectArea';
 
@@ -44,25 +45,17 @@ class AnimatorCanvasView extends MicroEvent {
 
 var AnimatorCanvasViewProto = AnimatorCanvasView.prototype;
 
-AnimatorCanvasViewProto._handleSelectedCell = function(clickedRect, sprite) {
-	let scaledRect = sprite.cell.scaled(this._grid.zoomScale);
+AnimatorCanvasViewProto.loadAnimation = function(frames) {
+	this.unselectAllCells()
 
-	const cellSelected = this._selectedCells.findIndex(cell => JSON.stringify(cell.rect) == JSON.stringify(scaledRect));
-	if(cellSelected > -1) {
-		this._selectedCells[cellSelected].unselect();
-		this._selectedCells.splice(cellSelected, 1);
-		this.trigger('removeFrame', sprite);
-	} else {
-		this._selectedCells.push(this._selectCell(clickedRect, scaledRect));
+	for(let i=0; i<frames.length; i++){
+		let index = frames[i];
+		let sprite = this._animatorCanvas.sprites[index];
+
+		let scaledRect = sprite.cell.scaled(this._grid.zoomScale);
+		this._selectedCells.push(this._loadCell(scaledRect));
 		this.trigger('addFrame', sprite);
 	}
-}
-
-AnimatorCanvasViewProto._selectCell = function(clickedRect, cellRect) {
-	const highlight = new Highlight(this._$container);
-	highlight.moveTo(clickedRect); // move to clicked area so the animation starts from click position
-
-	return new Selected(cellRect, highlight);
 }
 
 AnimatorCanvasViewProto.unselectAllCells = function() {
@@ -90,6 +83,35 @@ AnimatorCanvasViewProto.setDarkMode = function(color, anim = true) {
 AnimatorCanvasViewProto.zoom = function(pct) {
 	this.unselectAllCells();
 	this._animatorCanvas.zoom(pct);
+}
+
+AnimatorCanvasViewProto._handleSelectedCell = function(clickedRect, sprite) {
+	let scaledRect = sprite.cell.scaled(this._grid.zoomScale);
+
+	const cellSelected = this._selectedCells.findIndex(cell => JSON.stringify(cell.rect) == JSON.stringify(scaledRect));
+	if(cellSelected > -1) {
+		this._selectedCells[cellSelected].unselect();
+		this._selectedCells.splice(cellSelected, 1);
+		this.trigger('removeFrame', sprite);
+	} else {
+		this._selectedCells.push(this._selectCell(clickedRect, scaledRect));
+		this.trigger('addFrame', sprite);
+	}
+}
+
+AnimatorCanvasViewProto._selectCell = function(clickedRect, cellRect) {
+	const highlight = new Highlight(this._$container);
+	highlight.moveTo(clickedRect); // move to clicked area so the animation starts from click position
+
+	return new Selected(cellRect, highlight);
+}
+
+AnimatorCanvasViewProto._loadCell = function(cellRect) {
+	const highlight = new Highlight(this._$container);
+	const clickedRect = new Rect(cellRect.x, cellRect.y, 1, 1);
+	highlight.moveTo(clickedRect, false);
+
+	return new Selected(cellRect, highlight);
 }
 
 export default AnimatorCanvasView;

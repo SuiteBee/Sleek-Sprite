@@ -188,6 +188,14 @@ class ExporterView extends MicroEvent {
         $lblSeparate.appendTo($spnSeparate);
         $spnSeparate.appendTo(container);
 
+        let $spanAnimations = $('<span></span>');
+        let $chkAnimatinos = $(`<input type="checkbox" class="export-animations" name="export-animations" id="export-animations"/>`);
+        $chkAnimatinos.appendTo($spanAnimations);
+
+        let $lblAnimations = $(`<label>Include Animations</label>`);
+        $lblAnimations.appendTo($spanAnimations);
+        $spanAnimations.appendTo(container);
+
         let $btnExport = $('<button id="export-all">Export</button>');
         $btnExport.appendTo(container);
 
