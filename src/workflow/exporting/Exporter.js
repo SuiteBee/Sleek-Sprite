@@ -1,25 +1,41 @@
 import JSZip from 'jszip';
 
 import ExportSprite from './components/ExportSprite';
+import ExportAnim from './components/ExportAnim';
 import ExportData from './components/ExportData';
 
 export default (function() {
 
-    function Exporter(src) {
+    function Exporter(src, animView) {
         this.src = src;
+        this.anim = animView;
     }
     
     var ExporterProto = Exporter.prototype;
 
-    ExporterProto.getJson = function(sprites, fileName) {
+    ExporterProto.getJson = function(fileName, includeAnimations) {
         let exSprites = [];
 
-        for(let i=0; i<sprites.length; i++){
-            let exSprite = new ExportSprite(sprites[i], sprites[i].name);
+        //Sprite frames
+        for(let i=0; i<this.src.sprites.length; i++){
+            let exSprite = new ExportSprite(this.src.sprites[i], this.src.sprites[i].name);
             exSprites.push(exSprite);
         }
 
+        //Json Object
         let dat = new ExportData(exSprites, fileName, this.src.canvas.width, this.src.canvas.height);
+
+        if(includeAnimations) {
+            let exAnims = [];
+
+            for(let j=0; j<this.anim.animations.length; j++){
+                let exAnim = new ExportAnim(this.anim.animations[j], this.src.sprites);
+                exAnims.push(exAnim);
+            }
+
+            dat.AddAnimations(exAnims);
+        }
+
         return JSON.stringify(dat, null, 2);
     }
 
@@ -74,20 +90,20 @@ export default (function() {
         return zip.generateAsync({type:"base64"});
     }
 
-    ExporterProto.bundleExport = function(name, hasMap, isSeparate) {
+    ExporterProto.bundleExport = function(options) {
         var zip = new JSZip();
 
-        let imgName = name + '.png';
+        let imgName = options.exportName + '.png';
         let imgData = this.getEditorData();
         let imgBase64 = imgData.split(';base64,')[1];
         zip.file(imgName, imgBase64, {base64: true});
 
-        if(hasMap) {
-            let jsonPath = name + '.json';
-            let jsonData = this.getJson(this.src.sprites, imgName);
+        if(options.hasMap) {
+            let jsonPath = options.exportName + '.json';
+            let jsonData = this.getJson(imgName, options.hasAnim);
             let jsonBase64 = btoa(jsonData);
 
-            if(isSeparate){
+            if(options.isSeparate){
                 jsonPath = 'data/' + jsonPath;
             }
 

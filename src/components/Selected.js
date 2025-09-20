@@ -1,4 +1,4 @@
-import Highlight from './highlight';
+import Highlight from '../utilities/highlight';
 
 class Selected {
     constructor(rect, highlight) {

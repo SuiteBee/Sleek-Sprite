@@ -1,4 +1,4 @@
-import MicroEvent from '../utilities/MicroEvent';
+import MicroEvent from './MicroEvent';
 
 export default (function() {
 	

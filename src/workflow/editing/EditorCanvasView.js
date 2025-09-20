@@ -1,10 +1,10 @@
 import $ from 'jquery';
 
-import MicroEvent from '../../utilities/MicroEvent';
 import Selected from '../../components/Selected';
 
-import Highlight from '../../components/highlight';
-import SelectArea from '../../components/selectArea';
+import MicroEvent from '../../utilities/MicroEvent';
+import Highlight from '../../utilities/highlight';
+import SelectArea from '../../utilities/selectArea';
 
 class EditorCanvasView extends MicroEvent {
 	constructor(editorCanvas, $appendToElm) {

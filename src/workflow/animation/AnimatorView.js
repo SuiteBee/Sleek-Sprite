@@ -20,6 +20,8 @@ class AnimatorView extends MicroEvent {
         this.animatorCanvas       = new AnimatorCanvas(srcCanvas, srcCanvas.grid);
         this.animatorCanvasView   = new AnimatorCanvasView( this.animatorCanvas, $animatorContainer );
 
+        this.refresh            = false;
+
         this.name               = 'new0';
         this.fps                = 5;
         this.sprites            = [];
@@ -190,6 +192,12 @@ class AnimatorView extends MicroEvent {
     }
 
     activeTab(scale){
+        if(this.refresh){
+            this.animations = [];
+            this.updateAnimations();
+            this.refresh = false;
+        }
+
         const slider = document.getElementById('animate-zoom');
         slider.value = scale;
         this.setScale(scale);

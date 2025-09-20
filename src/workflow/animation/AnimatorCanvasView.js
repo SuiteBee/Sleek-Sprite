@@ -4,8 +4,9 @@ import MicroEvent from '../../utilities/MicroEvent';
 
 import Rect from '../../components/Rect';
 import Selected from '../../components/Selected';
-import Highlight from '../../components/highlight';
-import SelectArea from '../../components/selectArea';
+
+import Highlight from '../../utilities/highlight';
+import SelectArea from '../../utilities/selectArea';
 
 class AnimatorCanvasView extends MicroEvent {
 	constructor(animatorCanvas, $appendToElm) {

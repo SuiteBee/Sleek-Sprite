@@ -1,24 +1,23 @@
 import $ from 'jquery';
 
 import Exporter from './Exporter';
+import ExportOptions from './components/ExportOptions';
 import MicroEvent from '../../utilities/MicroEvent';
 
 
 class ExporterView extends MicroEvent {
 
-    constructor(editorCanvas) {
+    constructor(editorCanvas, animatorView) {
         super();
 
-        this.exporter            = new Exporter(editorCanvas);
+        this.exporter            = new Exporter(editorCanvas, animatorView);
 		this.$exportContainer    = $('.export-container');
         this.$previewCell        = $('.export-preview-cell');
         this.$optionsCell        = $('.export-options-cell');
         this.editorCanvas        = editorCanvas;
 
         this.refresh             = false;
-        this.exportName          = 'texture';
-        this.hasMap              = true;
-        this.isSeparate          = false;
+        this.options             = new ExportOptions();
 
         this.#buildExportOptions();
     }
@@ -30,8 +29,8 @@ class ExporterView extends MicroEvent {
             this.#buildExportPreview();
 
             $('#export-all').on('click', function() {
-                this.exporter.bundleExport(this.exportName, this.hasMap, this.isSeparate).then(zipped => {
-                    this.exporter.downloadBundle(zipped, this.exportName);
+                this.exporter.bundleExport(this.options).then(zipped => {
+                    this.exporter.downloadBundle(zipped, this.options.exportName);
                 });
             }.bind(this));
 
@@ -57,7 +56,7 @@ class ExporterView extends MicroEvent {
                 }
 
                 this.exporter.bundleDownload(urls, names).then(zipped => {
-                    this.exporter.downloadBundle(zipped, this.exportName);
+                    this.exporter.downloadBundle(zipped, this.options.exportName);
                 });
             }.bind(this));
 
@@ -76,19 +75,29 @@ class ExporterView extends MicroEvent {
 
             $('input.export-json[type=checkbox]').on('change', function(evt) {
                 let $chkJson = $(evt.target);
-                this.hasMap = $chkJson.prop('checked');
+                this.options.hasMap = $chkJson.prop('checked');
 
-                let $chkDependent = $('#export-separate');
-                $chkDependent.prop('disabled', !this.hasMap);
+                //Dependencies
+                let $chkSeparate = $('#export-separate');
+                $chkSeparate.prop('disabled', !this.options.hasMap);
 
-                if(!this.hasMap){
-                    $chkDependent.prop('checked', false);
+                let $chkAnim = $('#export-animations');
+                $chkAnim.prop('disabled', !this.options.hasMap);
+
+                if(!this.options.hasMap){
+                    $chkSeparate.prop('checked', false);
+                    $chkAnim.prop('checked', false);
                 } 
             }.bind(this));
 
              $('input.export-separate[type=checkbox]').on('change', function(evt) {
                 let $chkSeparate = $(evt.target);
-                this.isSeparate = $chkSeparate.prop('checked');
+                this.options.isSeparate = $chkSeparate.prop('checked');
+            }.bind(this));
+
+            $('input.export-animations[type=checkbox]').on('change', function(evt) {
+                let $chkAnim = $(evt.target);
+                this.options.hasAnim = $chkAnim.prop('checked');
             }.bind(this));
 
             this.refresh = false;
@@ -169,7 +178,7 @@ class ExporterView extends MicroEvent {
         let $lblExportName = $(`<label>File Name</label>`).css('font-weight', 'bold');
         $lblExportName.appendTo(container);
 
-        let $txtInput = $(`<input type="text" class="export-name" name="export-name" id="export-name"/><hr>`).val(this.exportName);
+        let $txtInput = $(`<input type="text" class="export-name" name="export-name" id="export-name"/><hr>`).val(this.options.exportName);
         $txtInput.appendTo(container);
 
         let $spnJson = $('<span></span>');

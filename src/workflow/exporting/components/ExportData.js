@@ -14,6 +14,17 @@ class ExportData {
             }, {})
         }
 	}
+
+    AddAnimations(exportAnims) {
+        this.animations = 
+            exportAnims.reduce((accumulator, anim) => {
+                accumulator[anim.name] = {
+                    fps: anim.fps,
+                    frames: anim.frames
+                }
+                return accumulator;
+            }, {});
+    }
 }
 
 export default ExportData;

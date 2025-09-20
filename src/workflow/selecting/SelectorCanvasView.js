@@ -2,11 +2,11 @@ import $ from 'jquery';
 
 import MicroEvent from '../../utilities/MicroEvent';
 import Selected from '../../components/Selected';
-
-import Highlight from '../../components/highlight';
-import SelectArea from '../../components/selectArea';
-import SelectColor from '../../components/selectColor';
 import Rect from '../../components/Rect';
+
+import Highlight from '../../utilities/highlight';
+import SelectArea from '../../utilities/selectArea';
+import SelectColor from '../../utilities/selectColor';
 
 class SelectorCanvasView extends MicroEvent {
 	constructor(spriteCanvas, $appendToElm) {

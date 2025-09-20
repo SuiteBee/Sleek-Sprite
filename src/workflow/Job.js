@@ -16,15 +16,14 @@ class Job {
         this.selector = new SelectorView();
         this.editor   = new EditorView(this.selector.selectorCanvas);
         this.animator = new AnimatorView(this.editor.editorCanvas);
-        this.exporter = new ExporterView(this.editor.editorCanvas);
+        this.exporter = new ExporterView(this.editor.editorCanvas, this.animator);
 
         this.darkMode = false;
         this.scale = 100;
 
         this.selector.bind('spriteChange', function(selectedSprites) {
 			this.editor.gather(selectedSprites);
-            this.editor.refresh = true;
-            this.exporter.refresh = true;
+            this.editor.refresh = this.exporter.refresh = this.animator.refresh = true;
 		}.bind(this));
 
         this.selector.bind('modeChange', function(isDark) {
