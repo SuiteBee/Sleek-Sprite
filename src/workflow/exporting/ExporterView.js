@@ -106,7 +106,7 @@ class ExporterView extends MicroEvent {
 
     #buildExportPreview() {
         var $previewToolbar = $('<div class="toolbar top"></div>'),
-            $lblName = $('<div><h2>Naming</h2></div>'),
+            $lblName = $('<div class="export-label-name"><h2>Naming</h2></div>'),
             
             $tipName = $('<div class="tooltip tipName"></div>'),
             txtTipName = 'Note: Images here may be stretched. This is for display purposes only. Download and export sprites will remain in perspective.',

@@ -102,7 +102,7 @@ class EditorView extends MicroEvent {
 
         this.toolbarTop.bind('invert-bg', function(evt) {
 			this.setMode(!evt.isActive, true);
-			this.trigger('modeChange', !evt.isActive);
+			this.trigger('viewMode', !evt.isActive);
 		}.bind(this));
 
         //Selected Events

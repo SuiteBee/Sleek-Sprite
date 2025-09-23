@@ -85,7 +85,7 @@ EditorCanvasViewProto.setDarkMode = function(color, anim = true) {
 		this._$bgElm.css({ 'background-color': color });
 	}
 	
-	this._highlight.setHighVisOnDark( color === '#000' );
+	this._highlight.setDisplayMode( color === '#000' );
 };
 
 EditorCanvasViewProto.zoom = function(pct) {

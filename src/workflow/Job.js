@@ -1,40 +1,39 @@
 import $ from 'jquery';
 
-import SelectorView from './selecting/SelectorView';
+import Selector from './selecting/Selector';
 import EditorView from './editing/EditorView';
 import AnimatorView from './animation/AnimatorView';
 import ExporterView from './exporting/ExporterView';
 
 class Job {
-
     constructor() {
+        this.selector = new Selector();
+        this.editor   = new EditorView(this.selector.window);
+        this.animator = new AnimatorView(this.editor.editorCanvas);
+        this.exporter = new ExporterView(this.editor.editorCanvas, this.animator);
+
         var $selectorTabBtn = $('#tabSelection'),
             $editorTabBtn   = $('#tabEditor'),
             $animatorTabBtn = $('#tabAnimate'),
             $exportTabBtn   = $('#tabExport');
 
-        this.selector = new SelectorView();
-        this.editor   = new EditorView(this.selector.selectorCanvas);
-        this.animator = new AnimatorView(this.editor.editorCanvas);
-        this.exporter = new ExporterView(this.editor.editorCanvas, this.animator);
-
         this.darkMode = false;
         this.scale = 100;
 
-        this.selector.bind('spriteChange', function(selectedSprites) {
+        this.selector.workspace.bind('selectedSpritesChange', function(selectedSprites) {
 			this.editor.gather(selectedSprites);
             this.editor.refresh = this.exporter.refresh = this.animator.refresh = true;
 		}.bind(this));
 
-        this.selector.bind('modeChange', function(isDark) {
+        this.selector.tools.bind('viewMode', function(isDark) {
 			this.darkMode = isDark;
 		}.bind(this));
 
-        this.editor.bind('modeChange', function(isDark) {
+        this.editor.bind('viewMode', function(isDark) {
 			this.darkMode = isDark;
 		}.bind(this));
 
-        this.animator.bind('modeChange', function(isDark) {
+        this.animator.bind('viewMode', function(isDark) {
 			this.darkMode = isDark;
 		}.bind(this));
 
@@ -50,7 +49,7 @@ class Job {
 
         //Selector tab activated
         $selectorTabBtn.on('click', function() {
-            this.selector.setMode(this.darkMode, false);
+            this.selector.setDisplayMode(this.darkMode);
         }.bind(this));
 
         //Editor tab activated

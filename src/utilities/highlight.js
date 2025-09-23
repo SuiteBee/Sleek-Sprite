@@ -3,6 +3,7 @@ import $ from 'jquery';
 export default (function() {
 	function Highlight($appendTo) {
 		this._$container = $('<div class="highlight"/>').appendTo( $appendTo );
+		this.highVis = false;
 	}
 	
 	var HighlightProto = Highlight.prototype;
@@ -63,8 +64,9 @@ export default (function() {
 		this._$container.remove();
 	}
 	
-	HighlightProto.setHighVisOnDark = function(highVis) {
-		this._$container[highVis ? 'addClass' : 'removeClass']('high-vis');
+	HighlightProto.setDisplayMode = function(dark) {
+		this._$container[dark ? 'addClass' : 'removeClass']('high-vis');
+		this.highVis = dark;
 		return this;
 	}
 	

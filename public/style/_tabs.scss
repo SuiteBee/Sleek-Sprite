@@ -135,9 +135,13 @@
         line-height: 5px;
         margin: 0px;
 
-        .tipName {
-            top: 12px;
-            left: 85px;
+        .export-label-name {
+            padding-left: 10px;
+
+            .tipName {
+                top: 12px;
+                left: 95px;
+            }
         }
     }
 
