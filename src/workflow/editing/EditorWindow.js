@@ -1,42 +1,36 @@
 import Grid from './components/Grid';
+import Window from '../../components/Window';
 
-export default (function() {
+class EditorWindow extends Window {
+    constructor(srcWindow) {
+        super();
 
-	function EditorCanvas(src) {
-		this.canvas = document.createElement('canvas');
-		this.context = this.canvas.getContext('2d');
-
-        this.src = src;
-        this.srcCanvas = src.canvas;
-        this.srcContext = src.canvas.getContext('2d');
-
+        this.src = srcWindow;
         this.grid = new Grid();
         this.sprites = [];
-	}
-	
-	var EditorCanvasProto = EditorCanvas.prototype;
-
-    EditorCanvasProto.reset = function(spriteArr, rows, cols) {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }  
+    
+    init(spriteArr, rows, cols) {
+        this.clear();
 
         this.sprites = spriteArr;
-        this.grid.reset(spriteArr, rows, cols);
+        this.grid.init(spriteArr, rows, cols);
 
-        this.canvas.width = this.grid.width;
-        this.canvas.height = this.grid.height;
+        this.width = this.grid.width;
+        this.height = this.grid.height;
 
         //Disable aliasing (has to be done on each resize or pixels get murdered)
         this.context.imageSmoothingEnabled = false;
     }
 
-    EditorCanvasProto.drawAll = function(showGrid) {
+    drawAll(showGrid) {
         var curX, curY, nCols;
         curX = curY = nCols = 0;
 
-        if(showGrid && this.sprites.length > 0) { this.grid.draw() }
+        if(showGrid) { this.grid.draw() }
         
         for(let i=0; i<this.sprites.length; i++){
-            this._update(i, curX, curY);
+            this.#update(i, curX, curY);
             nCols++;
 
             if(nCols >= this.grid.cols){
@@ -49,22 +43,15 @@ export default (function() {
         }
     }
 
-    EditorCanvasProto.drawSingle = function(n) {
-        this._update(n)
+    drawSingle(n) {
+        this.#update(n)
     }
 
-    EditorCanvasProto.zoom = function(pct){
-        let scl = pct/100;
-        let tOrigin = 'top left';
-        let trans = `scale(${scl}, ${scl})`;
-
-        this.canvas.style.transformOrigin = tOrigin;
-        this.canvas.style.transform = trans;
-
-        this.grid.zoom(scl, tOrigin, trans)
+    setDisplayMode(isDark) {
+        this.grid.setDisplayMode(isDark);
     }
 
-    EditorCanvasProto._fillCell = function(x, y, cellSize) {
+    #fillCell(x, y, cellSize) {
         let bg = this.src.getBg();
 
         //If background is not transparent
@@ -74,7 +61,7 @@ export default (function() {
         }
     }
 
-    EditorCanvasProto._update = function(index, x = -1, y = -1){
+    #update(index, x = -1, y = -1){
         let sprite = this.sprites[index];
         
         //Updating in place
@@ -85,26 +72,26 @@ export default (function() {
         sprite.update(x, y, this.grid.cellSize, previous);
 
         this.context.clearRect(x, y, this.grid.cellSize, this.grid.cellSize);
-        this._fillCell(x, y, this.grid.cellSize);
+        this.#fillCell(x, y, this.grid.cellSize);
 
         if(sprite.flipped){
-            this._drawFlipped(sprite);
+            this.#drawFlipped(sprite);
         }else{
-            this._draw(sprite);
+            this.#draw(sprite);
         }
     }
 
-    EditorCanvasProto._draw = function(sprite){
+    #draw(sprite){
         let s = sprite.src;
         let d = sprite.pos;
 
         this.context.drawImage(
-            this.srcCanvas, s.x, s.y, s.width, s.height, 
+            this.src.canvas, s.x, s.y, s.width, s.height, 
             d.x, d.y, d.width, d.height
         );
     }
 
-    EditorCanvasProto._drawFlipped = function(sprite){
+    #drawFlipped(sprite){
         this.context.save();
 
         let s = sprite.src;
@@ -129,12 +116,12 @@ export default (function() {
         this.context.scale(scaleX, scaleY);
 
         this.context.drawImage(
-            this.srcCanvas, s.x, s.y, s.width, s.height, 
+            this.src.canvas, s.x, s.y, s.width, s.height, 
             posX, posY, d.width, d.height
         );
         this.context.restore();
     }
 
+}
 
-	return EditorCanvas;
-})();
+export default EditorWindow;

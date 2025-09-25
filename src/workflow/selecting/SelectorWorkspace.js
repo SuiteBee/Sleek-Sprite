@@ -11,11 +11,11 @@ import SelectArea from '../../utilities/selectArea';
 import SelectColor from '../../utilities/selectColor';
 
 class SelectorWorkspace extends MicroEvent {
-	constructor(selectorWindow, model) {
+	constructor(selectorWindow, selectedSprites) {
 		super();
 
-		this.selectedSprites = model.selectedSprites;
-		this.history 		 = model.history;
+		this.selected        = selectedSprites;
+		this.history 		 = [];
 
 		var $parent   		 = $('.selection-inner');
 		this.window 		 = selectorWindow;
@@ -40,7 +40,7 @@ class SelectorWorkspace extends MicroEvent {
 			const rect = Object.assign({}, clickedRect);
 
 			//Clicking highlighted rect will unselect
-			let isSelected = selectorWindow.getHighlighted(this.selectedSprites, clickedRect);
+			let isSelected = selectorWindow.getHighlighted(this.selected, clickedRect);
 			if(isSelected) {
 				this.#handleSelectedSprite(clickedRect, isSelected, true);
 			} 
@@ -75,10 +75,10 @@ class SelectorWorkspace extends MicroEvent {
 	}
 
 	findAllSprites(spriteGap) {
-		this.history.push([...this.selectedSprites]);
+		this.history.push([...this.selected]);
 
 		//Find all sprite bounds excluding current selections from search
-		let currentSelections = this.selectedSprites.map(current => current.rect);
+		let currentSelections = this.selected.map(current => current.rect);
 		let selectable = this.window.findAllBounds(Array.from(currentSelections), spriteGap);
 
 		//Filter out the current selections for next step
@@ -87,22 +87,22 @@ class SelectorWorkspace extends MicroEvent {
 		//Highlight and add to selected
 		selectable.forEach(spriteRect => {
 			let clickedRect = new Rect(spriteRect.x, spriteRect.y, 1, 1);
-			this.selectedSprites.push(this.#selectSprite(clickedRect, spriteRect));
+			this.selected.push(this.#selectSprite(clickedRect, spriteRect));
 		});
 
-		this.trigger('selectedSpritesChange', this.selectedSprites);
+		this.trigger('selectedSpritesChange', this.selected);
 	}
 
 	unselectAllSprites(isHistoric = false) {
 		//Store previous state in history
 		if(isHistoric){
-			this.history.push([...this.selectedSprites]);
+			this.history.push([...this.selected]);
 		}
 
-		this.selectedSprites.forEach(sprite => sprite.unselect());
-		this.selectedSprites = [];
+		this.selected.forEach(sprite => sprite.unselect());
+		this.selected = [];
 
-		this.trigger('selectedSpritesChange', this.selectedSprites);
+		this.trigger('selectedSpritesChange', this.selected);
 	}
 
 	setTool(mode) {
@@ -133,8 +133,8 @@ class SelectorWorkspace extends MicroEvent {
 
 		this.highlight.setDisplayMode(isDark);
 
-		for(let i=0; i<this.selectedSprites.length; i++){
-			this.selectedSprites[i].highlight.setDisplayMode(isDark);
+		for(let i=0; i<this.selected.length; i++){
+			this.selected[i].highlight.setDisplayMode(isDark);
 		}
 	}
 
@@ -151,7 +151,7 @@ class SelectorWorkspace extends MicroEvent {
 		let currentState = this.window.getPixels();
 		this.history.push(currentState);
 
-		this.window.pixelsToBg(this.selectedSprites);
+		this.window.pixelsToBg(this.selected);
 		this.unselectAllSprites();
 	}
 
@@ -166,15 +166,15 @@ class SelectorWorkspace extends MicroEvent {
 				this.trigger('bgColorSelect', lastState);
 			} else {
 				this.unselectAllSprites();
-				this.selectedSprites = lastState;
+				this.selected = lastState;
 
-				for(let i=0; i<this.selectedSprites.length; i++){
-					let current = this.selectedSprites[i];
+				for(let i=0; i<this.selected.length; i++){
+					let current = this.selected[i];
 					current.reselect(this.$container);
 					current.highlight.setDisplayMode(this.highlight.highVis);
 				}
 
-				return this.selectedSprites;
+				return this.selected;
 			} 
 		}
 	}
@@ -182,22 +182,22 @@ class SelectorWorkspace extends MicroEvent {
 	#handleSelectedSprite(clickedRect, spriteRect, isHistoric = false) {
 		//Store previous state in history
 		if(isHistoric) {
-			this.history.push([...this.selectedSprites]);
+			this.history.push([...this.selected]);
 		}
 
-		const alreadySelectedSpriteIndex = this.selectedSprites.findIndex(sprite => JSON.stringify(sprite.rect) == JSON.stringify(spriteRect));
+		const alreadySelectedSpriteIndex = this.selected.findIndex(sprite => JSON.stringify(sprite.rect) == JSON.stringify(spriteRect));
 		if(alreadySelectedSpriteIndex > -1) {
-			this.selectedSprites[alreadySelectedSpriteIndex].unselect();
-			this.selectedSprites.splice(alreadySelectedSpriteIndex, 1);
+			this.selected[alreadySelectedSpriteIndex].unselect();
+			this.selected.splice(alreadySelectedSpriteIndex, 1);
 		} else {
-			this.selectedSprites.push(this.#selectSprite(clickedRect, spriteRect));
+			this.selected.push(this.#selectSprite(clickedRect, spriteRect));
 
 			if(spriteRect.width == this.window.width && spriteRect.height == this.window.height){
 				this.trigger('selectedSpriteMatchesCanvas');
 			}
 		}
 
-		this.trigger('selectedSpritesChange', this.selectedSprites);
+		this.trigger('selectedSpritesChange', this.selected);
 	}
 
 	#selectSprite(clickedRect, spriteRect) {

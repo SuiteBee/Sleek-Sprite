@@ -1,28 +1,15 @@
 import $ from 'jquery';
 import { Toolbar, ToolbarGroup } from '../../components/Toolbar';
 
-import EditorCanvas from './EditorCanvas';
-import EditorCanvasView from './EditorCanvasView';
-import EditSprite from './components/EditSprite';
 import MicroEvent from '../../utilities/MicroEvent';
 
-class EditorView extends MicroEvent {
+class EditorTools extends MicroEvent {
 
-    constructor(srcCanvas) {
+    constructor(workspace) {
         super();
-		var $editorContainer    = $('.editor-inner');
-		
-        this.editorCanvas       = new EditorCanvas(srcCanvas);
-        this.editorCanvasView   = new EditorCanvasView( this.editorCanvas, $editorContainer );
 
-        this.refresh            = false;
-
-        this.nRows              = -1;
-        this.nCols              = -1;
-
-        this.selectedSprites    = [];
-        this.editSelected;
-        this.editedSprites      = [];
+        this.workspace          = workspace;
+        this.editSelected       = null;
 
         this.toolbarTop         = new Toolbar('.editor-tab', '.toolbar-container');
 		this.toolbarBottom      = new Toolbar('.editor-tab', '.toolbar-bottom-container');
@@ -68,51 +55,78 @@ class EditorView extends MicroEvent {
 		this.toolbarTop.$container.addClass('top');
 		this.toolbarBottom.$container.addClass('bottom');
 
-        //Toolbar events
+        //////////////////////////////////////////////////
+		//Workspace Events
+		//////////////////////////////////////////////////
+
+        //Cell Selected
+        this.workspace.bind('editCellChange', function(sprite) {
+            this.#editing(sprite);
+        }.bind(this));
+
+        //Cells Unselected
+        this.workspace.bind('editNone', function(){
+            this.clearSelection();
+        }.bind(this));
+
+        //////////////////////////////////////////////////
+		//Toolbar Events (All Cells)
+		//////////////////////////////////////////////////
+
+        //TXT Columns Changed
         this.toolbarTop.bind('set-columns', function(evt, txt) {
             var cols = Number(txt);
            
             if (isNaN(cols) || cols < 0 || cols > 100) {
                 this.toolbarTop.feedback("Columns must be a number between 1-100");
             } else{
-                this.nCols = cols;
-                this.#place();
+                this.trigger('set-columns', cols);
+                this.trigger('place-all');
             }
 		}.bind(this));
 
+        //TXT Rows Changed
         this.toolbarTop.bind('set-rows', function(evt, txt) {
             var rows = Number(txt);
 
             if (isNaN(rows) || rows < 0 || rows > 100) {
                 this.toolbarTop.feedback("Rows must be a number between 1-100");
             } else{
-                this.nRows = rows;
-                this.#place();
+                this.trigger('set-rows', rows);
+                this.trigger('place-all');
             }
 		}.bind(this));
 
+        //DDL Anchor Changed
         this.toolbarTop.bind('set-all-align', function(evt, option) {
-            if(this.editedSprites.length > 0){
-                this.#anchorAll(option);
-
-                this.#place();
-                this.editorCanvasView.unselectAllCells();
-            }
+            this.trigger('set-anchor', option);
+            this.trigger('place-all');
         }.bind(this));
 
+        //BTN Set Dark Mode
         this.toolbarTop.bind('invert-bg', function(evt) {
-			this.setMode(!evt.isActive, true);
+			this.setDisplayMode(!evt.isActive);
 			this.trigger('viewMode', !evt.isActive);
 		}.bind(this));
 
-        //Selected Events
+        //RAD Single Anchor Change 
         this.toolbarTop.bind('edit-anchor', function(evt, option) {
             if(this.editSelected){
                 this.editSelected.anchor = option;
-                this.#placeSingle(this.editSelected.n);
+                this.trigger('place-single', this.editSelected.n);
             }
         }.bind(this));
 
+        //SLD Change Canvas Scale 
+        this.toolbarBottom.bind('editor-zoom', function(evt, pct){
+            this.trigger('zoomChange', pct);
+        }.bind(this));
+
+        //////////////////////////////////////////////////
+		//Toolbar Events (Selected Cell)
+		//////////////////////////////////////////////////
+
+        //TXT X Nudge Pos Changed
         this.toolbarTop.bind('edit-x', function(evt, txt) {
             if(this.editSelected){
                 var newX = Number(txt);
@@ -123,11 +137,12 @@ class EditorView extends MicroEvent {
                     this.toolbarTop.feedback(`Must be within cell bounds: ${this.editSelected.xRangeStr}`);
                 } else{  
                     this.editSelected.nudgeX = newX;
-                    this.#placeSingle(this.editSelected.n);
+                    this.trigger('place-single', this.editSelected.n);
                 }
             }
         }.bind(this));
 
+        //TXT Y Nudge Pos Changed
         this.toolbarTop.bind('edit-y', function(evt, txt) {
             if(this.editSelected){
                 var newY = Number(txt);
@@ -138,91 +153,61 @@ class EditorView extends MicroEvent {
                     this.toolbarTop.feedback(`Must be within cell bounds: ${this.editSelected.yRangeStr}`);
                 } else{
                     this.editSelected.nudgeY = newY;
-                    this.#placeSingle(this.editSelected.n);
+                    this.trigger('place-single', this.editSelected.n);
                 }
             }
         }.bind(this));
 
+        //CHK Flip X-Axis
         this.toolbarTop.bind('edit-flip-x', function(evt, chk) {
             if(this.editSelected){
                 this.editSelected.flipX = chk;
-                this.#placeSingle(this.editSelected.n);
+                this.trigger('place-single', this.editSelected.n);
             }
         }.bind(this));
 
+        //CHK Flip Y-Axis
         this.toolbarTop.bind('edit-flip-y', function(evt, chk) {
             if(this.editSelected){
                 this.editSelected.flipY = chk;
-                this.#placeSingle(this.editSelected.n);
+                this.trigger('place-single', this.editSelected.n);
             }
-        }.bind(this));
-
-        //Cell selected
-        this.editorCanvasView.bind('editCellChange', function(sprite) {
-            this.#editing(sprite);
-        }.bind(this));
-
-        //Cells unselected
-        this.editorCanvasView.bind('editNone', function(){
-            this.#notEditing();
-        }.bind(this));
-
-        //Zoom 
-        this.toolbarBottom.bind('editor-zoom', function(evt, pct){
-            this.trigger('zoomChange', pct);
         }.bind(this));
     }
 
-    activeTab(scale){
-        const slider = document.getElementById('editor-zoom');
-        slider.value = scale;
-        this.setScale(scale);
+    init(nEdited){
+        let anchorPos = $('#set-all-align').val();
+        this.trigger('set-anchor', anchorPos);
 
-        //Unselect all highlighted cells in editor
-        this.editorCanvasView.unselectAllCells();
-        this.#notEditing();
+        //Set automatic grid dimensions
+        if(nEdited > 0){
+            let nearestRoot = Math.sqrt(nEdited);
+            let nearestSquare = Math.ceil(nearestRoot);
 
-        //Don't redraw grid unless sprite selection changed
-        if(this.refresh){
-            //Pack any selected sprites into editedSprites[]
-            this.#pack();
-            this.#anchorAll($('#set-all-align').val());
+            $('#set-rows').val(nearestSquare.toString());
+            $('#set-columns').val(nearestSquare.toString());
 
-            //Set automatic grid dimensions
-            if(this.editedSprites.length > 0){
-                let nearestRoot = Math.sqrt(this.editedSprites.length);
-                let nearestSquare = Math.ceil(nearestRoot);
-
-                $('#set-rows').val(nearestSquare.toString());
-                $('#set-columns').val(nearestSquare.toString());
-
-                this.nRows = nearestSquare;
-                this.nCols = nearestSquare;
-            }
-
-            //Draw sliced sprites in editor
-            this.#place();
-            this.refresh = false;
+            this.trigger('set-rows', nearestSquare);
+            this.trigger('set-columns', nearestSquare);
         }
     }
 
-    setMode(dark, anim){
-		if(dark){
+    setScale(pct) {
+        const slider = document.getElementById('editor-zoom');
+        slider.value = pct;
+    }
+
+    setDisplayMode(isDark){
+		if(isDark){
 			this.toolbarTop.activate('invert-bg');
-			this.editorCanvasView.setDarkMode('#000', anim);
 		} else{
 			this.toolbarTop.deactivate('invert-bg');
-			this.editorCanvasView.setDarkMode('#fff', anim);
 		}
 	};
 
-    setScale(pct) {
-        this.editorCanvasView.zoom(pct);
-    }
-
-    //Update sprites from selector
-    gather(selectedSprites) {
-        this.selectedSprites = selectedSprites;
+    clearSelection(){
+        this.editSelected = null;
+        $('.edit-selected').hide();
     }
 
     #editing(sprite){
@@ -241,37 +226,6 @@ class EditorView extends MicroEvent {
         }
         $('.edit-selected').show();
     }
-
-    #notEditing(){
-        this.editSelected = null;
-        $('.edit-selected').hide();
-    }
-
-    //Pack selected sprites into an object array
-    #pack() {
-        this.editedSprites = [];
-        
-        this.selectedSprites.forEach(function(sprite, i) {
-            this.editedSprites.push(new EditSprite(sprite.rect, i));
-        }.bind(this)); 
-    }
-
-    //Place sprites from editedSprites array onto editor canvas and draw a grid
-    #place() {
-        this.editorCanvas.reset(this.editedSprites, this.nRows, this.nCols);
-        this.editorCanvas.drawAll(true); 
-    }
-
-    #placeSingle(index) {
-        this.editorCanvas.drawSingle(index);
-    }
-
-    #anchorAll(anchorPos) {
-        this.editedSprites.forEach(function(sprite) {
-            sprite.anchor = anchorPos;
-            sprite.nudgeY = 0;
-        }.bind(this)); 
-    }
 }
 
-export default EditorView;
+export default EditorTools;

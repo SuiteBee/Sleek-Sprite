@@ -8,10 +8,10 @@ import SelectorTools from './SelectorTools';
 class Selector {
 
 	constructor() {
-        this.model     = new SelectorModel();
+        this.selected  = [];
+
         this.window    = new SelectorWindow();
-        
-        this.workspace = new SelectorWorkspace(this.window, this.model);
+        this.workspace = new SelectorWorkspace(this.window, this.selected);
         this.tools     = new SelectorTools(this.workspace);
 
         //Prepare animations
@@ -46,13 +46,6 @@ class Selector {
     setDisplayMode(isDark) {
         this.tools.setDisplayMode(isDark);
         this.workspace.setDisplayMode(isDark, false);
-    }
-}
-
-class SelectorModel {
-    constructor() {
-        this.selectedSprites = [];
-        this.history = [];
     }
 }
 

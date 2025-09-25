@@ -1,80 +1,76 @@
+import Window from '../../../components/Window';
 
-class Grid {
+class Grid extends Window {
     constructor() {
-        this.canvas = document.createElement('canvas');
-        this.context = this.canvas.getContext('2d');
+        super();
 
-        this.width = 0;
-        this.height = 0;
+        this.color = 'black';
         this.cellSize = 0;
+
         this.rows = 0;
         this.cols = 0;
-
-        this.zoomScale = 1;
-    }
-}
-
-var GridProto = Grid.prototype;
-
-GridProto.reset = function(spriteArr, rows, columns) {
-    this.context.clearRect(0, 0, this.width, this.height);
-
-    //Get the max size of the selected sprites width and height
-    var maxWidth = Math.max(...spriteArr.map(sprite => sprite.rect.width));
-    var maxHeight = Math.max(...spriteArr.map(sprite => sprite.rect.height));
-
-    //Set cell size (square) to the largest dimension
-    this.cellSize = Math.max(maxWidth, maxHeight);
-
-    this.width = this.cellSize * columns;
-    this.height = this.cellSize * rows;
-
-    this.rows = rows;
-    this.cols = columns;
-
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
-}
-
-GridProto.draw = function() {
-    this.context.strokeStyle = 'black'; // Grid line color
-    this.context.lineWidth = 1; // Grid line thickness
-
-    // Draw vertical lines
-    for (let x = 0; x <= this.width; x += this.cellSize) {
-        this.context.beginPath();
-        this.context.moveTo(x, 0);
-        this.context.lineTo(x, this.height);
-        this.context.stroke();
     }
 
-    // Draw horizontal lines
-    for (let y = 0; y <= this.height; y += this.cellSize) {
-        this.context.beginPath();
-        this.context.moveTo(0, y);
-        this.context.lineTo(this.width, y);
-        this.context.stroke();
+    init(spriteArr, rows, columns) {
+        if(!spriteArr.length) { this.cellSize = 0; return; }
+
+        //Get the max size of the selected sprites width and height
+        var maxWidth = Math.max(...spriteArr.map(sprite => sprite.rect.width));
+        var maxHeight = Math.max(...spriteArr.map(sprite => sprite.rect.height));
+
+        //Set cell size (square) to the largest dimension
+        this.cellSize = Math.max(maxWidth, maxHeight);
+
+        this.width = this.cellSize * columns;
+        this.height = this.cellSize * rows;
+
+        this.rows = rows;
+        this.cols = columns;
     }
-}
+        
+    draw() {
+        this.clear();
 
-GridProto.find = function(mousePos) {
-    let scaledWidth  = this.width * this.zoomScale,
-        scaledHeight = this.height * this.zoomScale,
-        scaledCell   = this.cellSize * this.zoomScale;
+        this.context.strokeStyle = this.color; // Grid line color
+        this.context.lineWidth = 1; // Grid line thickness
 
-    if(mousePos.x <= scaledWidth && mousePos.y <= scaledHeight){
-        let findCol = Math.floor(mousePos.x / scaledCell);
-        let findRow = Math.floor(mousePos.y / scaledCell);
+        if(!this.cellSize) {return}
 
-        let i = (findRow * this.cols) + findCol;
-        return i;
+        // Draw vertical lines
+        for (let x = 0; x <= this.width; x += this.cellSize) {
+            this.context.beginPath();
+            this.context.moveTo(x, 0);
+            this.context.lineTo(x, this.height);
+            this.context.stroke();
+        }
+
+        // Draw horizontal lines
+        for (let y = 0; y <= this.height; y += this.cellSize) {
+            this.context.beginPath();
+            this.context.moveTo(0, y);
+            this.context.lineTo(this.width, y);
+            this.context.stroke();
+        }
     }
-}
 
-GridProto.zoom = function(scl, origin, transform) {
-    this.zoomScale = scl;
-    this.canvas.style.transformOrigin = origin;
-    this.canvas.style.transform = transform;
+    find(mousePos) {
+        let scaledWidth  = this.width * this.scale,
+            scaledHeight = this.height * this.scale,
+            scaledCell   = this.cellSize * this.scale;
+
+        if(mousePos.x <= scaledWidth && mousePos.y <= scaledHeight){
+            let findCol = Math.floor(mousePos.x / scaledCell);
+            let findRow = Math.floor(mousePos.y / scaledCell);
+
+            let i = (findRow * this.cols) + findCol;
+            return i;
+        }
+    }
+
+    setDisplayMode(isDark) {
+        this.color = isDark ? 'white' : 'black';
+        this.draw();
+    }
 }
 
 export default Grid;

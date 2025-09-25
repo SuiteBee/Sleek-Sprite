@@ -1,16 +1,16 @@
 import $ from 'jquery';
 
 import Selector from './selecting/Selector';
-import EditorView from './editing/EditorView';
+import Editor from './editing/Editor';
 import AnimatorView from './animation/AnimatorView';
 import ExporterView from './exporting/ExporterView';
 
 class Job {
     constructor() {
         this.selector = new Selector();
-        this.editor   = new EditorView(this.selector.window);
-        this.animator = new AnimatorView(this.editor.editorCanvas);
-        this.exporter = new ExporterView(this.editor.editorCanvas, this.animator);
+        this.editor   = new Editor(this.selector.window);
+        this.animator = new AnimatorView(this.editor.window);
+        this.exporter = new ExporterView(this.editor.window, this.animator);
 
         var $selectorTabBtn = $('#tabSelection'),
             $editorTabBtn   = $('#tabEditor'),
@@ -21,7 +21,7 @@ class Job {
         this.scale = 100;
 
         this.selector.workspace.bind('selectedSpritesChange', function(selectedSprites) {
-			this.editor.gather(selectedSprites);
+			this.editor.init(selectedSprites);
             this.editor.refresh = this.exporter.refresh = this.animator.refresh = true;
 		}.bind(this));
 
@@ -29,7 +29,7 @@ class Job {
 			this.darkMode = isDark;
 		}.bind(this));
 
-        this.editor.bind('viewMode', function(isDark) {
+        this.editor.tools.bind('viewMode', function(isDark) {
 			this.darkMode = isDark;
 		}.bind(this));
 
@@ -37,7 +37,7 @@ class Job {
 			this.darkMode = isDark;
 		}.bind(this));
 
-        this.editor.bind('zoomChange', function(pct) {
+        this.editor.tools.bind('zoomChange', function(pct) {
             this.scale = pct;
             this.editor.setScale(this.scale);
         }.bind(this));
@@ -54,8 +54,9 @@ class Job {
 
         //Editor tab activated
         $editorTabBtn.on('click', function() {
-            this.editor.setMode(this.darkMode, false);
-            this.editor.activeTab(this.scale);
+            this.editor.setDisplayMode(this.darkMode);
+            this.editor.setScale(this.scale);
+            this.editor.activeTab();
         }.bind(this));
 
         //Animator tab activated
