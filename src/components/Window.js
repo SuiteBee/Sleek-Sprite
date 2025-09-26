@@ -2,8 +2,13 @@ class Window {
     
     #bgColor;
     
-	constructor() {
-		this.canvas = document.createElement('canvas');
+	constructor(target) {
+		if(target) {
+			this.canvas = target;
+		} else {
+			this.canvas = document.createElement('canvas');
+		}
+
 		this.context = this.canvas.getContext('2d');
 		this.#bgColor = [0, 0, 0, 0];
 

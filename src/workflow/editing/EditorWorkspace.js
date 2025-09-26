@@ -1,20 +1,20 @@
 import $ from 'jquery';
 
-import Selected from '../../components/Selected';
+import ActiveSprite from '../../components/ActiveSprite';
 
 import MicroEvent from '../../utilities/MicroEvent';
 import Highlight from '../../utilities/highlight';
 import SelectArea from '../../utilities/selectArea';
 
 class EditorWorkspace extends MicroEvent {
-	constructor(editorWindow, selectedCell ) {
+	constructor(editorWindow) {
 		super();
 
-		this.selected   = selectedCell;
+		this.selected   = [];
+		this.window     = editorWindow;
 
 		var $parent     = $('.editor-inner');
-		this.window     = editorWindow;
-		
+
 		this.$container = $('<div class="editor-canvas-container"/>');
 		this.$canvas    = this.$container.append($(editorWindow.canvas)).append($(editorWindow.grid.canvas));
 		this.$canvasBg  = $parent;
@@ -27,24 +27,21 @@ class EditorWorkspace extends MicroEvent {
 
 		this.selectArea.bind('select', function (clickedRect) {
 			const rect = Object.assign({}, clickedRect);
-			let index = this.window.grid.find(rect);
-
-            if(index >= 0 && index < this.window.sprites.length){
-				let sprite = this.window.sprites[index];
-                this.#handleSelectedCell(clickedRect, sprite);
-            }else{
-                this.unselectAllCells()
-            }
+			let idx = this.window.grid.find(rect);
+			this.trigger('click-cell', clickedRect, idx);
 		}.bind(this));
+	}
+
+	selectCell(click, sprite) {
+		this.#handleSelectedCell(click, sprite);
 	}
 
 	unselectAllCells() {
 		if(this.selected.length > 0) {
 			this.selected.forEach(cell => cell.unselect());
 			this.selected = [];
-
-			this.trigger('editNone');
 		}
+		this.trigger('editNone');
 	}
 
 	setDisplayMode(isDark, anim = true) {
@@ -83,17 +80,18 @@ class EditorWorkspace extends MicroEvent {
 		} else {
 			this.unselectAllCells();
 
-			this.selected.push(this.#selectCell(clickedRect, scaledRect));
+			let cell = this.#getActiveCell(clickedRect, scaledRect);
+			this.selected.push(cell);
 			this.trigger('editCellChange', sprite);
 		}
 	}
 
-	#selectCell(clickedRect, cellRect) {
+	#getActiveCell(clickedRect, cellRect) {
 		const bbox = new Highlight(this.$container);
 		bbox.setDisplayMode(this.highlight.highVis);
 		bbox.moveTo(clickedRect); // move to clicked area so the animation starts from click position
 
-		return new Selected(cellRect, bbox);
+		return new ActiveSprite(cellRect, bbox);
 	}
 
 }

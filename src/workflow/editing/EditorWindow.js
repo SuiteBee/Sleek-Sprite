@@ -7,14 +7,12 @@ class EditorWindow extends Window {
 
         this.src = srcWindow;
         this.grid = new Grid();
-        this.sprites = [];
     }  
     
-    init(spriteArr, rows, cols) {
+    init(editedArr, rows, cols) {
         this.clear();
 
-        this.sprites = spriteArr;
-        this.grid.init(spriteArr, rows, cols);
+        this.grid.init(editedArr, rows, cols);
 
         this.width = this.grid.width;
         this.height = this.grid.height;
@@ -23,14 +21,17 @@ class EditorWindow extends Window {
         this.context.imageSmoothingEnabled = false;
     }
 
-    drawAll(showGrid) {
+    drawAll(editedArr, showGrid) {
         var curX, curY, nCols;
         curX = curY = nCols = 0;
 
         if(showGrid) { this.grid.draw() }
         
-        for(let i=0; i<this.sprites.length; i++){
-            this.#update(i, curX, curY);
+        for(let i=0; i<editedArr.length; i++){
+            let sprite = editedArr[i];
+            let previous = i > 0 ? editedArr[i-1] : sprite;
+            this.#update(sprite, previous, curX, curY);
+            
             nCols++;
 
             if(nCols >= this.grid.cols){
@@ -43,8 +44,8 @@ class EditorWindow extends Window {
         }
     }
 
-    drawSingle(n) {
-        this.#update(n)
+    drawSingle(sprite, previous) {
+        this.#update(sprite, previous)
     }
 
     setDisplayMode(isDark) {
@@ -61,14 +62,11 @@ class EditorWindow extends Window {
         }
     }
 
-    #update(index, x = -1, y = -1){
-        let sprite = this.sprites[index];
-        
+    #update(sprite, previous, x = -1, y = -1){
         //Updating in place
         if((x + y) < 0){ x = sprite.cell.x, y = sprite.cell.y }
 
         //Update sprite rect and cell rect
-        let previous = index > 0 ? this.sprites[index-1] : sprite;
         sprite.update(x, y, this.grid.cellSize, previous);
 
         this.context.clearRect(x, y, this.grid.cellSize, this.grid.cellSize);

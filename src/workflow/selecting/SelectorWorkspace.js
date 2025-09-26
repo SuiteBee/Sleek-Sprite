@@ -3,7 +3,7 @@ import $ from 'jquery';
 import MicroEvent from '../../utilities/MicroEvent';
 import ImgInput from '../../utilities/ImgInput';
 
-import Selected from '../../components/Selected';
+import ActiveSprite from '../../components/ActiveSprite';
 import Rect from '../../components/Rect';
 
 import Highlight from '../../utilities/highlight';
@@ -87,7 +87,9 @@ class SelectorWorkspace extends MicroEvent {
 		//Highlight and add to selected
 		selectable.forEach(spriteRect => {
 			let clickedRect = new Rect(spriteRect.x, spriteRect.y, 1, 1);
-			this.selected.push(this.#selectSprite(clickedRect, spriteRect));
+			let activeSprite = this.#getActiveSprite(clickedRect, spriteRect);
+
+			this.selected.push(activeSprite);
 		});
 
 		this.trigger('selectedSpritesChange', this.selected);
@@ -190,7 +192,9 @@ class SelectorWorkspace extends MicroEvent {
 			this.selected[alreadySelectedSpriteIndex].unselect();
 			this.selected.splice(alreadySelectedSpriteIndex, 1);
 		} else {
-			this.selected.push(this.#selectSprite(clickedRect, spriteRect));
+
+			let activeSprite = this.#getActiveSprite(clickedRect, spriteRect);
+			this.selected.push(activeSprite);
 
 			if(spriteRect.width == this.window.width && spriteRect.height == this.window.height){
 				this.trigger('selectedSpriteMatchesCanvas');
@@ -200,12 +204,12 @@ class SelectorWorkspace extends MicroEvent {
 		this.trigger('selectedSpritesChange', this.selected);
 	}
 
-	#selectSprite(clickedRect, spriteRect) {
+	#getActiveSprite(clickedRect, spriteRect) {
 		const bbox = new Highlight(this.$container);
 		bbox.setDisplayMode(this.highlight.highVis);
 		bbox.moveTo(clickedRect); // move to clicked area so the animation starts from click position
 
-		return new Selected(spriteRect, bbox);
+		return new ActiveSprite(spriteRect, bbox);
 	}
 }
 

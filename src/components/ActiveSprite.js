@@ -1,6 +1,6 @@
 import Highlight from '../utilities/highlight';
 
-class Selected {
+class ActiveSprite {
     constructor(rect, highlight) {
         this.rect = rect;
         this.highlight = highlight;
@@ -9,19 +9,19 @@ class Selected {
     }
 }
 
-Selected.prototype.unselect = function() {
+ActiveSprite.prototype.unselect = function() {
     this.highlight.remove();
 }
 
-Selected.prototype.selectNew = function(newRect) {
+ActiveSprite.prototype.selectNew = function(newRect) {
     this.rect = newRect;
     this.highlight.moveTo(newRect, true);
 }
 
-Selected.prototype.reselect = function(container) {
+ActiveSprite.prototype.reselect = function(container) {
     const highlight = new Highlight(container);
     this.highlight = highlight;
     this.highlight.moveTo(this.rect, false);
 }
 
-export default Selected;
+export default ActiveSprite;

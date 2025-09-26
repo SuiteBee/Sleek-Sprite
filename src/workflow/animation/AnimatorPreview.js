@@ -1,8 +1,11 @@
-class Animator {
+import Window from '../../components/Window';
+
+class AnimatorPreview extends Window {
 
 constructor(src, target) {
+        super(target);
+
         this.src            = src;
-        this.canvas         = target;
         this.interval       = 0;
         this.then           = Date.now();
 
@@ -12,59 +15,57 @@ constructor(src, target) {
         this.handle;
 
         //Animation callback
-        this.draw = function(src, target, frame) {
-            const context = target.getContext('2d');
-            context.imageSmoothingEnabled = false;
-            context.clearRect(0, 0, target.width, target.height);
+        this.draw = function(src, frame) {
+            this.clear();
 
             let pos = frame.pos;
             let origin = frame.origin;
 
-            context.drawImage(
+            this.context.imageSmoothingEnabled = false;
+            this.context.drawImage(
                 src, pos.x, pos.y, pos.width, pos.height,
                 origin.x, origin.y, origin.width, origin.height
             );
         };
     }
 
-    Queue = (sprites, fps) => {
+    Queue(sprites, fps) {
         this.Stop();
         this.interval = 1000/fps;
         this.then = Date.now();
 
         this.frames = sprites;
-        this.canvas.width = this.canvas.height = sprites[0].cell.width;
+        this.width = this.height = sprites[0].cell.width;
     }
 
-    Update = (fps) => {
+    Update(fps) {
         this.Pause();
         this.interval = 1000/fps;
         this.then = Date.now();
         this.Start();
     }
 
-    Pause = () => {
+    Pause() {
         self.cancelAnimationFrame(this.handle);
     }
 
-    Start = () => {
+    Start() {
         this.animIndex = 0;
-        this.animLoop();
+        this.#animLoop();
     }
 
-    Stop = () => {
+    Stop() {
         self.cancelAnimationFrame(this.handle);
         this.animIndex = 0;
         this.frames = [];
 
-        const context = this.canvas.getContext('2d');
-        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.clear();
     }
 
-    animLoop = () => {
+    #animLoop = () => {
         var frame = this.frames[this.animIndex];
         if(frame){
-            this.draw(this.src, this.canvas, frame);
+            this.draw(this.src, frame);
         }
 
         let now = Date.now();
@@ -75,18 +76,9 @@ constructor(src, target) {
             this.animIndex = (this.animIndex + 1) % this.frames.length;
         }
 
-        this.handle = self.requestAnimationFrame(this.animLoop);
-    }
-
-    zoom = function(pct){
-        let scl = pct/100;
-        let tOrigin = 'top right';
-        let trans = `scale(${scl}, ${scl})`;
-
-        this.canvas.style.transformOrigin = tOrigin;
-        this.canvas.style.transform = trans;
+        this.handle = self.requestAnimationFrame(this.#animLoop);
     }
 
 }
 
-export default Animator;
+export default AnimatorPreview;

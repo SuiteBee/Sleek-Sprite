@@ -2,14 +2,14 @@ import $ from 'jquery';
 
 import Selector from './selecting/Selector';
 import Editor from './editing/Editor';
-import AnimatorView from './animation/AnimatorView';
+import Animator from './animation/Animator';
 import ExporterView from './exporting/ExporterView';
 
 class Job {
     constructor() {
         this.selector = new Selector();
         this.editor   = new Editor(this.selector.window);
-        this.animator = new AnimatorView(this.editor.window);
+        this.animator = new Animator(this.editor.window);
         this.exporter = new ExporterView(this.editor.window, this.animator);
 
         var $selectorTabBtn = $('#tabSelection'),
@@ -33,7 +33,7 @@ class Job {
 			this.darkMode = isDark;
 		}.bind(this));
 
-        this.animator.bind('viewMode', function(isDark) {
+        this.animator.tools.bind('viewMode', function(isDark) {
 			this.darkMode = isDark;
 		}.bind(this));
 
@@ -42,7 +42,7 @@ class Job {
             this.editor.setScale(this.scale);
         }.bind(this));
 
-        this.animator.bind('zoomChange', function(pct) {
+        this.animator.tools.bind('zoomChange', function(pct) {
             this.scale = pct;
             this.animator.setScale(this.scale);
         }.bind(this));
@@ -64,8 +64,9 @@ class Job {
             if(this.editor.refresh){
                 this.editor.activeTab();
             }
-            this.animator.setMode(this.darkMode, false);
-            this.animator.activeTab(this.scale);
+            this.animator.setDisplayMode(this.darkMode);
+            this.animator.setScale(this.scale);
+            this.animator.activeTab(this.editor.edited);
         }.bind(this));
 
         //Exporter tab activated

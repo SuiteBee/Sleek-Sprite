@@ -15,7 +15,7 @@ class Editor {
         this.cols      = 0;
 
         this.window    = new EditorWindow(selectorWindow);
-        this.workspace = new EditorWorkspace(this.window, this.edited);
+        this.workspace = new EditorWorkspace(this.window);
         this.tools     = new EditorTools(this.workspace);
 
         this.tools.bind('viewMode', function(isDark) {
@@ -41,6 +41,15 @@ class Editor {
 
         this.tools.bind('place-single', function(idx) {
             this.#placeSingleSprite(idx);
+        }.bind(this));
+
+        this.workspace.bind('click-cell', function(click, idx) {
+            if(idx >= 0 && idx < this.edited.length){
+				let sprite = this.edited[idx];
+                this.workspace.selectCell(click, sprite);
+            }else{
+                this.workspace.unselectAllCells();
+            }
         }.bind(this));
     }
 
@@ -85,11 +94,13 @@ class Editor {
         this.workspace.unselectAllCells();
 
         this.window.init(this.edited, this.rows, this.cols);
-        this.window.drawAll(true); 
+        this.window.drawAll(this.edited, true); 
     }
 
     #placeSingleSprite(idx) {
-        this.window.drawSingle(idx);
+        let sprite = this.edited[idx];
+        let previous = idx > 0 ? this.edited[idx-1] : sprite;
+        this.window.drawSingle(sprite, previous);
     }
 
     #anchorAll(anchorPos) {

@@ -203,7 +203,7 @@ class EditorTools extends MicroEvent {
 		} else{
 			this.toolbarTop.deactivate('invert-bg');
 		}
-	};
+	}
 
     clearSelection(){
         this.editSelected = null;

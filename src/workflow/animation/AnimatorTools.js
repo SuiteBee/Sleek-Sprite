@@ -1,0 +1,134 @@
+import $ from 'jquery';
+import { Toolbar, ToolbarGroup } from '../../components/Toolbar';
+
+import MicroEvent from '../../utilities/MicroEvent';
+
+class AnimatorTools extends MicroEvent {
+    constructor(workspace) {
+        super();
+
+        this.workspace          = workspace;
+
+        this.toolbarTop         = new Toolbar('.animator-tab', '.toolbar-container');
+		this.toolbarBottom      = new Toolbar('.animator-tab', '.toolbar-bottom-container');
+
+         //Animator tools
+		this.toolbarTop.
+            addItem('select-none', 'Unselect All', {noLabel: true}).
+            addItem('save-anim', 'Save Current Animation', {noLabel: true}).
+            addItem('delete-anim', 'Delete Saved Animation', {noLabel: true}).
+            addItem(
+				new ToolbarGroup('animate-settings').
+					addInput('animate-fps', 'FPS:', '', '3', '5').
+                    addInput('animate-name', 'Name:', '', '10', 'new0')
+			).
+            addItem(
+                new ToolbarGroup('animations').
+                addDropDown(
+                    'saved-animations', 
+                    'Animations:',
+                    ''
+                )
+            ).
+            addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
+
+        this.toolbarBottom.
+            addSlider('animate-zoom', '0', '200', '100').
+            addSlider('animate-preview-zoom', '0', '500', '100');
+
+        this.toolbarTop.$container.addClass('top');
+		this.toolbarBottom.$container.addClass('bottom');
+
+        this.toolbarTop.bind('invert-bg', function(evt) {
+			this.setDisplayMode(!evt.isActive);
+			this.trigger('viewMode', !evt.isActive);
+		}.bind(this));
+
+        this.toolbarBottom.bind('animate-zoom', function(evt, pct){
+            this.trigger('zoomChange', pct);
+        }.bind(this));
+
+        this.toolbarBottom.bind('animate-preview-zoom', function(evt, pct){
+            this.workspace.preview.zoom(pct, 'top right');
+        }.bind(this));
+
+        this.toolbarTop.bind('select-none', function(event) {
+			this.workspace.unselectAllCells();
+			event.preventDefault();
+		}.bind(this));
+
+        this.toolbarTop.bind('save-anim', function(event) {
+            event.preventDefault();
+            this.trigger('save-anim');
+		}.bind(this));
+
+        this.toolbarTop.bind('delete-anim', function(event) {
+			this.trigger('delete-anim');
+			event.preventDefault();
+		}.bind(this));
+
+        this.toolbarTop.bind('saved-animations', function(evt, option) {
+            this.trigger('load-anim', option);
+        }.bind(this));
+
+        this.workspace.bind('addFrame', function(sprite) {
+			this.trigger('add-frame', sprite);
+		}.bind(this));
+
+        this.workspace.bind('removeFrame', function(sprite) {
+			this.trigger('remove-frame', sprite);
+		}.bind(this));
+
+        this.workspace.bind('removeAllFrames', function() {
+			this.trigger('remove-all');
+		}.bind(this));
+
+        this.toolbarTop.bind('animate-fps', function(evt, txt) {
+            var newFps = Number(txt);
+            
+            if(isNaN(newFps)){
+                this.toolbarTop.feedback(`FPS must be a number`);
+            } else{  
+                this.trigger('set-fps', newFps);
+            }
+        }.bind(this));
+
+        this.toolbarTop.bind('animate-name', function(evt, txt) {
+            this.trigger('set-name', txt);
+        }.bind(this));
+    }
+
+    updateAnimations(options, currentSelection) {
+        let $ddlAnimations = $('#saved-animations');
+        $ddlAnimations.empty();
+
+        for(let i=0; i<options.length;i++){
+			let $option = $(`<option value="${options[i]}">${options[i]}</option>`);
+			$option.appendTo($ddlAnimations);
+		}
+
+        if(currentSelection){
+            $ddlAnimations.val(currentSelection);
+        }
+    }
+
+    setAnimation(selected){
+        $('#animate-name').val(selected.name);
+        $('#animate-fps').val(selected.fps);
+    }
+
+    setDisplayMode(isDark){
+		if(isDark){
+			this.toolbarTop.activate('invert-bg');
+		} else{
+			this.toolbarTop.deactivate('invert-bg');
+		}
+	}
+
+    setScale(pct) {
+        const slider = document.getElementById('animate-zoom');
+        slider.value = pct;
+    }
+}
+        
+export default AnimatorTools
