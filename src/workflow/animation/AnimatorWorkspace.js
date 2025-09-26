@@ -33,7 +33,7 @@ class AnimatorWorkspace extends MicroEvent {
 
 		this.selectArea.bind('select', function (clickedRect) {
 			const rect = Object.assign({}, clickedRect);
-			let idx = this.window.srcGrid.find(rect);
+			let idx = this.window.grid.find(rect);
 			this.trigger('click-cell', clickedRect, idx);
 		}.bind(this));
 	}
