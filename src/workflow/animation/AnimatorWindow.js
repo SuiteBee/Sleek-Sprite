@@ -21,13 +21,9 @@ class AnimatorWindow extends Window {
 
         this.width = this.src.width;
         this.height = this.src.height;
-        this.canvas.style.transformOrigin = this.src.canvas.style.transformOrigin;
-        this.canvas.style.transform = this.src.canvas.style.transform;
 
         this.grid.width = this.srcGrid.width;
         this.grid.height = this.srcGrid.height;
-        this.grid.canvas.style.transformOrigin = this.srcGrid.canvas.style.transformOrigin;
-        this.grid.canvas.style.transform = this.srcGrid.canvas.style.transform;
         
         //Disable aliasing (has to be done on each resize or pixels get murdered)
         this.context.imageSmoothingEnabled = false;
