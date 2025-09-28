@@ -4,6 +4,7 @@ A simple sprite packer to streamline the process of building an atlas from malfo
 
 Includes animation previews and JSON map support
 
+Operates locally within the browser and can be used at the pages URL here [Try Sleek-Sprite](suitebee.github.io/Sleek-Sprite/)
 
 > [!Note]
 > If you find the workflow/functionality useful but need a different export format or options leave a comment in discussions
@@ -91,5 +92,19 @@ The project diverged so far from both, that I decided to remove the fork and hav
 - [Sprite Cow](https://github.com/jakearchibald/sprite-cow)
   - supplied some essential logic for detecting image slices on a background
   - had an elegant UI to use as a base
+ 
+Icons 
+
+* [Plump Flat - Free](https://www.streamlinehq.com/icons/plump-flat-free) (Streamline)
+
+Fonts 
+
+* [Oswald](https://fonts.google.com/specimen/Oswald) (Google)
+* [Lobster](https://fonts.google.com/specimen/Lobster) (Google)
+
+Sprites (example)
+
+* [Retro Character](https://openclipart.org/detail/248259/retro-character-sprite-sheet) (Open Clip Art)
+   * [isaiah658](https://openclipart.org/artist/isaiah658) (Open Clip Art Author)
 
 </details>
