@@ -1,6 +1,4 @@
-# Fork
-
-### Sleek-Sprite
+# Sleek-Sprite
 
 Copyright (c) 2025 Ryan Bee. All rights reserved.
 
