@@ -4,7 +4,7 @@ A simple sprite packer to streamline the process of building an atlas from malfo
 
 Includes animation previews and JSON map support
 
-Operates locally within the browser and can be used at the pages URL here [Try Sleek-Sprite](suitebee.github.io/Sleek-Sprite/)
+Operates locally within the browser and can be used at the pages URL here [Try Sleek-Sprite](https://suitebee.github.io/Sleek-Sprite/)
 
 > [!Note]
 > If you find the workflow/functionality useful but need a different export format or options leave a comment in discussions
