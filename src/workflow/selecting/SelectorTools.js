@@ -127,11 +127,7 @@ class SelectorTools extends MicroEvent {
 
 		//BTN Revert Changes
 		this.toolbarTop.bind('undo', function(event) {
-			let selectedSprites = workspace.undo();
-			if(selectedSprites){
-				this.trigger('selectedSpritesChange', selectedSprites);
-			}
-			
+			workspace.undo();
 			event.preventDefault();
 		}.bind(this));
 

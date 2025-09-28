@@ -66,7 +66,7 @@ class Animator {
 				let sprite = this.sprites[idx];
                 this.workspace.selectCell(click, sprite);
             }else{
-                this.workspace.unselectAllCells();
+                this.workspace.unselectAllFrames();
             }
         }.bind(this));
     }
@@ -136,7 +136,7 @@ class Animator {
         if(this.animations.length > 0){
             this.#setAnimation(this.animations[0].name);
         } else{
-            this.workspace.unselectAllCells();
+            this.workspace.unselectAllFrames();
         }
     }
 

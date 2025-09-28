@@ -8,10 +8,8 @@ import SelectorTools from './SelectorTools';
 class Selector {
 
 	constructor() {
-        this.selected  = [];
-
         this.window    = new SelectorWindow();
-        this.workspace = new SelectorWorkspace(this.window, this.selected);
+        this.workspace = new SelectorWorkspace(this.window);
         this.tools     = new SelectorTools(this.workspace);
 
         //Prepare animations

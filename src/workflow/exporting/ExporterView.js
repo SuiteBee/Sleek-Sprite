@@ -1,107 +1,80 @@
 import $ from 'jquery';
 
-import Exporter from './Exporter';
 import ExportOptions from './components/ExportOptions';
-import MicroEvent from '../../utilities/MicroEvent';
 
+import MicroEvent from '../../utilities/MicroEvent';
 
 class ExporterView extends MicroEvent {
 
-    constructor(editorCanvas, animatorView) {
+    constructor(controller) {
         super();
 
-        this.exporter            = new Exporter(editorCanvas, animatorView);
+        this.controller          = controller;
+        this.options             = new ExportOptions();
+
 		this.$exportContainer    = $('.export-container');
         this.$previewCell        = $('.export-preview-cell');
         this.$optionsCell        = $('.export-options-cell');
-        this.editorCanvas        = editorCanvas;
-
-        this.refresh             = false;
-        this.options             = new ExportOptions();
 
         this.#buildExportOptions();
     }
 
-    activeTab() {
-        if(this.refresh){
-            //Clear previews
-            this.$previewCell.empty();
-            this.#buildExportPreview();
+    init() {
+        //Clear previews
+        this.$previewCell.empty();
+        this.#buildExportPreview();
 
-            $('#export-all').on('click', function() {
-                this.exporter.bundleExport(this.options).then(zipped => {
-                    this.exporter.downloadBundle(zipped, this.options.exportName);
-                });
-            }.bind(this));
+        $('#export-all').on('click', function() {
+            this.controller.export(this.options);
+        }.bind(this));
 
-            $('.download-single').on('click', function(evt) {
-                let idx = $(evt.target).data('index');
-                let sprite = this.editorCanvas.sprites[idx];
+        $('.download-single').on('click', function(evt) {
+            let idx = $(evt.target).data('index');
+            this.controller.downloadSingle(idx);
+        }.bind(this));
 
-                let tmpCanvas = $(`<canvas style="display:none"/>`)[0];
-                let url = this.exporter.getSpriteData(sprite, tmpCanvas);
-                this.exporter.download(url, sprite.name, '.png');
-            }.bind(this));
+        $('#download-all').on('click', function(evt) {            
+            this.controller.downloadAll(this.options);
+        }.bind(this));
 
-            $('#download-all').on('click', function(evt) {            
-                let urls = [],   
-                    names = [];
+        $('input.item-name[type=text]').on('input', function(evt) {
+            let $txtInput = $(evt.target);
+            let idx = $txtInput.data('index');
 
-                for(let i=0; i<this.editorCanvas.sprites.length; i++){
-                    let sprite = this.editorCanvas.sprites[i];
+            this.controller.updateSpriteName(idx, $txtInput.val());
+        }.bind(this));
 
-                    let tmpCanvas = $(`<canvas style="display:none"/>`)[0];
-                    urls.push(this.exporter.getSpriteData(sprite, tmpCanvas));
-                    names.push(sprite.name);
-                }
+        $('input.export-name[type=text]').on('input', function(evt) {
+            let $txtInput = $(evt.target);
+            this.options.exportName = $txtInput.val();
+        }.bind(this));
 
-                this.exporter.bundleDownload(urls, names).then(zipped => {
-                    this.exporter.downloadBundle(zipped, this.options.exportName);
-                });
-            }.bind(this));
+        $('input.export-json[type=checkbox]').on('change', function(evt) {
+            let $chkJson = $(evt.target);
+            this.options.hasMap = $chkJson.prop('checked');
 
-            $('input.item-name[type=text]').on('input', function(evt) {
-                let $txtInput = $(evt.target);
-                let idx = $txtInput.data('index');
+            //Dependencies
+            let $chkSeparate = $('#export-separate');
+            $chkSeparate.prop('disabled', !this.options.hasMap);
 
-                let sprite = this.editorCanvas.sprites[idx];
-                sprite.name = $txtInput.val();
-            }.bind(this));
+            let $chkAnim = $('#export-animations');
+            $chkAnim.prop('disabled', !this.options.hasMap);
 
-            $('input.export-name[type=text]').on('input', function(evt) {
-                let $txtInput = $(evt.target);
-                this.exportName = $txtInput.val();
-            }.bind(this));
+            if(!this.options.hasMap){
+                $chkSeparate.prop('checked', false);
+                $chkAnim.prop('checked', false);
+            } 
+        }.bind(this));
 
-            $('input.export-json[type=checkbox]').on('change', function(evt) {
-                let $chkJson = $(evt.target);
-                this.options.hasMap = $chkJson.prop('checked');
+            $('input.export-separate[type=checkbox]').on('change', function(evt) {
+            let $chkSeparate = $(evt.target);
+            this.options.isSeparate = $chkSeparate.prop('checked');
+        }.bind(this));
 
-                //Dependencies
-                let $chkSeparate = $('#export-separate');
-                $chkSeparate.prop('disabled', !this.options.hasMap);
-
-                let $chkAnim = $('#export-animations');
-                $chkAnim.prop('disabled', !this.options.hasMap);
-
-                if(!this.options.hasMap){
-                    $chkSeparate.prop('checked', false);
-                    $chkAnim.prop('checked', false);
-                } 
-            }.bind(this));
-
-             $('input.export-separate[type=checkbox]').on('change', function(evt) {
-                let $chkSeparate = $(evt.target);
-                this.options.isSeparate = $chkSeparate.prop('checked');
-            }.bind(this));
-
-            $('input.export-animations[type=checkbox]').on('change', function(evt) {
-                let $chkAnim = $(evt.target);
-                this.options.hasAnim = $chkAnim.prop('checked');
-            }.bind(this));
-
-            this.refresh = false;
-        }
+        $('input.export-animations[type=checkbox]').on('change', function(evt) {
+            let $chkAnim = $(evt.target);
+            this.options.hasAnim = $chkAnim.prop('checked');
+        }.bind(this));
     }
 
     #buildExportPreview() {
@@ -126,7 +99,7 @@ class ExporterView extends MicroEvent {
     #fillPreview(){
         const container = $('<div class="export-items"></div>');
 
-        let sprites = [...this.editorCanvas.sprites];
+        let sprites = [...this.controller.sprites];
         for(let i=0; i<sprites.length; i++){
             let sprite = sprites[i];
             let $item = this.#createPreviewItem(sprite);
@@ -147,7 +120,7 @@ class ExporterView extends MicroEvent {
 
         let pos = sprite.pos;
         smallContext.drawImage(
-            this.editorCanvas.canvas, pos.x, pos.y, pos.width, pos.height,
+            this.controller.srcCanvas, pos.x, pos.y, pos.width, pos.height,
             0, 0, 100, 100
         );
         $smallPreview.addClass('small-preview').appendTo($item);

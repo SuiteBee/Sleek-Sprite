@@ -15,7 +15,7 @@ class SelectorWindow extends Window {
 		this.setBg(pixel);
 	}
 
-	getHighlighted(selectedSprites, clickRect) {
+	findActive(selectedSprites, clickRect) {
 		let currentSelections = selectedSprites.map(current => current.rect);
 		return currentSelections.find(SelectorWindow.#intersect, { rect: clickRect });
 	}

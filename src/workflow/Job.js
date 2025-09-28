@@ -2,15 +2,15 @@ import $ from 'jquery';
 
 import Selector from './selecting/Selector';
 import Editor from './editing/Editor';
-import Animator from './animation/Animator';
-import ExporterView from './exporting/ExporterView';
+import Animator from './animating/Animator';
+import Exporter from './exporting/Exporter';
 
 class Job {
     constructor() {
         this.selector = new Selector();
         this.editor   = new Editor(this.selector.window);
         this.animator = new Animator(this.editor.window);
-        this.exporter = new ExporterView(this.editor.window, this.animator);
+        this.exporter = new Exporter(this.editor, this.animator);
 
         var $selectorTabBtn = $('#tabSelection'),
             $editorTabBtn   = $('#tabEditor'),
