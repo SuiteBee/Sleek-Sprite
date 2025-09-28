@@ -1,14 +1,81 @@
-> [!IMPORTANT]
-> This is being actively developed and will evolve over time
+# Sleek-Sprite
 
-# Sleek-Sprite (WIP)
+A simple sprite packer to streamline the process of building an atlas from malformed sprite sheets
 
-This project was inspired by the dissatisfaction with existing software and tools to modify sprite-sheets, many locked behind paywalls or expensive subscriptions. It started as a personal project with a specific use case in mind, however once it was in progress the ideas for features just kept coming.
+Includes animation previews and JSON map support
 
-> [!Caution]
-> Only tested with small pixel graphics
->
-> Attempting to use high definition images may be slow or crash your browser
+
+> [!Note]
+> If you find the workflow/functionality useful but need a different export format or options leave a comment in discussions
+
+<details>
+
+<summary><h2>Purpose</h2></summary>
+
+This project was inspired by the dissatisfaction with existing software and tools to modify sprite-sheets, many locked behind paywalls or expensive subscriptions
+
+Started as a personal project with a specific use case in mind, however once it was in development, I decided to add some polish and additional features to make it feel more complete
+
+</details>
+
+<details>
+
+<summary><h2>Feature List</h2></summary>
+
+## Features
+
+* Persistent display mode between tabs (dark mode)
+* Shared zoom between editor and animator
+* Zoom does not alter image directly to maintain export integrity
+
+### Selector
+
+* Drag and drop image files
+* Reload
+* Search (find and select sprites)
+* Unselect all
+* Select single (with drag)
+* Set background (with hover preview)
+* Erase background
+* Delete selection
+* Undo
+
+### Editor
+
+All Sprites
+* Click to edit
+* Anchor dropdown (center or bottom)
+* Rows and columns textboxes (defaults to square)
+
+Selected Sprites
+* Nudge (within cell)
+* Anchor radio (center/bottom/previous)
+  * previous will take into account the y-position of the last selected sprite to maintain height difference
+* Flip (x/y axis)
+* Zoom
+
+### Animator
+
+* Click to add frame to preview
+* Unselect all
+* Save (FPS + Name)
+* Animation dropdown (to load/modify/delete saved)
+* Zoom (separate scrollbars for frames and preview)
+
+### Exporter
+
+* Preview panel
+* Name individual sprites/frames
+* Download individual sprites/frames
+* Download all sprites as zip
+* Export all sprites in atlas
+* Options to build JSON map w/ animations
+
+</details>
+
+<details>
+
+<summary><h2>Sources</h2></summary>
 
 ## Sources
 
@@ -19,43 +86,10 @@ The project diverged so far from both, that I decided to remove the fork and hav
 
 - [spritesheet-cutter](https://github.com/yeoji/spritesheet-cutter)
   - streamlined the build process
-  - sped up development significantly with yarn and Github Pages deployment support
+  - sped up development with yarn and Github Pages deployment support
 
 - [Sprite Cow](https://github.com/jakearchibald/sprite-cow)
-  - supplied some essential logic for automatically detecting image slices on a background
+  - supplied some essential logic for detecting image slices on a background
   - had an elegant UI to use as a base
 
-## Build Instructions
-
-```
-yarn install
-yarn dev
-```
-
-Go to `http://localhost:1234`
-
-## Status
-
-### Sort of Done
-
-- Many additional tools
-  * Selection(Unselect all, Background status, Erase Color, Dispose Rect, Undo)
-  * Editor(Anchor all, Grid dimensions, Nudge within cell, Anchor individual, Flip within cell)
-  * Persistent dark mode between tabs
-  * Animation Preview Started (need to migrate to its own tab after editor)
-
-- History
-  * Undo destructive operations like erasing colors or deleting slices
-  * Undo image selection
-
-- Workflow
-   * Tab structure to separate the steps and tools
-   * Events for hover tips/info, passing data between tabs, updating tools on image load/reload, detect background on load
-   * Remove a few existing events like unselecting all when clicking background
-
-### Todo
-- Export Built Atlas with JSON data
-- Export Tab (naming)
-- Animation Preview Tab (potential)
-- Zoom in/out
-- Find All (selection tab)
+</details>
