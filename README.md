@@ -23,7 +23,7 @@ Started as a personal project with a specific use case in mind, however once it 
 
 <summary><h2>Feature List</h2></summary>
 
-## Features
+### Global
 
 * Persistent display mode between tabs (dark mode)
 * Shared zoom between editor and animator
@@ -77,8 +77,6 @@ Selected Sprites
 <details>
 
 <summary><h2>Sources</h2></summary>
-
-## Sources
 
 This project started as a fork of [spritesheet-cutter](https://github.com/yeoji/spritesheet-cutter)
 which was based on [Sprite Cow](https://github.com/jakearchibald/sprite-cow)
