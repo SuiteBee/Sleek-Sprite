@@ -138,6 +138,9 @@
         &.select-none::before {
             @include utils.icon("cancel", 1px);
         }
+        &.dupe-frame::before {
+            @include utils.icon("add", 1px);
+        }
         &.select-sprite::before {
             @include utils.icon("arrow", 1px);
         }
@@ -180,6 +183,9 @@
         &:first-child {
             border-left-width: 1px;
             border-radius: 4px 0 0 4px;
+        }
+        &:nth-child(2) {
+            border-radius: 0 0 0 0;
         }
         &:last-child {
             margin-right: 5px;

@@ -13,6 +13,7 @@ class Animator {
         this.frames             = [];
         this.animations         = [];
 
+        this.copyEnabled        = false;
         this.name               = 'new0';
         this.fps                = 5;
 
@@ -46,13 +47,19 @@ class Animator {
             this.workspace.preview.Update(this.fps);
         }.bind(this));
 
+        this.tools.bind('enable-copy', function(enabled) {
+            this.copyEnabled = enabled;
+        }.bind(this));
+
         this.tools.bind('add-frame', function(sprite) {
             this.frames.push(sprite);
             this.#animate();
         }.bind(this));
 
         this.tools.bind('remove-frame', function(sprite) {
-            this.frames = this.frames.filter(f => f.n != sprite.n);
+            //Remove last instance of sprite from frames
+            let toRemove = this.frames.findLastIndex(f => f.n == sprite.n);
+            this.frames.splice(toRemove, 1);
             this.#animate();
         }.bind(this));
 
@@ -64,9 +71,7 @@ class Animator {
         this.workspace.bind('click-cell', function(click, idx) {
             if(idx >= 0 && idx < this.sprites.length){
 				let sprite = this.sprites[idx];
-                this.workspace.selectCell(click, sprite);
-            }else{
-                this.workspace.unselectAllFrames();
+                this.workspace.selectCell(click, sprite, this.copyEnabled);
             }
         }.bind(this));
     }

@@ -40,8 +40,8 @@ class AnimatorWorkspace extends Workspace {
 		return container;
 	}
 
-	selectCell(click, sprite){
-		this.#handleClick(click, sprite);
+	selectCell(click, sprite, dupeFrame){
+		this.#handleClick(click, sprite, dupeFrame);
 	}
 	
 	loadAnimation(frames, sprites) {
@@ -65,13 +65,15 @@ class AnimatorWorkspace extends Workspace {
 		this.window.grid.zoom(pct);
 	}
 
-	#handleClick(clickedRect, sprite) {
+	#handleClick(clickedRect, sprite, dupeFrame) {
 		let scaledRect = sprite.cell.scaled(this.window.grid.scale);
 
-		const cellSelected = this.activeSelections.findIndex(cell => JSON.stringify(cell.rect) == JSON.stringify(scaledRect));
-		if(cellSelected > -1) {
-			this.activeSelections[cellSelected].unselect();
-			this.activeSelections.splice(cellSelected, 1);
+		const cellIndex = this.activeSelections.findIndex(cell => JSON.stringify(cell.rect) == JSON.stringify(scaledRect));
+        const cellSelected = cellIndex > -1;
+
+		if(cellSelected && !dupeFrame) {
+			this.activeSelections[cellIndex].unselect();
+			this.activeSelections.splice(cellIndex, 1);
 			this.trigger('removeFrame', sprite);
 		} else {
 			let cell = this.getActive(clickedRect, scaledRect);
@@ -79,6 +81,7 @@ class AnimatorWorkspace extends Workspace {
 			this.trigger('addFrame', sprite);
 		}
 	}
+
 }
 
 export default AnimatorWorkspace;

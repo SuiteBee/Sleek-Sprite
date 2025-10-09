@@ -14,9 +14,10 @@ class AnimatorTools extends MicroEvent {
 
          //Animator tools
 		this.toolbarTop.
-            addItem('select-none', 'Unselect All', {noLabel: true}).
             addItem('save-anim', 'Save Current Animation', {noLabel: true}).
             addItem('delete-anim', 'Delete Saved Animation', {noLabel: true}).
+            addItem('select-none', 'Unselect All', {noLabel: true}).
+            addItem('dupe-frame', 'Copy Frame', {noLabel: true}).
             addItem(
 				new ToolbarGroup('animate-settings').
 					addInput('animate-fps', 'FPS:', '', '3', '5').
@@ -68,6 +69,10 @@ class AnimatorTools extends MicroEvent {
 			this.workspace.unselectAllFrames();
 			event.preventDefault();
 		}.bind(this));
+
+        this.toolbarTop.bind('dupe-frame', function(event) {
+            this.trigger('enable-copy', !event.isActive);
+        }.bind(this));
 
         this.toolbarTop.bind('save-anim', function(event) {
             event.preventDefault();

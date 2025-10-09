@@ -96,8 +96,8 @@ EditProto.update = function(x, y, cellSize, previous){
 }
 
 EditProto._setAlignment = function(x, y, cellSize, previous) {
-	let halfWidth = this.rect.width/2;
-	let halfHeight = this.rect.height/2;
+	let halfWidth = this.src.width/2;
+	let halfHeight = this.src.height/2;
 	let halfCell = cellSize/2;
 
 	//Sprite center pos to draw from
@@ -110,10 +110,10 @@ EditProto._setAlignment = function(x, y, cellSize, previous) {
 	//Vertical alignment 
 	//Base on previous sprite (uses original y AND current y)
 	if(this.anchor == "Previous"){
+        let sign = previous.src.y > this.src.y ? 1 : -1;
 		let prevOldDiff = previous.src.y - this.src.y;
-		let prevCurDiff = previous.rect.y;
 
-		this.rect.y = y + prevCurDiff - prevOldDiff;
+		this.rect.y = y + (sign * prevOldDiff);
 	//Align to bottom of cell
 	} else if(this.anchor == "Bottom"){
 		let cellDiff = cellSize - this.rect.height;
