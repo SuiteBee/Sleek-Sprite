@@ -297,6 +297,12 @@
             right: 20px;
             @include utils.icon("flip");			
         }
+        &.edit-show-ticks {
+            margin: 0px;
+        }
+        .edit-show-ticks {
+            margin: 0px;
+        }
     }
 
     & [role=radio] {
@@ -342,7 +348,7 @@
     @include utils.linear-gradient((top, #fefefe, #b8b8b8));
 }
 
-.edit-selected, .edit-all, .edit-grid, .animate-settings, .animations {
+.edit-selected, .edit-ticks, .edit-all, .edit-grid, .animate-settings, .animations {
     font-weight: 300;
     padding: 4px 5px;
     margin: 0 5px 5px 0;

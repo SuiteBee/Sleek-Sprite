@@ -85,6 +85,8 @@ class Animator {
             this.tools.updateAnimations(options);
 
             this.refresh = false;
+        } else {
+            this.sprites = editSprites;
         }
 
         this.window.reset();

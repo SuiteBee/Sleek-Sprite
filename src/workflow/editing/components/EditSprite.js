@@ -19,10 +19,11 @@ class EditSprite {
 		this.nudgeY = 0;
 	}
 
+    //Remove cell positions to draw in place (for animation)
 	get origin() {
 		return new Rect(
-			this.rect.x - this.cell.x,
-			this.rect.y - this.cell.y,
+			this.rect.x - this.cell.x + this.nudgeX,
+			this.rect.y - this.cell.y + this.nudgeY,
 			this.rect.width,
 			this.rect.height
 		)

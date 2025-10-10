@@ -21,11 +21,11 @@ class EditorWindow extends Window {
         this.context.imageSmoothingEnabled = false;
     }
 
-    drawAll(editedArr, showGrid) {
+    drawAll(editedArr, showGrid, showTicks) {
         var curX, curY, nCols;
         curX = curY = nCols = 0;
 
-        if(showGrid) { this.grid.draw() }
+        if(showGrid) { this.grid.draw(showTicks) }
         
         for(let i=0; i<editedArr.length; i++){
             let sprite = editedArr[i];
@@ -48,8 +48,8 @@ class EditorWindow extends Window {
         this.#update(sprite, previous)
     }
 
-    setDisplayMode(isDark) {
-        this.grid.setDisplayMode(isDark);
+    setDisplayMode(isDark, showTicks) {
+        this.grid.setDisplayMode(isDark, showTicks);
     }
 
     #fillCell(x, y, cellSize) {

@@ -11,6 +11,7 @@ class Editor {
 
         this.edited    = [];
 
+        this.showTicks = false;
         this.rows      = 0;
         this.cols      = 0;
 
@@ -19,9 +20,14 @@ class Editor {
         this.tools     = new EditorTools(this.workspace);
 
         this.tools.bind('viewMode', function(isDark) {
-            this.window.setDisplayMode(isDark);
+            this.window.setDisplayMode(isDark, this.showTicks);
             this.workspace.setDisplayMode(isDark);
 		}.bind(this));
+
+        this.tools.bind('show-ticks', function(show) {
+            this.showTicks = show;
+            this.#placeAllSprites();
+        }.bind(this));
 
         this.tools.bind('set-anchor', function(anchorPos) {
             this.#anchorAll(anchorPos);
@@ -86,7 +92,7 @@ class Editor {
 
     setDisplayMode(isDark) {
         this.tools.setDisplayMode(isDark);
-        this.window.setDisplayMode(isDark);
+        this.window.setDisplayMode(isDark, this.showTicks);
         this.workspace.setDisplayMode(isDark, false);
     }
 
@@ -94,7 +100,7 @@ class Editor {
         this.workspace.unselectAllCells();
 
         this.window.init(this.edited, this.rows, this.cols);
-        this.window.drawAll(this.edited, true); 
+        this.window.drawAll(this.edited, true, this.showTicks); 
     }
 
     #placeSingleSprite(idx) {

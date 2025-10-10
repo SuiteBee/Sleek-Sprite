@@ -17,6 +17,10 @@ class EditorTools extends MicroEvent {
         //Editor tools
 		this.toolbarTop.
             addItem(
+                new ToolbarGroup('edit-ticks').
+                addCheckbox('edit-show-ticks', 'Ticks: ', 'Show Tick Marks', false)
+            ).
+            addItem(
                 new ToolbarGroup('edit-all').
                 addDropDown(
                     'set-all-align', 
@@ -72,6 +76,11 @@ class EditorTools extends MicroEvent {
         //////////////////////////////////////////////////
 		//Toolbar Events (All Cells)
 		//////////////////////////////////////////////////
+
+        //CHK Ticks
+        this.toolbarTop.bind('edit-show-ticks', function(evt, chk) {
+            this.trigger('show-ticks', chk);
+        }.bind(this));
 
         //TXT Columns Changed
         this.toolbarTop.bind('set-columns', function(evt, txt) {
