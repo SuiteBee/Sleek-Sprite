@@ -5,13 +5,15 @@ class Grid extends Window {
         super();
 
         this.color = 'black';
+
+        this.cellSizeUnscaled = 0
         this.cellSize = 0;
 
         this.rows = 0;
         this.cols = 0;
     }
 
-    init(spriteArr, rows, columns) {
+    init(spriteArr, rows, columns, scale) {
         if(!spriteArr.length) { this.cellSize = 0; return; }
 
         //Get the max size of the selected sprites width and height
@@ -19,13 +21,26 @@ class Grid extends Window {
         var maxHeight = Math.max(...spriteArr.map(sprite => sprite.rect.height));
 
         //Set cell size (square) to the largest dimension
-        this.cellSize = Math.max(maxWidth, maxHeight);
+        this.cellSizeUnscaled = Math.max(maxWidth, maxHeight);
+        this.cellSize = this.cellSizeUnscaled * scale;
 
         this.width = this.cellSize * columns;
         this.height = this.cellSize * rows;
 
         this.rows = rows;
         this.cols = columns;
+    }
+
+    resize(pct, showTicks) {
+        if(!this.cellSize) { return; }
+
+        let scale = pct/100;
+        this.cellSize = this.cellSizeUnscaled * scale;
+
+        this.width = this.cellSize * this.cols;
+        this.height = this.cellSize * this.rows;
+
+        this.draw(showTicks);
     }
         
     draw(showTicks = false) {
@@ -38,14 +53,18 @@ class Grid extends Window {
         if(!this.cellSize) {return}
 
         // Draw vertical lines
-        for (let x = 0; x <= this.width; x += this.cellSize) {
-            this.drawLine([x, 0], [x, this.height]);
+        for (let x = 0; x < this.cols; x++) {
+            let curX = (this.cellSize * x);
+            this.drawLine([curX, 0], [curX, this.height]);
         }
+        this.drawLine([this.width, 0], [this.width, this.height]);
 
         // Draw horizontal lines
-        for (let y = 0; y <= this.height; y += this.cellSize) {
-            this.drawLine([0, y], [this.width, y]);
+        for (let y = 0; y < this.rows; y++) {
+            let curY = (this.cellSize * y);
+            this.drawLine([0, curY], [this.width, curY]);
         }
+        this.drawLine([0, this.height], [this.width, this.height]);
 
         if(showTicks) {
             this.drawTicks();
@@ -57,7 +76,7 @@ class Grid extends Window {
         let tickLength = this.cellSize/8;
         let halfTick = tickLength/2;
 
-        for(let x = 0; x <= this.cols; x++){
+        for(let x = 0; x < this.cols; x++){
             for(let y = 0; y < this.rows; y++) {
                 let curX = (this.cellSize * x);
                 let curY = (this.cellSize * y);
@@ -88,13 +107,9 @@ class Grid extends Window {
     }
 
     find(mousePos) {
-        let scaledWidth  = this.width * this.scale,
-            scaledHeight = this.height * this.scale,
-            scaledCell   = this.cellSize * this.scale;
-
-        if(mousePos.x <= scaledWidth && mousePos.y <= scaledHeight){
-            let findCol = Math.floor(mousePos.x / scaledCell);
-            let findRow = Math.floor(mousePos.y / scaledCell);
+        if(mousePos.x <= this.width && mousePos.y <= this.height){
+            let findCol = Math.floor(mousePos.x / this.cellSize);
+            let findRow = Math.floor(mousePos.y / this.cellSize);
 
             let i = (findRow * this.cols) + findCol;
             return i;

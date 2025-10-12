@@ -12,10 +12,10 @@ class EditorWindow extends Window {
     init(editedArr, rows, cols) {
         this.clear();
 
-        this.grid.init(editedArr, rows, cols);
+        this.grid.init(editedArr, rows, cols, this.scale);
 
-        this.width = this.grid.width;
-        this.height = this.grid.height;
+        this.width = this.grid.cellSizeUnscaled * cols;
+        this.height = this.grid.cellSizeUnscaled * rows;
 
         //Disable aliasing (has to be done on each resize or pixels get murdered)
         this.context.imageSmoothingEnabled = false;
@@ -37,9 +37,9 @@ class EditorWindow extends Window {
             if(nCols >= this.grid.cols){
                 nCols = 0;
                 curX = 0;
-                curY += this.grid.cellSize;
+                curY += this.grid.cellSizeUnscaled;
             } else{
-                curX += this.grid.cellSize;
+                curX += this.grid.cellSizeUnscaled;
             }
         }
     }
@@ -67,10 +67,10 @@ class EditorWindow extends Window {
         if((x + y) < 0){ x = sprite.cell.x, y = sprite.cell.y }
 
         //Update sprite rect and cell rect
-        sprite.update(x, y, this.grid.cellSize, previous);
+        sprite.update(x, y, this.grid.cellSizeUnscaled, previous);
 
-        this.context.clearRect(x, y, this.grid.cellSize, this.grid.cellSize);
-        this.#fillCell(x, y, this.grid.cellSize);
+        this.context.clearRect(x, y, this.grid.cellSizeUnscaled, this.grid.cellSizeUnscaled);
+        this.#fillCell(x, y, this.grid.cellSizeUnscaled);
 
         if(sprite.flipped){
             this.#drawFlipped(sprite);

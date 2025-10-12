@@ -58,10 +58,10 @@
 		align-items: end;
 		padding-top: 24px;
 
-		& [role=button] {
-			height: 15px;
+		& button {
+			height: 25px;
 
-			font-weight: bold;
+			font-weight: 700;
 			text-align: center;
 
 			margin: 0 5px 5px 0;
@@ -74,10 +74,16 @@
 			@include utils.linear-gradient((top, #fefefe, #b8b8b8));
 
 			&.active {
-				background: #707070;
+                background: #252525;
 				box-shadow: inset 0 3px 7px rgba(0,0,0,0.6);
-				color: #fff;	
+				color: #fff;
 			}
+
+            &:disabled {
+                background: #707070;
+				box-shadow: inset 0 3px 7px rgba(0,0,0,0.6);
+				color: #b6b5b5;	
+            }
 		}
 
 		&.intro {

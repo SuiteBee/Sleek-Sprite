@@ -36,7 +36,7 @@ class EditorTools extends MicroEvent {
             addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
 
         this.toolbarBottom.
-            addSlider('editor-zoom', '0', '200', '100');
+            addSlider('editor-zoom', '0', '500', '100');
 
         //Selected Tools
         this.toolbarTop.
@@ -126,9 +126,14 @@ class EditorTools extends MicroEvent {
             }
         }.bind(this));
 
-        //SLD Change Canvas Scale 
+        //SLD Update Canvas Scale 
         this.toolbarBottom.bind('editor-zoom', function(evt, pct){
-            this.trigger('zoomChange', pct);
+            this.trigger('zoomStart', Number(pct));
+        }.bind(this));
+
+        //SLD Canvas Scale Set
+        this.toolbarBottom.bind('editor-zoom-end', function(evt){
+            this.trigger('zoomEnd');
         }.bind(this));
 
         //////////////////////////////////////////////////
@@ -184,15 +189,12 @@ class EditorTools extends MicroEvent {
         }.bind(this));
     }
 
-    init(nEdited){
+    init(nearestSquare){
         let anchorPos = $('#set-all-align').val();
         this.trigger('set-anchor', anchorPos);
 
         //Set automatic grid dimensions
-        if(nEdited > 0){
-            let nearestRoot = Math.sqrt(nEdited);
-            let nearestSquare = Math.ceil(nearestRoot);
-
+        if(nearestSquare > 0){
             $('#set-rows').val(nearestSquare.toString());
             $('#set-columns').val(nearestSquare.toString());
 
@@ -201,7 +203,7 @@ class EditorTools extends MicroEvent {
         }
     }
 
-    setScale(pct) {
+    updateScale(pct) {
         const slider = document.getElementById('editor-zoom');
         slider.value = pct;
     }

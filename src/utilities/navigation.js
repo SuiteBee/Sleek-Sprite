@@ -33,7 +33,7 @@ import $ from 'jquery';
 
   //Create tab button with event
   function addButton(text, id, tabClass){
-      var $button = $('<div role="button"/>').attr("id", id).addClass('tablinks').text(text);
+      var $button = $('<button>').attr("id", id).addClass('tablinks').text(text);
       $button.on('click', function() {
           setTab(this, tabClass);
       });

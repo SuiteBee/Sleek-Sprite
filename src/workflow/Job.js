@@ -20,7 +20,17 @@ class Job {
         this.darkMode = false;
         this.scale = 100;
 
+        $editorTabBtn.prop('disabled', true);
+        $animatorTabBtn.prop('disabled', true);
+        $exportTabBtn.prop('disabled', true);
+
         this.selector.workspace.bind('selectedSpritesChange', function(selectedSprites) {
+            let disableWorkflow = selectedSprites.length == 0;
+
+            $editorTabBtn.prop('disabled', disableWorkflow);
+            $animatorTabBtn.prop('disabled', disableWorkflow);
+            $exportTabBtn.prop('disabled', disableWorkflow);
+            
 			this.editor.init(selectedSprites);
             this.editor.refresh = this.exporter.refresh = this.animator.refresh = true;
 		}.bind(this));
@@ -37,14 +47,22 @@ class Job {
 			this.darkMode = isDark;
 		}.bind(this));
 
-        this.editor.tools.bind('zoomChange', function(pct) {
+        this.editor.tools.bind('zoomStart', function(pct) {
             this.scale = pct;
-            this.editor.setScale(this.scale);
+            this.editor.updateScale(this.scale);
         }.bind(this));
 
-        this.animator.tools.bind('zoomChange', function(pct) {
+        this.editor.tools.bind('zoomEnd', function() {
+            this.editor.resize(this.scale);
+        }.bind(this));
+
+        this.animator.tools.bind('zoomStart', function(pct) {
             this.scale = pct;
-            this.animator.setScale(this.scale);
+            this.animator.updateScale(this.scale);
+        }.bind(this));
+
+        this.animator.tools.bind('zoomEnd', function() {
+            this.animator.resize(this.scale);
         }.bind(this));
 
         //Selector tab activated
@@ -55,7 +73,8 @@ class Job {
         //Editor tab activated
         $editorTabBtn.on('click', function() {
             this.editor.setDisplayMode(this.darkMode);
-            this.editor.setScale(this.scale);
+            this.editor.updateScale(this.scale);
+            this.editor.resize(this.scale);
             this.editor.activeTab();
         }.bind(this));
 
@@ -65,7 +84,8 @@ class Job {
                 this.editor.activeTab();
             }
             this.animator.setDisplayMode(this.darkMode);
-            this.animator.setScale(this.scale);
+            this.animator.updateScale(this.scale);
+            this.animator.resize(this.scale);
             this.animator.activeTab(this.editor.edited);
         }.bind(this));
 

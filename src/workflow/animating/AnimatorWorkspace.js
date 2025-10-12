@@ -59,14 +59,14 @@ class AnimatorWorkspace extends Workspace {
 		}
 	}
 
-	setScale(pct) {
+	updateScale(pct) {
 		this.unselectAllFrames();
 		this.window.zoom(pct);
-		this.window.grid.zoom(pct);
+		this.window.grid.clear();
 	}
 
 	#handleClick(clickedRect, sprite, dupeFrame) {
-		let scaledRect = sprite.cell.scaled(this.window.grid.scale);
+		let scaledRect = sprite.cell.scaled(this.window.scale);
 
 		const cellIndex = this.activeSelections.findIndex(cell => JSON.stringify(cell.rect) == JSON.stringify(scaledRect));
         const cellSelected = cellIndex > -1;

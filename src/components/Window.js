@@ -62,6 +62,10 @@ class Window {
 		this.context.clearRect(0, 0, this.width, this.height);
 	}
 
+    clearTransform() {
+        this.canvas.style.transform = 'none';
+    }
+
 	zoom(val, from = 'top left'){
         this.scale = val/100;
 

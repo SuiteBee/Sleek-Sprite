@@ -78,16 +78,26 @@ class Editor {
 
         if(this.refresh){
             this.tools.clearSelection();
-            this.tools.init(this.edited.length);
+
+            let nearestRoot = Math.sqrt(this.edited.length);
+            let nearestSquare = Math.ceil(nearestRoot);
+
+            this.tools.init(nearestSquare);
             this.#placeAllSprites();
 
             this.refresh = false;
         }
+
+        this.window.grid.draw(this.showTicks);
     }
 
-    setScale(pct) {
-        this.tools.setScale(pct);
-        this.workspace.setScale(pct);
+    updateScale(pct) {
+        this.tools.updateScale(pct);
+        this.workspace.updateScale(pct);
+    }
+
+    resize(pct) {
+        this.window.grid.resize(pct, this.showTicks);
     }
 
     setDisplayMode(isDark) {

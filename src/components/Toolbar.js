@@ -97,8 +97,15 @@ class Toolbar extends MicroEvent {
 		$container.on('input', 'input[type=range]', function() {
 			var $slider = $(this),
 			sldName = $slider.data('sldName'),
-			scrChange = new $.Event(sldName);
-			toolbar.trigger(scrChange, $slider.val());
+			sldChange = new $.Event(sldName);
+			toolbar.trigger(sldChange, $slider.val());
+		});
+
+        $container.on('change', 'input[type=range]', function() {
+			var $slider = $(this),
+			sldName = $slider.data('sldName'),
+			sldChange = new $.Event(sldName + '-end');
+			toolbar.trigger(sldChange);
 		});
 
 		toolbar.$container = $container;

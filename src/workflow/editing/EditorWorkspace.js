@@ -31,14 +31,14 @@ class EditorWorkspace extends Workspace {
 		this.#handleClick(click, sprite);
 	}
 
-	setScale(pct) {
+	updateScale(pct) {
 		this.unselectAllCells();
 		this.window.zoom(pct);
-		this.window.grid.zoom(pct);
+        this.window.grid.clear();
 	}
 	
 	#handleClick(clickedRect, sprite) {
-		let scaledRect = sprite.cell.scaled(this.window.grid.scale);
+		let scaledRect = sprite.cell.scaled(this.window.scale);
 
 		const cellSelected = this.activeSelections.findIndex(cell => JSON.stringify(cell.rect) == JSON.stringify(scaledRect));
 		if(cellSelected > -1) {

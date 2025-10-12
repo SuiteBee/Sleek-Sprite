@@ -34,8 +34,8 @@ class AnimatorTools extends MicroEvent {
             addItem('invert-bg', 'Toggle Dark Mode', {noLabel: true});
 
         this.toolbarBottom.
-            addSlider('animate-zoom', '0', '200', '100').
-            addSlider('animate-preview-zoom', '0', '500', '100');
+            addSlider('animate-zoom', '0', '500', '100').
+            addSlider('animate-preview-zoom', '0', '1000', '100');
 
         this.toolbarTop.$container.addClass('top');
 		this.toolbarBottom.$container.addClass('bottom');
@@ -44,14 +44,17 @@ class AnimatorTools extends MicroEvent {
 		//Workspace Events
 		//////////////////////////////////////////////////
 
+        //Cell Click
         this.workspace.bind('addFrame', function(sprite) {
 			this.trigger('add-frame', sprite);
 		}.bind(this));
 
+        //Cell Click (when highlighted)
         this.workspace.bind('removeFrame', function(sprite) {
 			this.trigger('remove-frame', sprite);
 		}.bind(this));
 
+        //Unselect All Frames
         this.workspace.bind('removeAllFrames', function() {
 			this.trigger('remove-all');
 		}.bind(this));
@@ -60,34 +63,41 @@ class AnimatorTools extends MicroEvent {
 		//Toolbar Events
 		//////////////////////////////////////////////////
 
+        //BTN Set Dark Mode
         this.toolbarTop.bind('invert-bg', function(evt) {
 			this.setDisplayMode(!evt.isActive);
 			this.trigger('viewMode', !evt.isActive);
 		}.bind(this));
 
+        //BTN Unselect All Frames
         this.toolbarTop.bind('select-none', function(event) {
 			this.workspace.unselectAllFrames();
 			event.preventDefault();
 		}.bind(this));
 
+        //BTN Copy Frame Enable/Disable
         this.toolbarTop.bind('dupe-frame', function(event) {
             this.trigger('enable-copy', !event.isActive);
         }.bind(this));
 
+        //BTN Save Current Animation
         this.toolbarTop.bind('save-anim', function(event) {
             event.preventDefault();
             this.trigger('save-anim');
 		}.bind(this));
 
+        //BTN Delete Current Animation
         this.toolbarTop.bind('delete-anim', function(event) {
 			this.trigger('delete-anim');
 			event.preventDefault();
 		}.bind(this));
 
+        //DDL Animation Selected
         this.toolbarTop.bind('saved-animations', function(evt, option) {
             this.trigger('load-anim', option);
         }.bind(this));
 
+        //TXT Animation Speed Changed
         this.toolbarTop.bind('animate-fps', function(evt, txt) {
             var newFps = Number(txt);
             
@@ -98,14 +108,22 @@ class AnimatorTools extends MicroEvent {
             }
         }.bind(this));
 
+        //TXT Animation Name Changed
         this.toolbarTop.bind('animate-name', function(evt, txt) {
             this.trigger('set-name', txt);
         }.bind(this));
 
+        //SLD Update Canvas Scale 
         this.toolbarBottom.bind('animate-zoom', function(evt, pct){
-            this.trigger('zoomChange', pct);
+            this.trigger('zoomStart', pct);
         }.bind(this));
 
+        //SLD Canvas Scale Set
+        this.toolbarBottom.bind('animate-zoom-end', function(evt){
+            this.trigger('zoomEnd');
+        }.bind(this));
+
+        //SLD Update Preview Scale
         this.toolbarBottom.bind('animate-preview-zoom', function(evt, pct){
             this.workspace.preview.zoom(pct, 'top right');
         }.bind(this));
@@ -144,7 +162,7 @@ class AnimatorTools extends MicroEvent {
 		}
 	}
 
-    setScale(pct) {
+    updateScale(pct) {
         const slider = document.getElementById('animate-zoom');
         slider.value = pct;
     }

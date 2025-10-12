@@ -18,6 +18,7 @@ class AnimatorWindow extends Window {
         this.grid.rows = this.srcGrid.rows;
         this.grid.cols = this.srcGrid.cols;
         this.grid.cellSize = this.srcGrid.cellSize;
+        this.grid.cellSizeUnscaled = this.srcGrid.cellSizeUnscaled;
 
         this.width = this.src.width;
         this.height = this.src.height;
@@ -37,6 +38,7 @@ class AnimatorWindow extends Window {
         this.grid.rows = this.srcGrid.rows;
         this.grid.cols = this.srcGrid.cols;
         this.grid.cellSize = this.srcGrid.cellSize;
+        this.grid.cellSizeUnscaled = this.srcGrid.cellSizeUnscaled;
 
         this.grid.setDisplayMode(isDark);
     }

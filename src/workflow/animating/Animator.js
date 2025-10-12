@@ -92,9 +92,13 @@ class Animator {
         this.window.reset();
     }
 
-    setScale(pct) {
-        this.tools.setScale(pct);
-        this.workspace.setScale(pct);
+    updateScale(pct) {
+        this.tools.updateScale(pct);
+        this.workspace.updateScale(pct);
+    }
+
+    resize(pct) {
+        this.window.grid.resize(pct);
     }
 
     setDisplayMode(isDark) {
