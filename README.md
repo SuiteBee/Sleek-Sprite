@@ -2,9 +2,9 @@
 
 A simple sprite packer to streamline the process of building an atlas from malformed sprite sheets
 
-Includes animation previews and JSON map support
+Functions like an online image editor that requires no installation. Loaded images are never modified or leave the browser. Prepare your atlas and download the result as an image paired with a JSON map.
 
-Operates locally within the browser and can be used at the pages URL here [Try Sleek-Sprite](https://suitebee.github.io/Sleek-Sprite/)
+Runs exclusively client side and can be viewed at the pages URL here [Try Sleek-Sprite](https://suitebee.github.io/Sleek-Sprite/)
 
 > [!Note]
 > If you find the workflow/functionality useful but need a different export format or options leave a comment in discussions
